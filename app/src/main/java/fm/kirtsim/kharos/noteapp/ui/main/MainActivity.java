@@ -1,4 +1,4 @@
-package fm.kirtsim.kharos.noteapp;
+package fm.kirtsim.kharos.noteapp.ui.main;
 
 import android.support.v7.app.AppCompatActivity;
 
