@@ -3,12 +3,9 @@ package fm.kirtsim.kharos.noteapp.ui.base;
 import android.content.Context;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.RecyclerView;
-import android.text.method.Touch;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-
-import java.lang.ref.WeakReference;
 
 /**
  * Created by kharos on 29/07/2017
@@ -17,20 +14,23 @@ import java.lang.ref.WeakReference;
 public abstract class BaseViewHolder<ListenerType> extends RecyclerView.ViewHolder {
 
     protected ListenerType listener;
-    protected GestureDetectorCompat gestureDetector;
 
     public BaseViewHolder(View itemView) {
         super(itemView);
     }
 
     public void setListener(ListenerType listener) {
+        if (listener == null)
+            throw new IllegalArgumentException("listener passed as a parameter is null");
         this.listener = listener;
-        gestureDetector = new GestureDetectorCompat(getContext(),new TouchListener(this));
+        GestureDetectorCompat gestureDetector = new GestureDetectorCompat(getContext(),
+                new TouchListener(this));
+        itemView.setOnTouchListener(new ViewCustomTouchListener(gestureDetector));
     }
 
     public void removeListener() {
         listener = null;
-        gestureDetector = null;
+        itemView.setOnTouchListener(null);
     }
 
     protected Context getContext() {
@@ -42,10 +42,10 @@ public abstract class BaseViewHolder<ListenerType> extends RecyclerView.ViewHold
 
     private static class TouchListener extends GestureDetector.SimpleOnGestureListener {
 
-        private WeakReference<BaseViewHolder> holder;
+        private BaseViewHolder holder;
 
         public TouchListener(BaseViewHolder holder) {
-            this.holder = new WeakReference<>(holder);
+            this.holder = holder;
         }
 
         @Override
@@ -55,13 +55,27 @@ public abstract class BaseViewHolder<ListenerType> extends RecyclerView.ViewHold
 
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
-            holder.get().onSingleTap(e);
+            holder.onSingleTap(e);
             return true;
         }
 
         @Override
         public void onLongPress(MotionEvent e) {
-            holder.get().onLongTap(e);
+            holder.onLongTap(e);
+        }
+    }
+
+    private static class ViewCustomTouchListener implements View.OnTouchListener {
+        private final GestureDetectorCompat gestureDetector;
+
+
+        public ViewCustomTouchListener(GestureDetectorCompat gestureDetector) {
+            this.gestureDetector = gestureDetector;
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            return gestureDetector.onTouchEvent(event);
         }
     }
 }
