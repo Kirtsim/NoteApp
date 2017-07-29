@@ -1,10 +1,11 @@
 package fm.kirtsim.kharos.noteapp.ui.main;
 
-import android.support.v7.app.AppCompatActivity;
+import fm.kirtsim.kharos.noteapp.ui.base.BaseActivity;
 
 /**
  * Created by kharos on 27/07/2017
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
+
 }
