@@ -3,7 +3,6 @@ package fm.kirtsim.kharos.noteapp.ui.adapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -47,6 +46,8 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListViewHolder> 
     public NotesListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         NotesListItemViewMvc mvcView = new NotesListItemViewMvcImpl(layoutInflater, parent);
         NotesListViewHolder viewHolder = new NotesListViewHolder(mvcView);
+        if (!listeners.isEmpty())
+            viewHolder.setListener(this);
         viewHolders.add(viewHolder);
         return viewHolder;
     }
@@ -71,8 +72,6 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListViewHolder> 
         for (NotesListAdapterListener listener : listeners) {
             listener.onNoteItemSingleClicked(clickedNote);
         }
-        Toast.makeText(layoutInflater.getContext(), "position:" + position, Toast.LENGTH_LONG)
-                .show();
     }
 
     @Override
@@ -81,8 +80,6 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListViewHolder> 
         for (NotesListAdapterListener listener : listeners) {
             listener.onNoteItemLongClicked(clickedNote);
         }
-        Toast.makeText(layoutInflater.getContext(), "position:" + position, Toast.LENGTH_LONG)
-                .show();
     }
 
 
@@ -102,7 +99,7 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListViewHolder> 
         if (listener == null)
             throw new IllegalArgumentException("listener " +
                     NotesListAdapterListener.class.getSimpleName() + " cannot be null");
-        if (listeners.size() == 0)
+        if (listeners.isEmpty())
             startListeningToTouches();
         listeners.add(listener);
     }

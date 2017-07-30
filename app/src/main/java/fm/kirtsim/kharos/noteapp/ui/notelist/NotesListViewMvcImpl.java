@@ -12,7 +12,8 @@ import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
  * Created by kharos on 29/07/2017
  */
 
-public class NotesListViewMvcImpl extends BaseViewMvc implements NotesListViewMvc {
+public class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvcListener>
+        implements NotesListViewMvc {
 
     private RecyclerView notesList;
 
@@ -35,5 +36,9 @@ public class NotesListViewMvcImpl extends BaseViewMvc implements NotesListViewMv
         // coming soon
     }
 
+
+    public RecyclerView.Adapter getRecyclerViewAdapter() {
+        return notesList.getAdapter();
+    }
 
 }

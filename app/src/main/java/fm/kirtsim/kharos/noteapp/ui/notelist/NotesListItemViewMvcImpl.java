@@ -42,6 +42,12 @@ public class NotesListItemViewMvcImpl extends BaseViewMvc implements NotesListIt
         textTV.setText(text);
     }
 
+
+    /*
+    These methods are overriden and left empty to avoid registration and unregistration of listeners
+    as there are none at the moment. If a listener is added in the future the two methods will be
+    deleted from this subclass to go back to their original functionality in the superclass.
+     */
     @Override
     public void registerListener(Object listener) {}
 

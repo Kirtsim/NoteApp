@@ -10,9 +10,6 @@ import fm.kirtsim.kharos.noteapp.ui.main.ViewMvc;
 public interface NotesListViewMvc extends ViewMvc
 {
     interface NotesListViewMvcListener {
-        void onNoteSingleClicked(Note note);
-
-        void onNoteLongClicked(Note note);
     }
 
 //    void setRecyclerViewAdapter()
