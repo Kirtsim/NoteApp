@@ -8,4 +8,16 @@ public class Note {
     private String title;
     private String text;
     private long timestamp;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
 }

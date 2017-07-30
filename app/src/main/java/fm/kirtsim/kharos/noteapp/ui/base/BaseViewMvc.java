@@ -2,7 +2,6 @@ package fm.kirtsim.kharos.noteapp.ui.base;
 
 import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.support.annotation.Nullable;
 import android.view.View;
 
 import java.util.HashSet;
@@ -35,16 +34,6 @@ public abstract class BaseViewMvc<ListenerType> implements ViewMvc {
             throw new IllegalArgumentException("attempt to register listener that is null");
         }
         listeners.remove(listener);
-    }
-
-
-    @SuppressWarnings("unchecked")
-    @Nullable
-    protected <T extends View> T findViewById(@IdRes int resId) {
-        if (rootView != null) {
-            return (T) rootView.findViewById(resId);
-        }
-        return null;
     }
 
     /***************************************

@@ -19,17 +19,15 @@ public class NotesListViewMvcImpl extends BaseViewMvc implements NotesListViewMv
     public NotesListViewMvcImpl(LayoutInflater inflater, ViewGroup container,
                                 RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter,
                                 RecyclerView.LayoutManager layoutManager) {
-        setRootView(inflater.inflate(0, container, false));
+        setRootView(inflater.inflate(R.layout.layout_notes_list, container, false));
         initializeRecyclerView(adapter, layoutManager);
     }
 
     private void initializeRecyclerView(RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter,
                                         RecyclerView.LayoutManager layoutManager) {
-        notesList = (RecyclerView) findViewById(R.id.notes_recycler_view);
-        if (notesList != null) {
-            notesList.setAdapter(adapter);
-            notesList.setLayoutManager(layoutManager);
-        }
+        notesList = (RecyclerView) rootView.findViewById(R.id.notes_recycler_view);
+        notesList.setAdapter(adapter);
+        notesList.setLayoutManager(layoutManager);
     }
 
     @Override

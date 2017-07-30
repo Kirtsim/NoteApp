@@ -7,16 +7,22 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import fm.kirtsim.kharos.noteapp.dataholder.Note;
+import fm.kirtsim.kharos.noteapp.ui.main.ViewMvc;
+
 /**
  * Created by kharos on 29/07/2017
  */
 
-public abstract class BaseViewHolder<ListenerType> extends RecyclerView.ViewHolder {
+public abstract class BaseViewHolder<ListenerType, MvcView extends ViewMvc>
+        extends RecyclerView.ViewHolder {
 
     protected ListenerType listener;
+    protected MvcView viewMvc;
 
-    public BaseViewHolder(View itemView) {
-        super(itemView);
+    public BaseViewHolder(MvcView viewMvc) {
+        super(viewMvc.getRootView());
+        this.viewMvc = viewMvc;
     }
 
     public void setListener(ListenerType listener) {
@@ -37,9 +43,14 @@ public abstract class BaseViewHolder<ListenerType> extends RecyclerView.ViewHold
         return itemView.getContext();
     }
 
+    protected abstract void applyDataFromNote(Note note);
     protected abstract void onSingleTap(MotionEvent e);
     protected abstract void onLongTap(MotionEvent e);
 
+
+    /**************************************
+     *          TOUCH LISTENER
+     **************************************/
     private static class TouchListener extends GestureDetector.SimpleOnGestureListener {
 
         private BaseViewHolder holder;
@@ -65,6 +76,10 @@ public abstract class BaseViewHolder<ListenerType> extends RecyclerView.ViewHold
         }
     }
 
+
+    /**************************************
+     *          CUSTOM TOUCH LISTENER
+     **************************************/
     private static class ViewCustomTouchListener implements View.OnTouchListener {
         private final GestureDetectorCompat gestureDetector;
 

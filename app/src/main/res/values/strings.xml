@@ -5,4 +5,5 @@
     <string name="dummy_long_text">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.</string>
     <string name="dummy_date">18/07/2017 15:40</string>
     <string name="last_edited">Last edited:</string>
+    <string name="dummy_title">Title</string>
 </resources>
