@@ -13,7 +13,7 @@ import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListItemViewMvc;
 public class NotesListViewHolder extends
         BaseViewHolder<NotesListViewHolder.NotesListViewHolderListener, NotesListItemViewMvc> {
 
-    interface NotesListViewHolderListener {
+    public interface NotesListViewHolderListener {
         void onNoteSingleClicked(int position);
         void onNoteLongClicked(int position);
     }
@@ -23,7 +23,7 @@ public class NotesListViewHolder extends
     }
 
     @Override
-    protected void applyDataFromNote(Note note) {
+    public void applyDataFromNote(Note note) {
         viewMvc.setText(note.getText());
         viewMvc.setTitle(note.getTitle());
     }
