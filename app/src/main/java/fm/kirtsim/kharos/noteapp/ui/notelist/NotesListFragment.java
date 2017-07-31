@@ -15,6 +15,7 @@ import java.util.List;
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
+import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailFragment;
 
 /**
  * Created by kharos on 29/07/2017
@@ -44,13 +45,15 @@ public class NotesListFragment extends BaseFragment implements
         for (int i = 1; i <= COUNT; ++i) {
             notes.add(new Note("Title " + i, "Text text text text text " + i, i));
         }
-        Log.d(this.getClass().getSimpleName(), "count: " + notes.size());
         return notes;
     }
 
     @Override
     public void onNoteItemSingleClicked(Note note) {
-        Toast.makeText(getContext(), "short: " + note.getTitle(), Toast.LENGTH_LONG).show();
+        Bundle arguments = new Bundle(2);
+        arguments.putString(NoteDetailFragment.ARG_NOTE_TITLE, note.getTitle());
+        arguments.putString(NoteDetailFragment.ARG_NOTE_TEXT, note.getText());
+        startNewFragment(NoteDetailFragment.class, arguments, true);
     }
 
     @Override

@@ -44,7 +44,7 @@ public class NotesListItemViewMvcImpl extends BaseViewMvc implements NotesListIt
 
 
     /*
-    These methods are overriden and left empty to avoid registration and unregistration of listeners
+    These methods are overridden and left empty to avoid registration and unregistration of listeners
     as there are none at the moment. If a listener is added in the future the two methods will be
     deleted from this subclass to go back to their original functionality in the superclass.
      */

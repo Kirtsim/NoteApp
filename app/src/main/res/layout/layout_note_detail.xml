@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="@dimen/layout_left_right_padding"
+    android:paddingEnd="@dimen/layout_left_right_padding"
+    android:paddingTop="@dimen/layout_top_bottom_padding"
+    android:paddingBottom="@dimen/layout_top_bottom_padding">
+
+    <EditText
+        android:id="@+id/detail_note_title"
+        android:text="@string/dummy_title"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:background="@android:color/transparent"
+        android:fontFamily="monospace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <FrameLayout
+        android:id="@+id/detail_note_delimiter"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/colorPrimaryDark" />
+
+    <EditText
+        android:id="@+id/detail_note_text"
+        android:text="@string/dummy_long_text"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:background="@android:color/transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>
