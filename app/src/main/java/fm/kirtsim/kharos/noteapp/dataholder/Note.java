@@ -9,6 +9,12 @@ public class Note {
     private String text;
     private long timestamp;
 
+    public Note(String title, String text, long timestamp) {
+        this.title = title;
+        this.text = text;
+        this.timestamp = timestamp;
+    }
+
     public String getTitle() {
         return title;
     }

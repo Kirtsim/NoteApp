@@ -3,11 +3,14 @@ package fm.kirtsim.kharos.noteapp.ui.notelist;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
@@ -31,7 +34,18 @@ public class NotesListFragment extends BaseFragment implements
         mvcView = new NotesListViewMvcImpl(inflater, container,
                 adapter, new LinearLayoutManager(inflater.getContext()));
         adapter.registerListener(this);
+        adapter.addNotes(getDummyNotes());
         return mvcView.getRootView();
+    }
+
+    private List<Note> getDummyNotes() {
+        final int COUNT = 20;
+        List<Note> notes = new ArrayList<>(COUNT);
+        for (int i = 1; i <= COUNT; ++i) {
+            notes.add(new Note("Title " + i, "Text text text text text " + i, i));
+        }
+        Log.d(this.getClass().getSimpleName(), "count: " + notes.size());
+        return notes;
     }
 
     @Override
