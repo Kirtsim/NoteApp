@@ -5,6 +5,8 @@ import android.content.Context;
 
 import dagger.Module;
 import dagger.Provides;
+import fm.kirtsim.kharos.noteapp.db.NoteDbHelper;
+import fm.kirtsim.kharos.noteapp.manager.NotesManager;
 
 /**
  * Created by kharos on 27/07/2017
@@ -22,5 +24,10 @@ public class ControllerModule {
     @Provides
     public Context getContext() {
         return activity;
+    }
+
+    @Provides
+    public NotesManager notesManager(NoteDbHelper noteDbHelper) {
+        return new NotesManager(noteDbHelper);
     }
 }

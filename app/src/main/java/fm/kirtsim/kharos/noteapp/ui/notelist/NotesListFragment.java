@@ -12,7 +12,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
+import fm.kirtsim.kharos.noteapp.manager.NotesManager;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
 import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailFragment;
@@ -23,9 +26,18 @@ import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailFragment;
 
 public class NotesListFragment extends BaseFragment implements
         NotesListAdapter.NotesListAdapterListener,
-        NotesListViewMvc.NotesListViewMvcListener {
+        NotesListViewMvc.NotesListViewMvcListener,
+        NotesManager.NotesManagerListener {
 
     private NotesListViewMvc mvcView;
+    @Inject NotesManager notesManager;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        getControllerComponent().inject(this);
+        super.onCreate(savedInstanceState);
+        notesManager.registerListener(this);
+    }
 
     @Nullable
     @Override
@@ -35,17 +47,13 @@ public class NotesListFragment extends BaseFragment implements
         mvcView = new NotesListViewMvcImpl(inflater, container,
                 adapter, new LinearLayoutManager(inflater.getContext()));
         adapter.registerListener(this);
-        adapter.addNotes(getDummyNotes());
         return mvcView.getRootView();
     }
 
-    private List<Note> getDummyNotes() {
-        final int COUNT = 20;
-        List<Note> notes = new ArrayList<>(COUNT);
-        for (int i = 1; i <= COUNT; ++i) {
-            notes.add(new Note("Title " + i, "Text text text text text " + i, i));
-        }
-        return notes;
+    @Override
+    public void onStart() {
+        super.onStart();
+        notesManager.fetchNotes();
     }
 
     @Override
@@ -59,5 +67,11 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onNoteItemLongClicked(Note note) {
         Toast.makeText(getContext(), "long: " + note.getTitle(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onNotesFetched(List<Note> notes) {
+        final NotesListAdapter adapter = (NotesListAdapter) mvcView.getRecyclerViewAdapter();
+        adapter.setNewNotesList(notes);
     }
 }
