@@ -5,14 +5,28 @@ package fm.kirtsim.kharos.noteapp.dataholder;
  */
 
 public class Note {
+    private int id;
     private String title;
     private String text;
     private long timestamp;
 
-    public Note(String title, String text, long timestamp) {
+    public Note(int id, String title, String text, long timestamp) {
+        this.id = id;
         this.title = title;
         this.text = text;
         this.timestamp = timestamp;
+    }
+
+    public Note(String title, String text, long timestamp) {
+        this(0, title, text, timestamp);
+    }
+
+    public Note(Note other) {
+        this(other.getId(), other.getTitle(), other.getText(), other.getTimestamp());
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getTitle() {

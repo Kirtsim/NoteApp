@@ -17,6 +17,8 @@ public class NotesManager {
 
     public interface NotesManagerListener {
         void onNotesFetched(List<Note> notes);
+        void onNewNoteAdded(Note note);
+        void onNoteDeleted(Note note);
     }
 
     private final NoteDbHelper notesDatabase;
@@ -25,23 +27,44 @@ public class NotesManager {
     public NotesManager(NoteDbHelper notesDbHelper) {
         listeners = Collections.newSetFromMap(new ConcurrentHashMap<>(1));
         notesDatabase = notesDbHelper;
+//        populateDatabase();
+    }
+
+    public void addNewNote(Note note) {
+        // TODO: perform on the background thread;
+        if (note != null && notesDatabase.insertNote(note) != -1) {
+            final Note inserted = notesDatabase.selectNote(note);
+            if (inserted != null) {
+                listeners.forEach(listener ->  listener.onNewNoteAdded(inserted));
+            }
+        }
     }
 
     public void fetchNotes() {
-        // TODO: fetch notes from the background thread and update listeners
-        List<Note> notes = getDummyNotes();
+        // TODO: perform on the background thread;
+        List<Note> notes = notesDatabase.selectAllNotes();
         for (NotesManagerListener listener : listeners) {
             listener.onNotesFetched(notes);
         }
     }
 
-    private List<Note> getDummyNotes() {
+    public void removeNote(Note note) {
+        // TODO: perform on the background thread;
+        if (note != null) {
+            if (notesDatabase.deleteNote(note.getId()) != 0) {
+                final Note noteCopy = new Note(note);
+                listeners.forEach(listener -> listener.onNoteDeleted(noteCopy));
+            }
+        }
+    }
+
+    private void populateDatabase() {
         final int COUNT = 20;
         List<Note> notes = new ArrayList<>(COUNT);
         for (int i = 1; i <= COUNT; ++i) {
             notes.add(new Note("Title " + i, "Text text text text text " + i, i));
         }
-        return notes;
+        notes.forEach(notesDatabase::insertNote);
     }
 
     public void registerListener(NotesManagerListener listener) {
