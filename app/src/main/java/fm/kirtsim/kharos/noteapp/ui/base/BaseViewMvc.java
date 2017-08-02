@@ -13,7 +13,7 @@ import fm.kirtsim.kharos.noteapp.ui.main.ViewMvc;
  * Created by kharos on 29/07/2017
  */
 
-public abstract class BaseViewMvc<ListenerType> implements ViewMvc {
+public abstract class BaseViewMvc<ListenerType> implements ObservableViewMvc<ListenerType> {
 
     protected View rootView;
     protected final Set<ListenerType> listeners = new HashSet<>(1);
@@ -22,6 +22,7 @@ public abstract class BaseViewMvc<ListenerType> implements ViewMvc {
         this.rootView = view;
     }
 
+    @Override
     public void registerListener(ListenerType listener) {
         if (listener == null) {
             throw new IllegalArgumentException("attempt to register listener that is null");
@@ -29,6 +30,7 @@ public abstract class BaseViewMvc<ListenerType> implements ViewMvc {
         listeners.add(listener);
     }
 
+    @Override
     public void unregisterListener(ListenerType listener) {
         if (listener == null) {
             throw new IllegalArgumentException("attempt to register listener that is null");

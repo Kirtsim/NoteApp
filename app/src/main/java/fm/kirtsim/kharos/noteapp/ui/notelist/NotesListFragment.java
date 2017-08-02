@@ -1,6 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.manager.NotesManager;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
@@ -30,12 +32,14 @@ public class NotesListFragment extends BaseFragment implements
         NotesManager.NotesManagerListener {
 
     private NotesListViewMvc mvcView;
+    @Inject NotesListAdapter notesListAdapter;
     @Inject NotesManager notesManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         getControllerComponent().inject(this);
         super.onCreate(savedInstanceState);
+        notesListAdapter.registerListener(this);
         notesManager.registerListener(this);
     }
 
@@ -43,10 +47,9 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        final NotesListAdapter adapter = new NotesListAdapter(inflater);
         mvcView = new NotesListViewMvcImpl(inflater, container,
-                adapter, new LinearLayoutManager(inflater.getContext()));
-        adapter.registerListener(this);
+                notesListAdapter, new LinearLayoutManager(inflater.getContext()));
+        mvcView.registerListener(this);
         return mvcView.getRootView();
     }
 
@@ -54,6 +57,17 @@ public class NotesListFragment extends BaseFragment implements
     public void onStart() {
         super.onStart();
         notesManager.fetchNotes();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        notesListAdapter = null;
+        notesManager.removeListener(this);
+        notesManager = null;
+
+        mvcView.unregisterListener(this);
+        mvcView = null;
     }
 
     @Override
@@ -70,8 +84,30 @@ public class NotesListFragment extends BaseFragment implements
     }
 
     @Override
-    public void onNotesFetched(List<Note> notes) {
-        final NotesListAdapter adapter = (NotesListAdapter) mvcView.getRecyclerViewAdapter();
-        adapter.setNewNotesList(notes);
+    public void onNotesFetched(@NonNull List<Note> notes) {
+        notesListAdapter.setNewNotesList(notes);
+    }
+
+    @Override public void onNewNoteAdded(@NonNull Note note) {}
+
+    @Override public void onNoteUpdated(@NonNull Note note) {}
+
+    @Override
+    public void onNoteDeleted(@NonNull Note note) {
+        if (notesListAdapter.deleteNote(note, true)) {
+            Toast.makeText(getContext(), R.string.note_deleted_message, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onMultipleNotesDeleted(@NonNull List<Note> notes) {
+        if (notesListAdapter.deleteNotes(notes)) {
+            Toast.makeText(getContext(), "Notes deleted", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onNewNoteRequested() {
+        startNewFragment(NoteDetailFragment.class, null, true);
     }
 }

@@ -40,4 +40,17 @@ public class Note {
     public long getTimestamp() {
         return timestamp;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj instanceof Note) {
+            final Note note = (Note) obj;
+            return note.getId() == id &&
+                    note.getText().equals(text) &&
+                    note.getTitle().equals(title) &&
+                    note.getTimestamp() == timestamp;
+        }
+        return false;
+    }
 }

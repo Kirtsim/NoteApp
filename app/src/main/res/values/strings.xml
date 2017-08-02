@@ -6,4 +6,9 @@
     <string name="dummy_date">18/07/2017 15:40</string>
     <string name="last_edited">Last edited:</string>
     <string name="dummy_title">Title</string>
+    <string name="note_saved_message">Note saved</string>
+    <string name="note_deleted_message">Note deleted</string>
+
+    <string name="default_title">Title</string>
+    <string name="default_text">text …</string>
 </resources>

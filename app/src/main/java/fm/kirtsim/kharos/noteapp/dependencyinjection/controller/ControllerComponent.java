@@ -1,6 +1,7 @@
 package fm.kirtsim.kharos.noteapp.dependencyinjection.controller;
 
 import dagger.Subcomponent;
+import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailFragment;
 import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListFragment;
 
 /**
@@ -11,4 +12,6 @@ import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListFragment;
 public interface ControllerComponent {
 
     public void inject(NotesListFragment notesListFragment);
+
+    public void inject(NoteDetailFragment noteDetailFragment);
 }

@@ -1,5 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.adapter;
 
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -90,9 +91,42 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListViewHolder> 
         addNotes(newNotes);
     }
 
-    public void addNotes(List<Note> newNotes) {
-        notes.addAll(newNotes);
-        notifyDataSetChanged();
+    public boolean addNotes(List<Note> newNotes) {
+        boolean listChanged = false;
+        if (newNotes != null && !newNotes.isEmpty()) {
+            listChanged = notes.addAll(newNotes);
+            notifyDataSetChanged();
+        }
+        return listChanged;
+    }
+
+    public boolean changeNoteAt(int index, Note note) {
+        boolean changed = false;
+        if (note != null && index > -1 && index < notes.size()) {
+            notes.set(index, note);
+            notifyItemChanged(index);
+            changed = true;
+        }
+        return changed;
+    }
+
+    public boolean deleteNote(Note note, boolean updateUi) {
+        boolean removed = false;
+        if (note != null) {
+            removed = notes.remove(note);
+            if (updateUi)
+                notifyDataSetChanged();
+        }
+        return removed;
+    }
+
+    public boolean deleteNotes(List<Note> notes) {
+        boolean removed = false;
+        if (notes != null && !notes.isEmpty()) {
+            removed = notes.removeAll(notes);
+            notifyDataSetChanged();
+        }
+        return removed;
     }
 
     public void registerListener(NotesListAdapterListener listener) {

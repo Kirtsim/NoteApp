@@ -1,5 +1,7 @@
 package fm.kirtsim.kharos.noteapp.manager;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,9 +18,11 @@ import fm.kirtsim.kharos.noteapp.db.NoteDbHelper;
 public class NotesManager {
 
     public interface NotesManagerListener {
-        void onNotesFetched(List<Note> notes);
-        void onNewNoteAdded(Note note);
-        void onNoteDeleted(Note note);
+        void onNotesFetched(@NonNull List<Note> notes);
+        void onNewNoteAdded(@NonNull Note note);
+        void onNoteUpdated(@NonNull Note note);
+        void onNoteDeleted(@NonNull Note note);
+        void onMultipleNotesDeleted(@NonNull List<Note> notes);
     }
 
     private final NoteDbHelper notesDatabase;
@@ -48,6 +52,15 @@ public class NotesManager {
         }
     }
 
+    public void updateNote(Note note) {
+        if (note != null) {
+            if (notesDatabase.updateNote(note) != 0) {
+                final Note noteCopy = new Note(note);
+                listeners.forEach(listener -> listener.onNoteUpdated(noteCopy));
+            }
+        }
+    }
+
     public void removeNote(Note note) {
         // TODO: perform on the background thread;
         if (note != null) {
@@ -55,6 +68,16 @@ public class NotesManager {
                 final Note noteCopy = new Note(note);
                 listeners.forEach(listener -> listener.onNoteDeleted(noteCopy));
             }
+        }
+    }
+
+    public void removeNotes(List<Note> notes) {
+        // TODO: perform on the background thread;
+        if (notes != null && !notes.isEmpty()) {
+            final List<Integer> ids = new ArrayList<>(notes.size());
+            notes.forEach(note -> ids.add(note.getId()));
+            notesDatabase.deleteNotes(ids);
+            listeners.forEach(listener -> listener.onMultipleNotesDeleted(notes));
         }
     }
 
