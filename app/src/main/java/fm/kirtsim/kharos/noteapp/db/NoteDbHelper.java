@@ -200,6 +200,6 @@ public class NoteDbHelper extends SQLiteOpenHelper {
             NoteEntry.ATT_MODIFY_DATE
     };
 
-    private static final String SELECTION_ALL_EXCEPT_ID = NoteEntry.ATT_TITLE + " = ?, " +
-            NoteEntry.ATT_TEXT + " = ?, " + NoteEntry.ATT_MODIFY_DATE + " = ?";
+    private static final String SELECTION_ALL_EXCEPT_ID = NoteEntry.ATT_TITLE + " = ? AND " +
+            NoteEntry.ATT_TEXT + " = ? AND " + NoteEntry.ATT_MODIFY_DATE + " = ?";
 }

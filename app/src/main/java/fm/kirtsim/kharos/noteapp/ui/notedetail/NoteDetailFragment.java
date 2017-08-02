@@ -1,19 +1,17 @@
 package fm.kirtsim.kharos.noteapp.ui.notedetail;
 
-import android.app.Service;
-import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.content.res.ResourcesCompat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import java.util.List;
@@ -39,7 +37,6 @@ public class NoteDetailFragment extends BaseFragment implements
     public static final String ARG_NOTE_TEXT = "DETAIL_NOTE_TEXT";
     public static final String ARG_NOTE_TIME = "DETAIL_NOTE_TIMESTAMP";
 
-    private InputMethodManager inputMethodManager;
     private NoteDetailViewMvc viewMvc;
     @Inject NotesManager notesManager;
 
@@ -55,8 +52,7 @@ public class NoteDetailFragment extends BaseFragment implements
         getControllerComponent().inject(this);
         super.onCreate(savedInstanceState);
         notesManager.registerListener(this);
-        inputMethodManager = (InputMethodManager) getActivity()
-                .getSystemService(Service.INPUT_METHOD_SERVICE);
+        setHasOptionsMenu(true);
         initNoteDetailsFromArguments(getArguments());
     }
 
@@ -74,6 +70,22 @@ public class NoteDetailFragment extends BaseFragment implements
         viewMvc = new NoteDetailViewMvcImpl(inflater, container);
         viewMvc.registerListener(this);
         return viewMvc.getRootView();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_save_delete, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save: onSaveNoteMenuItemClicked(); break;
+            case R.id.delete: onDeletenoteMenuItemClicked(); break;
+            default: return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 
     @Override
@@ -103,6 +115,20 @@ public class NoteDetailFragment extends BaseFragment implements
             viewMvc.setTitleColor(color);
             viewMvc.setTextColor(color);
         }
+    }
+
+    private void onSaveNoteMenuItemClicked() {
+        timestamp = System.currentTimeMillis();
+        Note note = new Note(noteId, viewMvc.getTitle(), viewMvc.getText(), timestamp);
+        if (noteId == -1) {
+            notesManager.addNewNote(note);
+        } else {
+            notesManager.updateNote(note);
+        }
+    }
+
+    private void onDeletenoteMenuItemClicked() {
+
     }
 
 
