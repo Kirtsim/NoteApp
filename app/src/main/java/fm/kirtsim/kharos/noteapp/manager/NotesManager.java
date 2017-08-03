@@ -81,15 +81,6 @@ public class NotesManager {
         }
     }
 
-    private void populateDatabase() {
-        final int COUNT = 20;
-        List<Note> notes = new ArrayList<>(COUNT);
-        for (int i = 1; i <= COUNT; ++i) {
-            notes.add(new Note("Title " + i, "Text text text text text " + i, i));
-        }
-        notes.forEach(notesDatabase::insertNote);
-    }
-
     public void registerListener(NotesManagerListener listener) {
         if (listener == null)
             throw new IllegalArgumentException("listener cannot be null");

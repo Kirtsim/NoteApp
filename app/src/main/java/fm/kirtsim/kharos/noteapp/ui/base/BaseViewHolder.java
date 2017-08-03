@@ -53,9 +53,9 @@ public abstract class BaseViewHolder<ListenerType, MvcView extends ViewMvc>
      **************************************/
     private static class TouchListener extends GestureDetector.SimpleOnGestureListener {
 
-        private BaseViewHolder holder;
+        private BaseViewHolder<?,?> holder;
 
-        public TouchListener(BaseViewHolder holder) {
+        public TouchListener(BaseViewHolder<?,?> holder) {
             this.holder = holder;
         }
 

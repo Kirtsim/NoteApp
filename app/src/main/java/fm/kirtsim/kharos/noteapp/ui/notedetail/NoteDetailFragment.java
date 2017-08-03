@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.content.res.ResourcesCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -82,7 +83,7 @@ public class NoteDetailFragment extends BaseFragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.save: onSaveNoteMenuItemClicked(); break;
-            case R.id.delete: onDeletenoteMenuItemClicked(); break;
+            case R.id.delete: onDeleteNoteMenuItemClicked(); break;
             default: return super.onOptionsItemSelected(item);
         }
         return true;
@@ -92,6 +93,11 @@ public class NoteDetailFragment extends BaseFragment implements
     public void onResume() {
         super.onResume();
         displayNoteDetailsFromArguments(getArguments());
+    }
+
+    @Override
+    protected String getClassName() {
+        return this.getClass().getSimpleName();
     }
 
     @Override
@@ -127,8 +133,12 @@ public class NoteDetailFragment extends BaseFragment implements
         }
     }
 
-    private void onDeletenoteMenuItemClicked() {
-
+    private void onDeleteNoteMenuItemClicked() {
+        if (noteId != -1) {
+            Note note = new Note(noteId, viewMvc.getTitle(), viewMvc.getText(), timestamp);
+            notesManager.removeNote(note);
+        } else
+            Log.d(this.getClass().getSimpleName(), "noteId is -1");
     }
 
 
@@ -157,10 +167,11 @@ public class NoteDetailFragment extends BaseFragment implements
     @Override
     public void onNoteDeleted(@NonNull Note note) {
         if (note.getId() == noteId) {
-            startNewFragment(NotesListFragment.class, null, false);
             displayToast(R.string.note_deleted_message);
+            popFromBackStack(NotesListFragment.class.getSimpleName());
         }
     }
+
 
 
     /* ****************************************************

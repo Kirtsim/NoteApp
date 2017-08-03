@@ -1,13 +1,10 @@
 package fm.kirtsim.kharos.noteapp.ui.base;
 
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.view.View;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import fm.kirtsim.kharos.noteapp.ui.main.ViewMvc;
 
 /**
  * Created by kharos on 29/07/2017

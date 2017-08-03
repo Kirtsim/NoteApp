@@ -1,11 +1,8 @@
 package fm.kirtsim.kharos.noteapp.ui.main;
 
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;

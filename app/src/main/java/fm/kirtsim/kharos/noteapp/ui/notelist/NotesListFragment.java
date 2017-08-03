@@ -4,13 +4,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -70,11 +68,29 @@ public class NotesListFragment extends BaseFragment implements
         mvcView = null;
     }
 
+    /* ************************************************************************
+     *                          BaseFragment methods
+     * ************************************************************************/
+
+    @Override
+    protected String getClassName() {
+        return this.getClass().getSimpleName();
+    }
+
+    // ###################### BaseFragment ########################
+
+
+    /* ************************************************************************
+     *                NoteListAdapterListener methods
+     * ************************************************************************/
+
     @Override
     public void onNoteItemSingleClicked(Note note) {
-        Bundle arguments = new Bundle(2);
+        Bundle arguments = new Bundle(4);
+        arguments.putInt(NoteDetailFragment.ARG_NOTE_ID, note.getId());
         arguments.putString(NoteDetailFragment.ARG_NOTE_TITLE, note.getTitle());
         arguments.putString(NoteDetailFragment.ARG_NOTE_TEXT, note.getText());
+        arguments.putLong(NoteDetailFragment.ARG_NOTE_TIME, note.getTimestamp());
         startNewFragment(NoteDetailFragment.class, arguments, true);
     }
 
@@ -82,6 +98,12 @@ public class NotesListFragment extends BaseFragment implements
     public void onNoteItemLongClicked(Note note) {
         Toast.makeText(getContext(), "long: " + note.getTitle(), Toast.LENGTH_LONG).show();
     }
+    // ###################### NoteListAdapterListener ########################
+
+
+    /* ************************************************************************
+     *                 NotesManagerListener methods
+     * ************************************************************************/
 
     @Override
     public void onNotesFetched(@NonNull List<Note> notes) {
@@ -105,6 +127,12 @@ public class NotesListFragment extends BaseFragment implements
             Toast.makeText(getContext(), "Notes deleted", Toast.LENGTH_LONG).show();
         }
     }
+    // ###################### NotesManagerListener ########################
+
+
+    /* ************************************************************************
+     *                 NotesListViewMvcListener methods
+     * ************************************************************************/
 
     @Override
     public void onNewNoteRequested() {

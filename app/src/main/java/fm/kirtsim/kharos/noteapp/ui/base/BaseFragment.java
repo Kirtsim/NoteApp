@@ -17,7 +17,8 @@ public abstract class BaseFragment extends Fragment {
 
     public interface BaseFragmentListener {
         void requestFragmentChange(Class<? extends BaseFragment> class_, Bundle arguments,
-                                   boolean addToBackStack);
+                                   boolean addToBackStack, String backStackStateName);
+        void popBackStack(String callingFragmentName);
     }
 
     private boolean isControllerComponentUsed = false;
@@ -31,9 +32,16 @@ public abstract class BaseFragment extends Fragment {
                 .newControllerComponent(new ControllerModule(getActivity()), new ViewMvcModule());
     }
 
+    protected abstract String getClassName();
+
     protected void startNewFragment(Class<? extends BaseFragment> class_, Bundle arguments,
                                     boolean addToBackStack) {
-        baseFragmentListener.requestFragmentChange(class_, arguments, addToBackStack);
+        baseFragmentListener.requestFragmentChange(class_, arguments,
+                addToBackStack, getClassName());
+    }
+
+    protected void popFromBackStack(String backStackStateName) {
+        baseFragmentListener.popBackStack(backStackStateName);
     }
 
     @Override

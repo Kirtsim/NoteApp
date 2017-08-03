@@ -7,10 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
-
 import fm.kirtsim.kharos.noteapp.R;
-import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
 
 /**
@@ -53,7 +50,7 @@ public class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesList
     }
 
     @Override
-    public RecyclerView.Adapter getRecyclerViewAdapter() {
+    public RecyclerView.Adapter<?> getRecyclerViewAdapter() {
         return notesList.getAdapter();
     }
 }
