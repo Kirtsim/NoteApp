@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.content.res.ResourcesCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -137,8 +136,10 @@ public class NoteDetailFragment extends BaseFragment implements
         if (noteId != -1) {
             Note note = new Note(noteId, viewMvc.getTitle(), viewMvc.getText(), timestamp);
             notesManager.removeNote(note);
-        } else
-            Log.d(this.getClass().getSimpleName(), "noteId is -1");
+        } else {
+            displayToast(R.string.note_discarded_message);
+            popFromBackStack(NotesListFragment.class.getSimpleName());
+        }
     }
 
 

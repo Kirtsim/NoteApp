@@ -31,7 +31,6 @@ public class NotesManager {
     public NotesManager(NoteDbHelper notesDbHelper) {
         listeners = Collections.newSetFromMap(new ConcurrentHashMap<>(1));
         notesDatabase = notesDbHelper;
-//        populateDatabase();
     }
 
     public void addNewNote(Note note) {
@@ -91,5 +90,8 @@ public class NotesManager {
         if (listener == null)
             throw new IllegalArgumentException("listener cannot be null");
         listeners.remove(listener);
+        if (listeners.isEmpty()) {
+            notesDatabase.close();
+        }
     }
 }

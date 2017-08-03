@@ -3,6 +3,8 @@ package fm.kirtsim.kharos.noteapp.dependencyinjection.controller;
 import android.app.Activity;
 import android.content.Context;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 import fm.kirtsim.kharos.noteapp.db.NoteDbHelper;
@@ -32,6 +34,7 @@ public class ControllerModule {
         return new NotesListAdapter(activity.getLayoutInflater());
     }
 
+    @Singleton
     @Provides
     public NotesManager notesManager(NoteDbHelper noteDbHelper) {
         return new NotesManager(noteDbHelper);
