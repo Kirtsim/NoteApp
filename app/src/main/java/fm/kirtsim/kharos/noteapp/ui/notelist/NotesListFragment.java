@@ -5,6 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -37,6 +40,7 @@ public class NotesListFragment extends BaseFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         getControllerComponent().inject(this);
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         notesListAdapter.registerListener(this);
         notesManager.registerListener(this);
     }
@@ -66,6 +70,29 @@ public class NotesListFragment extends BaseFragment implements
 
         mvcView.unregisterListener(this);
         mvcView = null;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_save_delete, menu);
+        MenuItem item = menu.findItem(R.id.save);
+        if (item != null) {
+            item.setEnabled(false);
+            item.setVisible(false);
+        }
+        item = menu.findItem(R.id.delete);
+        if (item != null) {
+            item.setVisible(false);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /* ************************************************************************
