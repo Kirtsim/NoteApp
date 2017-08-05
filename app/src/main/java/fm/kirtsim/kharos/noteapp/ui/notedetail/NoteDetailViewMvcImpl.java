@@ -18,6 +18,7 @@ public class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDet
 
     private EditText titleET;
     private EditText textET;
+    @SuppressWarnings("unused")
     private FrameLayout delimiterFL;
 
     public NoteDetailViewMvcImpl(LayoutInflater inflater, ViewGroup container) {

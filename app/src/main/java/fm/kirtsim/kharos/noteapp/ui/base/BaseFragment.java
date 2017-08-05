@@ -29,7 +29,8 @@ public abstract class BaseFragment extends Fragment {
             throw new IllegalStateException("controller component can be used only once at a time");
         isControllerComponentUsed = true;
         return ((NoteApplication) getActivity().getApplication()).getApplicationComponent()
-                .newControllerComponent(new ControllerModule(getActivity()), new ViewMvcModule());
+                .newControllerComponent(
+                        new ControllerModule((BaseActivity) getActivity()), new ViewMvcModule());
     }
 
     protected abstract String getClassName();

@@ -1,8 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.base;
 
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 
 import fm.kirtsim.kharos.noteapp.ui.main.MenuViewMvc;
 

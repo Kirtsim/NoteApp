@@ -43,7 +43,10 @@ public abstract class BaseViewHolder<ListenerType, MvcView extends ViewMvc>
         return itemView.getContext();
     }
 
-    public abstract void applyDataFromNote(Note note);
+    public MvcView getItemViewMvc() {
+        return viewMvc;
+    }
+
     protected abstract void onSingleTap(MotionEvent e);
     protected abstract void onLongTap(MotionEvent e);
 

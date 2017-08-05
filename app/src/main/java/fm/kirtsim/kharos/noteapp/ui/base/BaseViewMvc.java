@@ -50,4 +50,9 @@ public abstract class BaseViewMvc<ListenerType> implements ObservableViewMvc<Lis
         getState(bundle);
         return bundle;
     }
+
+    @Override
+    public void invalidate() {
+        rootView.invalidate();
+    }
 }

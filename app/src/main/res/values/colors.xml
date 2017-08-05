@@ -6,4 +6,7 @@
 
     <color name="default_text_color">#757575</color>
     <color name="user_text_color">#212121</color>
+
+    <color name="note_detail_selected_background">#aae0ff</color>
+    <color name="note_detail_selected_frame">#0537ff</color>
 </resources>

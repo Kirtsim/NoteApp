@@ -14,27 +14,27 @@ public class NotesListViewHolder extends
         BaseViewHolder<NotesListViewHolder.NotesListViewHolderListener, NotesListItemViewMvc> {
 
     public interface NotesListViewHolderListener {
-        void onNoteSingleClicked(int position);
-        void onNoteLongClicked(int position);
+        void onNoteSingleClicked(int position, NotesListItemViewMvc noteItemView);
+        void onNoteLongClicked(int position, NotesListItemViewMvc noteItemView);
     }
+
+    private boolean isHighlighted;
 
     public NotesListViewHolder(NotesListItemViewMvc itemView) {
         super(itemView);
     }
 
-    @Override
-    public void applyDataFromNote(Note note) {
-        viewMvc.setText(note.getText());
-        viewMvc.setTitle(note.getTitle());
+    public boolean isHighlighted() {
+        return isHighlighted;
     }
 
     @Override
     protected void onSingleTap(MotionEvent e) {
-        listener.onNoteSingleClicked(getAdapterPosition());
+        listener.onNoteSingleClicked(getAdapterPosition(), viewMvc);
     }
 
     @Override
     protected void onLongTap(MotionEvent e) {
-        listener.onNoteLongClicked(getAdapterPosition());
+        listener.onNoteLongClicked(getAdapterPosition(), viewMvc);
     }
 }

@@ -14,4 +14,6 @@ public interface ViewMvc {
     void getState(Bundle bundle);
 
     Bundle getState();
+
+    void invalidate();
 }

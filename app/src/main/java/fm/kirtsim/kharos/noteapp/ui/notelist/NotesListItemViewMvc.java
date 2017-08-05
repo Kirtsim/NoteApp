@@ -1,5 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
+import android.support.annotation.ColorInt;
+
 import fm.kirtsim.kharos.noteapp.ui.main.ViewMvc;
 
 /**
@@ -10,4 +12,6 @@ public interface NotesListItemViewMvc extends ViewMvc{
 
     void setTitle(String title);
     void setText(String text);
+    void setBackgroundColors(@ColorInt int outerBackgroundColor,
+                             @ColorInt int innerBackgroundColor);
 }

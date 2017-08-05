@@ -1,15 +1,13 @@
 package fm.kirtsim.kharos.noteapp.dependencyinjection.controller;
 
-import android.app.Activity;
 import android.content.Context;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import fm.kirtsim.kharos.noteapp.db.NoteDbHelper;
-import fm.kirtsim.kharos.noteapp.manager.NotesManager;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
+import fm.kirtsim.kharos.noteapp.ui.base.BaseActivity;
 
 /**
  * Created by kharos on 27/07/2017
@@ -18,9 +16,9 @@ import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 @Module
 public class ControllerModule {
 
-    private final Activity activity;
+    private final BaseActivity activity;
 
-    public ControllerModule(Activity activity) {
+    public ControllerModule(BaseActivity activity) {
         this.activity = activity;
     }
 
@@ -32,11 +30,5 @@ public class ControllerModule {
     @Provides
     public NotesListAdapter notesListAdapter() {
         return new NotesListAdapter(activity.getLayoutInflater());
-    }
-
-    @Singleton
-    @Provides
-    public NotesManager notesManager(NoteDbHelper noteDbHelper) {
-        return new NotesManager(noteDbHelper);
     }
 }

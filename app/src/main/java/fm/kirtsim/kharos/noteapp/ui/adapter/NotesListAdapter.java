@@ -22,8 +22,9 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListViewHolder> 
         NotesListViewHolder.NotesListViewHolderListener {
 
     public interface NotesListAdapterListener {
-        void onNoteItemSingleClicked(Note note);
-        void onNoteItemLongClicked(Note note);
+        void onNoteItemSingleClicked(Note note, NotesListItemViewMvc noteItemView, int listPosition);
+        void onNoteItemLongClicked(Note note, NotesListItemViewMvc noteItemView, int listPosition);
+        void onNoteItemVisible(Note note, NotesListItemViewMvc noteItemView);
     }
 
     private LayoutInflater layoutInflater;
@@ -54,7 +55,9 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListViewHolder> 
 
     @Override
     public void onBindViewHolder(NotesListViewHolder holder, int position) {
-        holder.applyDataFromNote(notes.get(position));
+        final Note note = notes.get(position);
+        final NotesListItemViewMvc listItemView = holder.getItemViewMvc();
+        listeners.forEach(l -> l.onNoteItemVisible(note, listItemView));
     }
 
     @Override
@@ -67,21 +70,28 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListViewHolder> 
      *            NotesListViewHolderListener methods
      * ********************************************************/
     @Override
-    public void onNoteSingleClicked(int position) {
+    public void onNoteSingleClicked(int position, NotesListItemViewMvc noteItemView) {
         final Note clickedNote = notes.get(position);
         for (NotesListAdapterListener listener : listeners) {
-            listener.onNoteItemSingleClicked(clickedNote);
+            listener.onNoteItemSingleClicked(clickedNote, noteItemView, position);
         }
     }
 
     @Override
-    public void onNoteLongClicked(int position) {
+    public void onNoteLongClicked(int position, NotesListItemViewMvc noteItemView) {
         final Note clickedNote = notes.get(position);
         for (NotesListAdapterListener listener : listeners) {
-            listener.onNoteItemLongClicked(clickedNote);
+            listener.onNoteItemLongClicked(clickedNote, noteItemView, position);
         }
     }
 
+    public void updateNoteItemUI(int position) {
+        notifyItemChanged(position);
+    }
+
+    public void updateAllNoteItemsUI() {
+        notifyDataSetChanged();
+    }
 
     // ************** ADAPTER's METHODS ***************************
 

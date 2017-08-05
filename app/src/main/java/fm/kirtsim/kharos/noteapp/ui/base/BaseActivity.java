@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import fm.kirtsim.kharos.noteapp.NoteApplication;
 import fm.kirtsim.kharos.noteapp.R;
@@ -32,8 +31,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     public void requestFragmentChange(Class<? extends BaseFragment> class_, Bundle arguments,
                                       boolean addToBackStack, String backStackStateName) {
-        if (backStackStateName != null)
-            Log.d(getClass().getSimpleName(), backStackStateName);
         BaseFragment fragment = instantiateFragmentFromClass(class_);
         if (fragment != null) {
             fragment.setArguments(arguments);
@@ -47,7 +44,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public void popBackStack(String backStackStateName) {
-        Log.d(getClass().getSimpleName(), backStackStateName);
         getSupportFragmentManager().popBackStack(backStackStateName,
                 FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }

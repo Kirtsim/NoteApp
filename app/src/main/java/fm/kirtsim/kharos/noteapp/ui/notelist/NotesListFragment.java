@@ -1,8 +1,11 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,7 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -35,14 +40,28 @@ public class NotesListFragment extends BaseFragment implements
     private NotesListViewMvc mvcView;
     @Inject NotesListAdapter notesListAdapter;
     @Inject NotesManager notesManager;
+//    @Inject ActionBar actionBar;
+    private NotesListMenuViewMvc menuMvc;
+    private final Set<Integer> highlightedNotes = new HashSet<>(1);
+
+    private int COLOR_HIGHLIGHTED_BACKGROUND;
+    private int COLOR_HIGHLIGHTED_FRAME;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         getControllerComponent().inject(this);
         super.onCreate(savedInstanceState);
+        initializeColors(getResources());
         setHasOptionsMenu(true);
         notesListAdapter.registerListener(this);
         notesManager.registerListener(this);
+    }
+
+    private void initializeColors(Resources resources) {
+        COLOR_HIGHLIGHTED_BACKGROUND = ResourcesCompat.getColor(resources,
+                R.color.note_detail_selected_background, null);
+        COLOR_HIGHLIGHTED_FRAME = ResourcesCompat.getColor(resources,
+                R.color.note_detail_selected_frame, null);
     }
 
     @Nullable
@@ -75,23 +94,12 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_save_delete, menu);
-        MenuItem item = menu.findItem(R.id.save);
-        if (item != null) {
-            item.setEnabled(false);
-            item.setVisible(false);
-        }
-        item = menu.findItem(R.id.delete);
-        if (item != null) {
-            item.setVisible(false);
-        }
+        menuMvc = new NotesListMenuViewMvcImpl(menu, inflater);
+        menuMvc.hideDeleteMenuItem();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -112,7 +120,21 @@ public class NotesListFragment extends BaseFragment implements
      * ************************************************************************/
 
     @Override
-    public void onNoteItemSingleClicked(Note note) {
+    public void onNoteItemSingleClicked(Note note, NotesListItemViewMvc noteItemView,
+                                        int notePosition) {
+        if (!highlightedNotes.isEmpty())
+            onNoteItemLongClicked(note, noteItemView, notePosition);
+        else {
+            displayDetailsOfNote(note);
+        }
+    }
+
+    private void clearAllNoteHighlighting() {
+        highlightedNotes.clear();
+        menuMvc.hideDeleteMenuItem();
+    }
+
+    private void displayDetailsOfNote(Note note) {
         Bundle arguments = new Bundle(4);
         arguments.putInt(NoteDetailFragment.ARG_NOTE_ID, note.getId());
         arguments.putString(NoteDetailFragment.ARG_NOTE_TITLE, note.getTitle());
@@ -122,8 +144,43 @@ public class NotesListFragment extends BaseFragment implements
     }
 
     @Override
-    public void onNoteItemLongClicked(Note note) {
-        Toast.makeText(getContext(), "long: " + note.getTitle(), Toast.LENGTH_LONG).show();
+    public void onNoteItemLongClicked(Note note, NotesListItemViewMvc noteItemView, int notePosition) {
+        final int noteId = note.getId();
+        final boolean isHighlighted = highlightedNotes.contains(noteId);
+        if (isHighlighted) {
+            removeNoteIdFromHighlighted(noteId);
+        } else {
+            addNoteIdToHighlighted(noteId);
+        }
+        setNoteItemBackground(noteItemView, isHighlighted);
+        notesListAdapter.updateNoteItemUI(notePosition);
+    }
+
+    private void addNoteIdToHighlighted(int noteId) {
+        highlightedNotes.add(noteId);
+        if (highlightedNotes.size() == 1)
+            menuMvc.showDeleteMenuItem();
+    }
+
+    private void removeNoteIdFromHighlighted(int noteId) {
+        highlightedNotes.remove(noteId);
+        if (highlightedNotes.isEmpty())
+            menuMvc.hideDeleteMenuItem();
+    }
+
+    @Override
+    public void onNoteItemVisible(Note note, NotesListItemViewMvc noteItemView) {
+        noteItemView.setText(note.getText());
+        noteItemView.setTitle(note.getTitle());
+        setNoteItemBackground(noteItemView, highlightedNotes.contains(note.getId()));
+    }
+
+    private void setNoteItemBackground(NotesListItemViewMvc noteItemView, boolean isHighlighted) {
+        if (isHighlighted) {
+            noteItemView.setBackgroundColors(COLOR_HIGHLIGHTED_FRAME, COLOR_HIGHLIGHTED_BACKGROUND);
+        } else {
+            noteItemView.setBackgroundColors(Color.WHITE, Color.WHITE);
+        }
     }
     // ###################### NoteListAdapterListener ########################
 

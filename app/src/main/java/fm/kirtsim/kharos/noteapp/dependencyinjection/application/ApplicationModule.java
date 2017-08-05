@@ -7,6 +7,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import fm.kirtsim.kharos.noteapp.db.NoteDbHelper;
+import fm.kirtsim.kharos.noteapp.manager.NotesManager;
 
 /**
  * Created by kharos on 27/07/2017
@@ -30,5 +31,11 @@ public class ApplicationModule {
     @Singleton
     public NoteDbHelper noteDbHelper() {
         return new NoteDbHelper(application);
+    }
+
+    @Singleton
+    @Provides
+    public NotesManager notesManager(NoteDbHelper noteDbHelper) {
+        return new NotesManager(noteDbHelper);
     }
 }
