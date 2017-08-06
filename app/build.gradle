@@ -1,7 +1,4 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'com.neenbedankt.android-apt'
-
-//def daggerVersion = '2.10'
 
 android {
     compileSdkVersion 25
@@ -16,6 +13,9 @@ android {
         jackOptions {
             enabled true
         }
+    }
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:2.0.1'
     }
     buildTypes {
         release {
@@ -32,6 +32,7 @@ android {
 ext {
     daggerVersion = '2.10'
     supportLibVersion = "25.3.1"
+    guavaVersion = '22.0'
 }
 
 dependencies {
@@ -54,4 +55,8 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
 
     testCompile 'junit:junit:4.12'
+
+    // Google's Guava
+    compile "com.google.guava:guava:22.0-android"
+
 }
