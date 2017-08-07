@@ -87,6 +87,26 @@ public class RemoveNullObjectsUT {
     }
 
     @Test
+    public void removeSecond() {
+        List<Integer> myList = Lists.newArrayList(1, null, 3, 4, 5, 6, 7, 8, 9, 10);
+        List<Integer> expected = Lists.newArrayList(1, 3, 4, 5, 6, 7, 8, 9, 10);
+
+        ListUtils.removeNullObjects(myList);
+
+        assertArrayEquals("removeMiddle", expected.toArray(), myList.toArray());
+    }
+
+    @Test
+    public void removePenultimate() {
+        List<Integer> myList = Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, null, 10);
+        List<Integer> expected = Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, 10);
+
+        ListUtils.removeNullObjects(myList);
+
+        assertArrayEquals("removeMiddle", expected.toArray(), myList.toArray());
+    }
+
+    @Test
     public void removeConsecutive() {
         List<Integer> myList = Lists.newArrayList(1, 2, null, null, null, 6, 7, 8, 9, 10);
         List<Integer> expected = Lists.newArrayList(1, 2, 6, 7, 8, 9, 10);
