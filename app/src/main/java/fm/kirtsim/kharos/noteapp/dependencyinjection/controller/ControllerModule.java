@@ -2,11 +2,10 @@ package fm.kirtsim.kharos.noteapp.dependencyinjection.controller;
 
 import android.content.Context;
 
-import javax.inject.Singleton;
-
 import dagger.Module;
 import dagger.Provides;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
+import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseActivity;
 
 /**
@@ -29,6 +28,6 @@ public class ControllerModule {
 
     @Provides
     public NotesListAdapter notesListAdapter() {
-        return new NotesListAdapter(activity.getLayoutInflater());
+        return new NotesListAdapterImpl(activity.getLayoutInflater());
     }
 }

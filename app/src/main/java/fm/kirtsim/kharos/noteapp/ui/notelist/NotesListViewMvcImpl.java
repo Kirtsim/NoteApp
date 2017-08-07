@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import fm.kirtsim.kharos.noteapp.R;
+import fm.kirtsim.kharos.noteapp.ui.adapter.BaseListAdapter;
+import fm.kirtsim.kharos.noteapp.ui.adapter.ListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
 
 /**
@@ -20,12 +22,12 @@ public class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesList
     private RecyclerView notesList;
     private FloatingActionButton addNoteButton;
 
-    public NotesListViewMvcImpl(LayoutInflater inflater, ViewGroup container,
-                                RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter,
+    public NotesListViewMvcImpl(LayoutInflater inflater, ViewGroup container, ListAdapter adapter,
                                 RecyclerView.LayoutManager layoutManager) {
         setRootView(inflater.inflate(R.layout.layout_notes_list, container, false));
         initializeViews();
-        initializeRecyclerView(adapter, layoutManager);
+        initializeRecyclerView((RecyclerView.Adapter<? extends RecyclerView.ViewHolder>) adapter,
+                layoutManager);
         addNoteButton.setOnClickListener(this::onAddNewButtonClicked);
     }
 
