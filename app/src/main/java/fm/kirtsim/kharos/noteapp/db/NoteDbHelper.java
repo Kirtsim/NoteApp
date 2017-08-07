@@ -142,7 +142,7 @@ public class NoteDbHelper extends SQLiteOpenHelper {
     }
 
     private String createWhereClauseForDeletionBasedOnIds(int idCount) {
-        StringBuilder clauseBuilder = new StringBuilder(NoteEntry.TABLE_NAME);
+        StringBuilder clauseBuilder = new StringBuilder(NoteEntry.ATT_ID);
         clauseBuilder.append(" IN (");
         for (int i = 0; i < idCount; ++i) {
             clauseBuilder.append("?,");

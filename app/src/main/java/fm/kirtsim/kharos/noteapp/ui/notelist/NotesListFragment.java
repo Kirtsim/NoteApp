@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.common.collect.Lists;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +42,6 @@ public class NotesListFragment extends BaseFragment implements
     private NotesListViewMvc mvcView;
     @Inject NotesListAdapter notesListAdapter;
     @Inject NotesManager notesManager;
-//    @Inject ActionBar actionBar;
     private NotesListMenuViewMvc menuMvc;
     private final Set<Integer> highlightedNotes = new HashSet<>(1);
 
@@ -100,7 +101,29 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.delete:
+                deleteHighlightedNotes();
+                break;
+            case android.R.id.home:
+            default: return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    void deleteHighlightedNotes() {
+        boolean deleted = false;
+        List<Note> notes = Lists.newArrayListWithCapacity(highlightedNotes.size());
+        final Note defaultNote = new Note(-1, null, null, 0);
+        highlightedNotes.forEach(id ->
+                notes.add(notesListAdapter.getNoteWithIdOrDefault(id, defaultNote)));
+        notesManager.removeNotes(notes);
+    }
+
+    void clearNoteHighlighting() {
+        highlightedNotes.clear();
+        menuMvc.hideDeleteMenuItem();
+        notesListAdapter.notifyDataSetChanged();
     }
 
     /* ************************************************************************
@@ -129,11 +152,6 @@ public class NotesListFragment extends BaseFragment implements
         }
     }
 
-    private void clearAllNoteHighlighting() {
-        highlightedNotes.clear();
-        menuMvc.hideDeleteMenuItem();
-    }
-
     private void displayDetailsOfNote(Note note) {
         Bundle arguments = new Bundle(4);
         arguments.putInt(NoteDetailFragment.ARG_NOTE_ID, note.getId());
@@ -153,7 +171,7 @@ public class NotesListFragment extends BaseFragment implements
             addNoteIdToHighlighted(noteId);
         }
         setNoteItemBackground(noteItemView, isHighlighted);
-        notesListAdapter.updateNoteItemUI(notePosition);
+        notesListAdapter.notifyItemChanged(notePosition);
     }
 
     private void addNoteIdToHighlighted(int noteId) {
@@ -200,16 +218,25 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onNoteDeleted(@NonNull Note note) {
-        if (notesListAdapter.deleteNote(note, true)) {
+        if (notesListAdapter.removeNote(note)) {
+            notesListAdapter.notifyNoteRemoved(note);
+            clearNoteHighlighting();
             Toast.makeText(getContext(), R.string.note_deleted_message, Toast.LENGTH_LONG).show();
+            return;
         }
+        // TODO: refetch all the notes and update the adapter
     }
 
     @Override
     public void onMultipleNotesDeleted(@NonNull List<Note> notes) {
-        if (notesListAdapter.deleteNotes(notes)) {
-            Toast.makeText(getContext(), "Notes deleted", Toast.LENGTH_LONG).show();
+        if (notesListAdapter.removeNotes(notes)) {
+            notesListAdapter.notifyDataSetChanged();
+            clearNoteHighlighting();
+            Toast.makeText(getContext(), getResources().
+                    getString(R.string.note_deleted_message, "s"), Toast.LENGTH_LONG).show();
+            return;
         }
+        // TODO: refetch all the notes and update the adapter
     }
     // ###################### NotesManagerListener ########################
 
