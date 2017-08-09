@@ -83,6 +83,7 @@ public class NoteDetailFragment extends BaseFragment implements
         switch (item.getItemId()) {
             case R.id.save: onSaveNoteMenuItemClicked(); break;
             case R.id.delete: onDeleteNoteMenuItemClicked(); break;
+            case android.R.id.home: onSaveNoteMenuItemClicked(); break;
             default: return super.onOptionsItemSelected(item);
         }
         return true;
@@ -110,26 +111,45 @@ public class NoteDetailFragment extends BaseFragment implements
     }
 
     private void displayNoteDetailsFromArguments(Bundle arguments) {
+        String noteTitle = "", noteText = "";
         if (arguments != null) {
-            viewMvc.setNoteTitle(arguments.getString(ARG_NOTE_TITLE, getString(R.string.default_title)));
-            viewMvc.setNoteText(arguments.getString(ARG_NOTE_TEXT, getString(R.string.default_text)));
-        } else {
-            viewMvc.setNoteTitle(getString(R.string.default_title));
-            viewMvc.setNoteText(getString(R.string.default_text));
-            final int color = getColor(R.color.default_text_color);
+            noteTitle = arguments.getString(ARG_NOTE_TITLE, getString(R.string.default_title));
+            noteText = arguments.getString(ARG_NOTE_TEXT, getString(R.string.default_text));
+        }
+        viewMvc.setNoteTitle(noteTitle);
+        viewMvc.setNoteText(noteText.isEmpty() ? getString(R.string.default_text) : noteText);
+
+        final int color = getColor(R.color.default_text_color);
+
+        if (noteId == -1) {
             viewMvc.setTitleColor(color);
             viewMvc.setTextColor(color);
+        } else {
+            isTitleDefault = false;
+            isTextDefault = noteText.isEmpty();
         }
     }
 
     private void onSaveNoteMenuItemClicked() {
         timestamp = System.currentTimeMillis();
+        String noteTitle = viewMvc.getTitle();
+        String noteText = viewMvc.getText();
+        if (isTitleDefault && isTextDefault)
+            return;
+        if (isTitleDefault) {
+            noteTitle = createTitleFromNoteText(noteText);
+        }
+
         Note note = new Note(noteId, viewMvc.getTitle(), viewMvc.getText(), timestamp);
         if (noteId == -1) {
             notesManager.addNewNote(note);
         } else {
             notesManager.updateNote(note);
         }
+    }
+
+    private String createTitleFromNoteText(String text) {
+        return null;
     }
 
     private void onDeleteNoteMenuItemClicked() {
