@@ -5,13 +5,13 @@
     <item
         android:id="@+id/save"
         android:title="@string/save_menu_title"
-        android:icon="@drawable/ic_save_black_24dp"
+        android:icon="@drawable/confirm_vd_24dp"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/delete"
         android:title="@string/delete_menu_title"
-        android:icon="@drawable/ic_delete_forever_black_24dp"
+        android:icon="@drawable/delete_vd_24dp"
         app:showAsAction="ifRoom" />
 
 </menu>

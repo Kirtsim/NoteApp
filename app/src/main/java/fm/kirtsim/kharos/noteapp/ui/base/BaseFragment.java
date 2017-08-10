@@ -2,7 +2,9 @@ package fm.kirtsim.kharos.noteapp.ui.base;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
+import android.widget.Toast;
 
 import fm.kirtsim.kharos.noteapp.NoteApplication;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerComponent;
@@ -43,6 +45,14 @@ public abstract class BaseFragment extends Fragment {
 
     protected void popFromBackStack(String backStackStateName) {
         baseFragmentListener.popBackStack(backStackStateName);
+    }
+
+    protected void showToast(@StringRes int resId) {
+        Toast.makeText(getContext(), resId, Toast.LENGTH_LONG).show();
+    }
+
+    protected void showToast(@StringRes int resId, Object... formatArgs) {
+        Toast.makeText(getContext(), getString(resId, formatArgs), Toast.LENGTH_LONG).show();
     }
 
     @Override

@@ -13,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.common.collect.Lists;
 
@@ -212,16 +211,20 @@ public class NotesListFragment extends BaseFragment implements
         listAdapter.setNewNotesList(notes);
     }
 
-    @Override public void onNewNoteAdded(@NonNull Note note) {}
+    @Override public void onNewNoteAdded(@NonNull Note note) {
+        showToast(R.string.note_saved_message, "");
+    }
 
-    @Override public void onNoteUpdated(@NonNull Note note) {}
+    @Override public void onNoteUpdated(@NonNull Note note) {
+        onNewNoteAdded(note);
+    }
 
     @Override
     public void onNoteDeleted(@NonNull Note note) {
         if (listAdapter.removeNote(note)) {
             listAdapter.notifyNoteRemoved(note);
             clearNoteHighlighting();
-            Toast.makeText(getContext(), R.string.note_deleted_message, Toast.LENGTH_LONG).show();
+            showToast(R.string.note_deleted_message, "");
 //            return;
         }
         // TODO: refetch all the notes and update the adapter
@@ -232,8 +235,7 @@ public class NotesListFragment extends BaseFragment implements
         if (listAdapter.removeNotes(notes)) {
             listAdapter.updateDataSet();
             clearNoteHighlighting();
-            Toast.makeText(getContext(), getResources().
-                    getString(R.string.note_deleted_message, "s"), Toast.LENGTH_LONG).show();
+            showToast(R.string.note_deleted_message, "s");
 //            return;
         }
         // TODO: refetch all the notes and update the adapter
