@@ -428,4 +428,17 @@ public class ExtractFirstWordsUpToLengthUT {
     }
 
 
+
+    @Test
+    public void multipleWordsOnSingleLine() {
+        String input = "and my new message.";
+        int length = 26;
+
+        String result = extractFirstWordsUpToLength(input, length);
+        String expected = "and my new message.";
+
+        assertEquals("multipleWordsOnSingleLine", expected, result);
+    }
+
+
 }

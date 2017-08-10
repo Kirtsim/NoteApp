@@ -35,9 +35,11 @@ public class StringUtils {
             endIndexCandidate = text.lastIndexOf('\n', endIndexExc-1);
         }
 
-        endIndexCandidate = text.lastIndexOf(' ', endIndexExc);
-        if (endIndexCandidate > startIndex)
-            endIndexExc = endIndexCandidate;
+        if (endIndexExc != textLength && text.charAt(endIndexExc) != '\n') {
+            endIndexCandidate = text.lastIndexOf(' ', endIndexExc-1);
+            if (endIndexCandidate > startIndex)
+                endIndexExc = endIndexCandidate;
+        }
 
         return text.substring(startIndex, endIndexExc);
     }
