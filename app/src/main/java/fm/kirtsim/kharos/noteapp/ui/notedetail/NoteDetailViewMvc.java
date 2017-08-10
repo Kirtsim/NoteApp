@@ -1,5 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.notedetail;
 
+import android.support.annotation.ColorInt;
+
 import fm.kirtsim.kharos.noteapp.ui.base.ObservableViewMvc;
 
 /**
@@ -20,4 +22,6 @@ public interface NoteDetailViewMvc extends
 
     String getTitle();
     String getText();
+    @ColorInt int getTitleColor();
+    @ColorInt int getTextColor();
 }

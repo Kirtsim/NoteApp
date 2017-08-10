@@ -80,4 +80,14 @@ public class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDet
     public String getText() {
         return textET.getText().toString();
     }
+
+    @Override
+    public int getTitleColor() {
+        return titleET.getCurrentTextColor();
+    }
+
+    @Override
+    public int getTextColor() {
+        return textET.getCurrentTextColor();
+    }
 }
