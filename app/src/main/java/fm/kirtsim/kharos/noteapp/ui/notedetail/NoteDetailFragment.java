@@ -35,8 +35,8 @@ public class NoteDetailFragment extends BaseFragment implements
     public static final String ARG_NOTE_TEXT = "DETAIL_NOTE_TEXT";
     public static final String ARG_NOTE_TIME = "DETAIL_NOTE_TIMESTAMP";
 
-    private NoteDetailViewMvc viewMvc;
     @Inject NotesManager notesManager;
+    private NoteDetailViewMvc viewMvc;
 
     private int noteId = -1;
     private long timestamp = -1;
@@ -45,8 +45,6 @@ public class NoteDetailFragment extends BaseFragment implements
     private boolean isTextDefault = true;
 
     private @ColorInt int userTextColor, defaultTextColor;
-
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

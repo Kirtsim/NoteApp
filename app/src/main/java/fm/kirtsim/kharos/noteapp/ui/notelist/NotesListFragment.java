@@ -41,8 +41,9 @@ public class NotesListFragment extends BaseFragment implements
 
     @Inject NotesListAdapter listAdapter;
     @Inject NotesManager notesManager;
+    @Inject
+    NotesListActionBarViewMvc menuViewMvc;
     private NotesListViewMvc mvcView;
-    private NotesListMenuViewMvc menuMvc;
     private final Set<Integer> highlightedNotes = new HashSet<>(1);
 
     private int COLOR_HIGHLIGHTED_BACKGROUND;
@@ -56,6 +57,8 @@ public class NotesListFragment extends BaseFragment implements
         setHasOptionsMenu(true);
         listAdapter.setListener(this);
         notesManager.registerListener(this);
+
+        menuViewMvc.setShowHomeButton(false);
     }
 
     private void initializeColors(Resources resources) {
@@ -95,17 +98,15 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        menuMvc = new NotesListMenuViewMvcImpl(menu, inflater);
-        menuMvc.hideDeleteMenuItem();
+        menuViewMvc.setMenu(menu, inflater);
+        menuViewMvc.hideDeleteMenuItem();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.delete:
-                deleteHighlightedNotes();
-                break;
-            case android.R.id.home:
+            case R.id.delete: deleteHighlightedNotes();break;
+            case android.R.id.home: clearNoteHighlighting(); break;
             default: return super.onOptionsItemSelected(item);
         }
         return true;
@@ -121,7 +122,7 @@ public class NotesListFragment extends BaseFragment implements
 
     void clearNoteHighlighting() {
         highlightedNotes.clear();
-        menuMvc.hideDeleteMenuItem();
+        onNoteIdRemovedFromHighlighted();
         listAdapter.updateDataSet();
     }
 
@@ -162,27 +163,30 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onNoteItemLongClicked(Note note, NotesListItemViewMvc noteItemView, int notePosition) {
-        final int noteId = note.getId();
-        final boolean isHighlighted = highlightedNotes.contains(noteId);
+        final boolean isHighlighted = highlightedNotes.contains(note.getId());
         if (isHighlighted) {
-            removeNoteIdFromHighlighted(noteId);
+            highlightedNotes.remove(note.getId());
+            onNoteIdRemovedFromHighlighted();
         } else {
-            addNoteIdToHighlighted(noteId);
+            highlightedNotes.add(note.getId());
+            onNoteIdAddedToHighlighted();
         }
         setNoteItemBackground(noteItemView, isHighlighted);
         listAdapter.updateItemAtPosition(notePosition);
     }
 
-    private void addNoteIdToHighlighted(int noteId) {
-        highlightedNotes.add(noteId);
-        if (highlightedNotes.size() == 1)
-            menuMvc.showDeleteMenuItem();
+    private void onNoteIdRemovedFromHighlighted() {
+        if (highlightedNotes.isEmpty()) {
+            menuViewMvc.hideDeleteMenuItem();
+            menuViewMvc.setDisplayHomeAsUp(false);
+        }
     }
 
-    private void removeNoteIdFromHighlighted(int noteId) {
-        highlightedNotes.remove(noteId);
-        if (highlightedNotes.isEmpty())
-            menuMvc.hideDeleteMenuItem();
+    private void onNoteIdAddedToHighlighted() {
+        if (highlightedNotes.size() == 1) {
+            menuViewMvc.showDeleteMenuItem();
+            menuViewMvc.setDisplayHomeAsUp(true);
+        }
     }
 
     @Override
