@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -92,6 +93,7 @@ public class NoteDetailFragment extends BaseFragment implements
                 break;
             case R.id.delete: onDeleteNoteMenuItemClicked(); break;
             case android.R.id.home:
+                Log.d(getClassName(), "home button clicked");
                 if (!onSaveNoteMenuItemClicked())
                     onDeleteNoteMenuItemClicked();
                 break;

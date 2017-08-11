@@ -10,6 +10,7 @@ import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerComponent;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerModule;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ViewMvcModule;
+import fm.kirtsim.kharos.noteapp.ui.Animations;
 
 /**
  * Created by kharos on 27/07/2017
@@ -30,6 +31,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public void requestFragmentChange(Class<? extends BaseFragment> class_, Bundle arguments,
+                                      Animations animations,
                                       boolean addToBackStack, String backStackStateName) {
         BaseFragment fragment = instantiateFragmentFromClass(class_);
         if (fragment != null) {
@@ -37,6 +39,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             if (addToBackStack)
                 transaction.addToBackStack(backStackStateName);
+            if (animations != null)
+                animations.applyAnimationsToTransaction(transaction);
             transaction.replace(R.id.main_fragment_holder, fragment, class_.getSimpleName());
             transaction.commit();
         }

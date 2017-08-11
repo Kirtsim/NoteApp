@@ -3,6 +3,7 @@ package fm.kirtsim.kharos.noteapp.ui.main;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import fm.kirtsim.kharos.noteapp.ui.Animations;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseActivity;
 import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListFragment;
 
@@ -12,13 +13,19 @@ import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListFragment;
 
 public class MainActivity extends BaseActivity {
 
-    private MainViewMvc viewMvc;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewMvc = new MainViewMvcImpl(getLayoutInflater(), null);
+        MainViewMvc viewMvc = new MainViewMvcImpl(getLayoutInflater(), null);
         setContentView(viewMvc.getRootView());
-        requestFragmentChange(NotesListFragment.class, null, false, null);
+        requestFragmentChange(NotesListFragment.class, null, createInitialAnimations(), false, null);
     }
+
+    private Animations createInitialAnimations() {
+        Animations.Builder builder = new Animations.Builder();
+        builder.setEnterAnimation(android.R.anim.fade_in);
+        return builder.build();
+    }
+
+
 }

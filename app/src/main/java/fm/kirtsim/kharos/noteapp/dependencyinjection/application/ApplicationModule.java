@@ -37,12 +37,6 @@ public class ApplicationModule {
 
     @Singleton
     @Provides
-    public NotesManager notesManager(NoteDbHelper noteDbHelper) {
-        return new NotesManager(noteDbHelper);
-    }
-
-    @Singleton
-    @Provides
     public MainThreadPoster mainThreadPoster() {
         return new MainThreadPoster();
     }
@@ -51,5 +45,13 @@ public class ApplicationModule {
     @Provides
     public BackgroundThreadPoster backgroundThreadPoster() {
         return new BackgroundThreadPoster();
+    }
+
+    @Singleton
+    @Provides
+    public NotesManager notesManager(NoteDbHelper noteDbHelper,
+                                     MainThreadPoster mainPoster,
+                                     BackgroundThreadPoster backgroundPoster) {
+        return new NotesManager(noteDbHelper, mainPoster, backgroundPoster);
     }
 }

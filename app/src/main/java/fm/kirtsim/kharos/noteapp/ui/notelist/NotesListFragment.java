@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.manager.NotesManager;
+import fm.kirtsim.kharos.noteapp.ui.Animations;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
@@ -41,10 +42,12 @@ public class NotesListFragment extends BaseFragment implements
 
     @Inject NotesListAdapter listAdapter;
     @Inject NotesManager notesManager;
-    @Inject
-    NotesListActionBarViewMvc menuViewMvc;
+    @Inject NotesListActionBarViewMvc menuViewMvc;
+
     private NotesListViewMvc mvcView;
     private final Set<Integer> highlightedNotes = new HashSet<>(1);
+
+    private Animations noteDetailAnimations;
 
     private int COLOR_HIGHLIGHTED_BACKGROUND;
     private int COLOR_HIGHLIGHTED_FRAME;
@@ -55,10 +58,12 @@ public class NotesListFragment extends BaseFragment implements
         super.onCreate(savedInstanceState);
         initializeColors(getResources());
         setHasOptionsMenu(true);
+
         listAdapter.setListener(this);
         notesManager.registerListener(this);
-
         menuViewMvc.setShowHomeButton(false);
+
+        noteDetailAnimations = getAnimationsForNoteDetailFragment();
     }
 
     private void initializeColors(Resources resources) {
@@ -66,6 +71,15 @@ public class NotesListFragment extends BaseFragment implements
                 R.color.note_detail_selected_background, null);
         COLOR_HIGHLIGHTED_FRAME = ResourcesCompat.getColor(resources,
                 R.color.note_detail_selected_frame, null);
+    }
+
+    private Animations getAnimationsForNoteDetailFragment() {
+        Animations.Builder builder = new Animations.Builder();
+        builder.setEnterAnimation(R.anim.slide_enter)
+                .setExitAnimation(R.anim.slide_exit)
+                .setPopEnterAnimation(R.anim.pop_slide_enter)
+                .setPopExitAnimation(R.anim.pop_slide_exit);
+        return builder.build();
     }
 
     @Nullable
@@ -158,7 +172,7 @@ public class NotesListFragment extends BaseFragment implements
         arguments.putString(NoteDetailFragment.ARG_NOTE_TITLE, note.getTitle());
         arguments.putString(NoteDetailFragment.ARG_NOTE_TEXT, note.getText());
         arguments.putLong(NoteDetailFragment.ARG_NOTE_TIME, note.getTimestamp());
-        startNewFragment(NoteDetailFragment.class, arguments, true);
+        startNewFragment(NoteDetailFragment.class, arguments, noteDetailAnimations, true);
     }
 
     @Override
@@ -253,6 +267,6 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onNewNoteRequested() {
-        startNewFragment(NoteDetailFragment.class, null, true);
+        startNewFragment(NoteDetailFragment.class, null, noteDetailAnimations, true);
     }
 }

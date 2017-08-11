@@ -10,6 +10,7 @@ import fm.kirtsim.kharos.noteapp.NoteApplication;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerComponent;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerModule;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ViewMvcModule;
+import fm.kirtsim.kharos.noteapp.ui.Animations;
 
 /**
  * Created by kharos on 27/07/2017
@@ -17,8 +18,10 @@ import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ViewMvcModule;
 
 public abstract class BaseFragment extends Fragment {
 
+    @SuppressWarnings("WeakerAccess")
     public interface BaseFragmentListener {
         void requestFragmentChange(Class<? extends BaseFragment> class_, Bundle arguments,
+                                   Animations animations,
                                    boolean addToBackStack, String backStackStateName);
         void popBackStack(String callingFragmentName);
     }
@@ -38,9 +41,10 @@ public abstract class BaseFragment extends Fragment {
     protected abstract String getClassName();
 
     protected void startNewFragment(Class<? extends BaseFragment> class_, Bundle arguments,
+                                    Animations animations,
                                     boolean addToBackStack) {
         baseFragmentListener.requestFragmentChange(class_, arguments,
-                addToBackStack, getClassName());
+                animations, addToBackStack, getClassName());
     }
 
     protected void popFromBackStack(String backStackStateName) {
