@@ -8,6 +8,8 @@ import dagger.Module;
 import dagger.Provides;
 import fm.kirtsim.kharos.noteapp.db.NoteDbHelper;
 import fm.kirtsim.kharos.noteapp.manager.NotesManager;
+import fm.kirtsim.kharos.noteapp.threading.BackgroundThreadPoster;
+import fm.kirtsim.kharos.noteapp.threading.MainThreadPoster;
 
 /**
  * Created by kharos on 27/07/2017
@@ -37,5 +39,17 @@ public class ApplicationModule {
     @Provides
     public NotesManager notesManager(NoteDbHelper noteDbHelper) {
         return new NotesManager(noteDbHelper);
+    }
+
+    @Singleton
+    @Provides
+    public MainThreadPoster mainThreadPoster() {
+        return new MainThreadPoster();
+    }
+
+    @Singleton
+    @Provides
+    public BackgroundThreadPoster backgroundThreadPoster() {
+        return new BackgroundThreadPoster();
     }
 }

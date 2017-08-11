@@ -10,6 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.db.NoteDbHelper;
+import fm.kirtsim.kharos.noteapp.threading.BackgroundThreadPoster;
+import fm.kirtsim.kharos.noteapp.threading.MainThreadPoster;
 
 /**
  * Created by kharos on 31/07/2017
@@ -27,14 +29,23 @@ public class NotesManager {
 
     private final NoteDbHelper notesDatabase;
     private final Set<NotesManagerListener> listeners;
+    private final MainThreadPoster mainThreadPoster;
+    private final BackgroundThreadPoster backgroundThreadPoster;
 
-    public NotesManager(NoteDbHelper notesDbHelper) {
+    public NotesManager(NoteDbHelper notesDbHelper,
+                        MainThreadPoster mainThreadPoster,
+                        BackgroundThreadPoster backgroundThreadPoster) {
         listeners = Collections.newSetFromMap(new ConcurrentHashMap<>(1));
         notesDatabase = notesDbHelper;
+        this.mainThreadPoster = mainThreadPoster;
+        this.backgroundThreadPoster = backgroundThreadPoster;
     }
 
     public void addNewNote(Note note) {
-        // TODO: perform on the background thread;
+        backgroundThreadPoster.post(() -> insertNote(note));
+    }
+
+    private void insertNote(Note note) {
         if (note != null && notesDatabase.insertNote(note) != -1) {
             final Note inserted = notesDatabase.selectNote(note);
             if (inserted != null) {
@@ -44,7 +55,10 @@ public class NotesManager {
     }
 
     public void fetchNotes() {
-        // TODO: perform on the background thread;
+        backgroundThreadPoster.post(this::selectAllNotes);
+    }
+
+    private void selectAllNotes() {
         List<Note> notes = notesDatabase.selectAllNotes();
         for (NotesManagerListener listener : listeners) {
             listener.onNotesFetched(notes);
@@ -52,6 +66,10 @@ public class NotesManager {
     }
 
     public void updateNote(Note note) {
+        backgroundThreadPoster.post(() -> updateSingleNote(note));
+    }
+
+    private void updateSingleNote(Note note) {
         if (note != null) {
             if (notesDatabase.updateNote(note) != 0) {
                 final Note noteCopy = new Note(note);
@@ -61,7 +79,10 @@ public class NotesManager {
     }
 
     public void removeNote(Note note) {
-        // TODO: perform on the background thread;
+        backgroundThreadPoster.post(() -> deleteNote(note));
+    }
+
+    private void deleteNote(Note note) {
         if (note != null) {
             if (notesDatabase.deleteNote(note.getId()) != 0) {
                 final Note noteCopy = new Note(note);
@@ -71,7 +92,10 @@ public class NotesManager {
     }
 
     public void removeNotes(List<Note> notes) {
-        // TODO: perform on the background thread;
+        backgroundThreadPoster.post(() -> deleteMultipleNotes(notes));
+    }
+
+    private void deleteMultipleNotes(List<Note> notes) {
         if (notes != null && !notes.isEmpty()) {
             final List<Integer> ids = new ArrayList<>(notes.size());
             notes.forEach(note -> ids.add(note.getId()));
