@@ -16,6 +16,7 @@ import javax.inject.Inject;
 
 import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
+import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerComponent;
 import fm.kirtsim.kharos.noteapp.manager.NotesManager;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
 import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListFragment;
@@ -49,7 +50,6 @@ public class NoteDetailFragment extends BaseFragment implements
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        getControllerComponent().inject(this);
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         initNoteDetailsFromArguments(getArguments());
@@ -67,6 +67,12 @@ public class NoteDetailFragment extends BaseFragment implements
         userTextColor = ResourcesCompat.getColor(getResources(), R.color.user_text_color, null);
         defaultTextColor = ResourcesCompat.
                 getColor(getResources(), R.color.default_text_color, null);
+    }
+
+    @Override
+    protected boolean performInjection(ControllerComponent component) {
+        component.inject(this);
+        return true;
     }
 
     @Nullable
@@ -108,20 +114,6 @@ public class NoteDetailFragment extends BaseFragment implements
         displayNoteDetailsFromArguments(getArguments());
     }
 
-    @Override
-    protected String getClassName() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        notesManager = null;
-
-        viewMvc.unregisterListener(this);
-        viewMvc = null;
-    }
-
     private void displayNoteDetailsFromArguments(Bundle arguments) {
         if (noteId == -1) {
             viewMvc.setTitleColor(defaultTextColor);
@@ -141,6 +133,20 @@ public class NoteDetailFragment extends BaseFragment implements
             viewMvc.setNoteText(isTextDefault ? getString(R.string.default_text) : noteText);
             viewMvc.setTextColor(isTextDefault ? defaultTextColor : userTextColor);
         }
+    }
+
+    @Override
+    protected String getClassName() {
+        return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        notesManager = null;
+
+        viewMvc.unregisterListener(this);
+        viewMvc = null;
     }
 
     private boolean onSaveNoteMenuItemClicked() {
@@ -214,5 +220,11 @@ public class NoteDetailFragment extends BaseFragment implements
     private boolean validateNoteText(String text, @ColorInt int textColor) {
         isTextDefault = (text == null || text.isEmpty()) || textColor == defaultTextColor;
         return !isTextDefault;
+    }
+
+    @Override
+    protected void onBackPressed() {
+        if (!onSaveNoteMenuItemClicked())
+            onDeleteNoteMenuItemClicked();
     }
 }

@@ -1,15 +1,24 @@
 package fm.kirtsim.kharos.noteapp.ui.base;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+
+import com.google.common.collect.Sets;
+
+import java.util.Set;
+
+import javax.inject.Inject;
 
 import fm.kirtsim.kharos.noteapp.NoteApplication;
 import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerComponent;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerModule;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ViewMvcModule;
+import fm.kirtsim.kharos.noteapp.threading.BackgroundThreadPoster;
 import fm.kirtsim.kharos.noteapp.ui.Animations;
 
 /**
@@ -19,14 +28,48 @@ import fm.kirtsim.kharos.noteapp.ui.Animations;
 public abstract class BaseActivity extends AppCompatActivity implements
         BaseFragment.BaseFragmentListener {
 
+    @SuppressWarnings("WeakerAccess")
+    @FunctionalInterface
+    public interface BackPressListener {
+        void onBackPressed();
+    }
+
+    @Inject BackgroundThreadPoster backgroundThread;
+    private final Set<BackPressListener> backPressListeners = Sets.newConcurrentHashSet();
     private boolean isControllerComponentUsed = false;
 
-    public ControllerComponent getControllerComponent() {
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        ControllerComponent component = getControllerComponent();
+        if (!performDependencyInjection(component)) {
+            component.inject(this);
+        }
+        super.onCreate(savedInstanceState);
+    }
+
+    protected boolean performDependencyInjection(ControllerComponent component) {
+        return false;
+    }
+
+    private ControllerComponent getControllerComponent() {
         if (isControllerComponentUsed)
             throw new IllegalStateException("controller component can be used only once at a time");
         isControllerComponentUsed = true;
         return ((NoteApplication) getApplication()).getApplicationComponent()
                 .newControllerComponent(new ControllerModule(this), new ViewMvcModule());
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d(getClass().getSimpleName(), "backPressed");
+        backPressListeners.forEach(BackPressListener::onBackPressed);
+//        super.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        backPressListeners.clear();
+        super.onDestroy();
     }
 
     @Override
@@ -46,12 +89,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void popBackStack(String backStackStateName) {
-        getSupportFragmentManager().popBackStack(backStackStateName,
-                FragmentManager.POP_BACK_STACK_INCLUSIVE);
-    }
-
     private BaseFragment instantiateFragmentFromClass(Class<? extends BaseFragment> class_) {
         BaseFragment fragment = null;
         try {
@@ -60,5 +97,28 @@ public abstract class BaseActivity extends AppCompatActivity implements
             e.printStackTrace();
         }
         return fragment;
+    }
+
+    @Override
+    public void popBackStack(String backStackStateName) {
+        Log.d(getClass().getSimpleName(), "popping from back stack");
+        if (getSupportFragmentManager().findFragmentByTag(backStackStateName) == null)
+            Log.d(getClass().getSimpleName(), "could not find the fragment transaction");
+        getSupportFragmentManager().popBackStack(backStackStateName,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+
+    @Override
+    public void registerBackPressListener(BackPressListener listener) {
+        if (listener != null) {
+            backgroundThread.post(() -> backPressListeners.add(listener));
+        }
+    }
+
+    @Override
+    public void unregisterBackPressListener(BackPressListener listener) {
+        if (listener != null) {
+            backgroundThread.post(() -> backPressListeners.remove(listener));
+        }
     }
 }

@@ -24,6 +24,7 @@ import javax.inject.Inject;
 
 import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
+import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerComponent;
 import fm.kirtsim.kharos.noteapp.manager.NotesManager;
 import fm.kirtsim.kharos.noteapp.ui.Animations;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
@@ -54,7 +55,6 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        getControllerComponent().inject(this);
         super.onCreate(savedInstanceState);
         initializeColors(getResources());
         setHasOptionsMenu(true);
@@ -64,6 +64,12 @@ public class NotesListFragment extends BaseFragment implements
         menuViewMvc.setShowHomeButton(false);
 
         noteDetailAnimations = getAnimationsForNoteDetailFragment();
+    }
+
+    @Override
+    protected boolean performInjection(ControllerComponent component) {
+        component.inject(this);
+        return true;
     }
 
     private void initializeColors(Resources resources) {
