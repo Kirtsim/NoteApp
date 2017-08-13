@@ -1,5 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
+import android.support.annotation.MainThread;
 import android.support.v7.widget.RecyclerView;
 
 import fm.kirtsim.kharos.noteapp.ui.base.ObservableViewMvc;
@@ -14,6 +15,10 @@ public interface NotesListViewMvc extends
     interface NotesListViewMvcListener {
         void onNewNoteRequested();
     }
+
+    @MainThread void showAddButton();
+
+    @MainThread void hideAddButton();
 
     @SuppressWarnings("unused")
     RecyclerView.Adapter getRecyclerViewAdapter();

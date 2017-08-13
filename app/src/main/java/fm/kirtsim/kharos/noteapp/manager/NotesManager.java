@@ -49,7 +49,8 @@ public class NotesManager {
         if (note != null && notesDatabase.insertNote(note) != -1) {
             final Note inserted = notesDatabase.selectNote(note);
             if (inserted != null) {
-                listeners.forEach(listener ->  listener.onNewNoteAdded(inserted));
+                mainThreadPoster.post(() ->
+                        listeners.forEach(listener -> listener.onNewNoteAdded(inserted)));
             }
         }
     }
@@ -60,9 +61,8 @@ public class NotesManager {
 
     private void selectAllNotes() {
         List<Note> notes = notesDatabase.selectAllNotes();
-        for (NotesManagerListener listener : listeners) {
-            listener.onNotesFetched(notes);
-        }
+        mainThreadPoster.post(() ->
+                        listeners.forEach(listener -> listener.onNotesFetched(notes)));
     }
 
     public void updateNote(Note note) {
@@ -73,7 +73,8 @@ public class NotesManager {
         if (note != null) {
             if (notesDatabase.updateNote(note) != 0) {
                 final Note noteCopy = new Note(note);
-                listeners.forEach(listener -> listener.onNoteUpdated(noteCopy));
+                mainThreadPoster.post(() ->
+                        listeners.forEach(listener -> listener.onNoteUpdated(noteCopy)));
             }
         }
     }
@@ -86,7 +87,8 @@ public class NotesManager {
         if (note != null) {
             if (notesDatabase.deleteNote(note.getId()) != 0) {
                 final Note noteCopy = new Note(note);
-                listeners.forEach(listener -> listener.onNoteDeleted(noteCopy));
+                mainThreadPoster.post(() ->
+                        listeners.forEach(listener -> listener.onNoteDeleted(noteCopy)));
             }
         }
     }
@@ -100,7 +102,8 @@ public class NotesManager {
             final List<Integer> ids = new ArrayList<>(notes.size());
             notes.forEach(note -> ids.add(note.getId()));
             notesDatabase.deleteNotes(ids);
-            listeners.forEach(listener -> listener.onMultipleNotesDeleted(notes));
+            mainThreadPoster.post(() ->
+                    listeners.forEach(listener -> listener.onMultipleNotesDeleted(notes)));
         }
     }
 

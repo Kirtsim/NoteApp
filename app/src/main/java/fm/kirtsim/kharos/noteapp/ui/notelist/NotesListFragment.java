@@ -1,8 +1,11 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
@@ -181,6 +184,7 @@ public class NotesListFragment extends BaseFragment implements
         startNewFragment(NoteDetailFragment.class, arguments, noteDetailAnimations, true);
     }
 
+    @MainThread
     @Override
     public void onNoteItemLongClicked(Note note, NotesListItemViewMvc noteItemView, int notePosition) {
         final boolean isHighlighted = highlightedNotes.contains(note.getId());
@@ -193,12 +197,14 @@ public class NotesListFragment extends BaseFragment implements
         }
         setNoteItemBackground(noteItemView, isHighlighted);
         listAdapter.updateItemAtPosition(notePosition);
+        // TODO: hide or show FAB to avoid bugs
     }
 
     private void onNoteIdRemovedFromHighlighted() {
         if (highlightedNotes.isEmpty()) {
             menuViewMvc.hideDeleteMenuItem();
             menuViewMvc.setDisplayHomeAsUp(false);
+            mvcView.showAddButton();
         }
     }
 
@@ -206,9 +212,11 @@ public class NotesListFragment extends BaseFragment implements
         if (highlightedNotes.size() == 1) {
             menuViewMvc.showDeleteMenuItem();
             menuViewMvc.setDisplayHomeAsUp(true);
+            mvcView.hideAddButton();
         }
     }
 
+    @MainThread
     @Override
     public void onNoteItemVisible(Note note, NotesListItemViewMvc noteItemView) {
         noteItemView.setText(note.getText());
@@ -230,39 +238,42 @@ public class NotesListFragment extends BaseFragment implements
      *                 NotesManagerListener methods
      * ************************************************************************/
 
+    @MainThread
     @Override
     public void onNotesFetched(@NonNull List<Note> notes) {
         listAdapter.setNewNotesList(notes);
     }
 
+    @MainThread
     @Override public void onNewNoteAdded(@NonNull Note note) {
         showToast(R.string.note_saved_message, "");
     }
 
+    @MainThread
     @Override public void onNoteUpdated(@NonNull Note note) {
         onNewNoteAdded(note);
     }
 
+    @MainThread
     @Override
     public void onNoteDeleted(@NonNull Note note) {
+        clearNoteHighlighting();
         if (listAdapter.removeNote(note)) {
             listAdapter.notifyNoteRemoved(note);
-            clearNoteHighlighting();
             showToast(R.string.note_deleted_message, "");
-//            return;
-        }
-        // TODO: refetch all the notes and update the adapter
+        } else
+            notesManager.fetchNotes();
     }
 
+    @MainThread
     @Override
     public void onMultipleNotesDeleted(@NonNull List<Note> notes) {
+        clearNoteHighlighting();
         if (listAdapter.removeNotes(notes)) {
             listAdapter.updateDataSet();
-            clearNoteHighlighting();
             showToast(R.string.note_deleted_message, "s");
-//            return;
-        }
-        // TODO: refetch all the notes and update the adapter
+        } else
+            notesManager.fetchNotes();
     }
     // ###################### NotesManagerListener ########################
 

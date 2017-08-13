@@ -1,6 +1,9 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.os.Bundle;
+import android.support.annotation.MainThread;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -46,9 +49,25 @@ public class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesList
         listeners.forEach(NotesListViewMvcListener::onNewNoteRequested);
     }
 
+    @MainThread
     @Override
     public void getState(Bundle bundle) {
-        // coming soon
+        ObjectAnimator animator = ObjectAnimator.ofFloat(addNoteButton, "translationY", 300);
+        animator.setDuration(350);
+        animator.start();
+    }
+
+    @MainThread
+    @Override
+    public void showAddButton() {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(addNoteButton, "translationY", 0);
+        animator.setDuration(350);
+        animator.start();
+    }
+
+    @Override
+    public void hideAddButton() {
+
     }
 
     @Override
