@@ -22,6 +22,9 @@ import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
 public class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvcListener>
         implements NotesListViewMvc {
 
+    private static final int MAX_TRANSLATION_Y = 220;
+
+    private ObjectAnimator animator;
     private RecyclerView notesList;
     private FloatingActionButton addNoteButton;
 
@@ -31,6 +34,7 @@ public class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesList
         initializeViews();
         initializeRecyclerView((RecyclerView.Adapter<? extends RecyclerView.ViewHolder>) adapter,
                 layoutManager);
+        initializeAnimator();
         addNoteButton.setOnClickListener(this::onAddNewButtonClicked);
     }
 
@@ -45,29 +49,32 @@ public class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesList
         notesList.setLayoutManager(layoutManager);
     }
 
+    private void initializeAnimator() {
+        animator = ObjectAnimator.ofFloat(addNoteButton, "translationY", MAX_TRANSLATION_Y);
+        animator.setDuration(300);
+    }
+
     private void onAddNewButtonClicked(View v) {
         listeners.forEach(NotesListViewMvcListener::onNewNoteRequested);
     }
 
     @MainThread
     @Override
-    public void getState(Bundle bundle) {
-        ObjectAnimator animator = ObjectAnimator.ofFloat(addNoteButton, "translationY", 300);
-        animator.setDuration(350);
-        animator.start();
-    }
+    public void getState(Bundle bundle) {}
 
     @MainThread
     @Override
     public void showAddButton() {
-        ObjectAnimator animator = ObjectAnimator.ofFloat(addNoteButton, "translationY", 0);
-        animator.setDuration(350);
-        animator.start();
+        if (addNoteButton.getTranslationY() == MAX_TRANSLATION_Y) {
+            animator.reverse();
+        }
     }
 
     @Override
     public void hideAddButton() {
-
+        if (addNoteButton.getTranslationY() != MAX_TRANSLATION_Y) {
+            animator.start();
+        }
     }
 
     @Override
