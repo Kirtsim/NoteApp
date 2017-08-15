@@ -1,6 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.main;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.view.View;
 
 /**
@@ -11,9 +12,9 @@ public interface ViewMvc {
 
     View getRootView();
 
+    void initFromSavedState(@Nullable Bundle savedState);
+
     void getState(Bundle bundle);
 
     Bundle getState();
-
-    void invalidate();
 }

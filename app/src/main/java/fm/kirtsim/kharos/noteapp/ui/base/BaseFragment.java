@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.widget.Toast;
 
 import javax.inject.Inject;
@@ -65,16 +64,19 @@ public abstract class BaseFragment extends Fragment {
                                     Animations animations,
                                     boolean addToBackStack) {
         baseFragmentListener.requestFragmentChange(class_, arguments,
-                animations, addToBackStack, getClassName());
+                animations, addToBackStack, class_.getSimpleName());
     }
 
     protected void popFromBackStack(String backStackStateName) {
-        Log.d(getClassName(), "popping from backStack");
         baseFragmentListener.popBackStack(backStackStateName);
     }
 
-    protected void onBackPressed() {
+    protected final void popFromBackStack() {
         popFromBackStack(getClassName());
+    }
+
+    protected void onBackPressed() {
+        popFromBackStack();
     }
 
     protected void showToast(@StringRes int resId) {
@@ -91,7 +93,6 @@ public abstract class BaseFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof BaseFragmentListener) {
             baseFragmentListener = (BaseFragmentListener) context;
-            baseFragmentListener.registerBackPressListener(getBackPressListener());
         } else {
             throw new IllegalArgumentException("activity must implement" +
                     BaseFragmentListener.class.getSimpleName());
@@ -108,8 +109,19 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        baseFragmentListener.unregisterBackPressListener(backPressListener);
         baseFragmentListener = null;
         backPressListener = null;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        baseFragmentListener.unregisterBackPressListener(backPressListener);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        baseFragmentListener.registerBackPressListener(getBackPressListener());
     }
 }

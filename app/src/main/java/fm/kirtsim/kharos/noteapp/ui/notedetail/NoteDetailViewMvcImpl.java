@@ -1,6 +1,8 @@
 package fm.kirtsim.kharos.noteapp.ui.notedetail;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -15,6 +17,11 @@ import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
 
 public class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDetailViewMvcListener>
         implements NoteDetailViewMvc {
+
+    private static final String ARG_NOTE_TITLE = "NOTE_TITLE";
+    private static final String ARG_NOTE_TEXT = "NOTE_TEXT";
+    private static final String ARG_NOTE_TITLE_COLOR = "NOTE_TITLE_COLOR";
+    private static final String ARG_NOTE_TEXT_COLOR = "NOTE_TEXT_COLOR";
 
     private EditText titleET;
     private EditText textET;
@@ -31,6 +38,7 @@ public class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDet
     }
 
     private void initializeViews() {
+        Log.d(this.getClass().getSimpleName(), "initializing Views");
         titleET = (EditText) rootView.findViewById(R.id.detail_note_title);
         textET = (EditText) rootView.findViewById(R.id.detail_note_text);
         delimiterFL = (FrameLayout) rootView.findViewById(R.id.detail_note_delimiter);
@@ -42,8 +50,23 @@ public class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDet
      * ***************************************/
 
     @Override
+    public void initFromSavedState(@Nullable Bundle savedState) {
+        super.initFromSavedState(savedState);
+        if (savedState != null) {
+            Log.d(this.getClass().getSimpleName(), "initializing from Saved State");
+            setNoteTitle(savedState.getString(ARG_NOTE_TITLE));
+            setNoteText(savedState.getString(ARG_NOTE_TEXT));
+            setTitleColor(savedState.getInt(ARG_NOTE_TITLE_COLOR, 0));
+            setTextColor(savedState.getInt(ARG_NOTE_TEXT_COLOR, 0));
+        }
+    }
+
+    @Override
     public void getState(Bundle bundle) {
-        // coming soon;
+        bundle.putString(ARG_NOTE_TITLE, getTitle());
+        bundle.putString(ARG_NOTE_TEXT, getText());
+        bundle.putInt(ARG_NOTE_TITLE_COLOR, getTitleColor());
+        bundle.putInt(ARG_NOTE_TEXT_COLOR, getTextColor());
     }
 
 

@@ -1,6 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.base;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.view.View;
 
 import java.util.HashSet;
@@ -45,14 +46,12 @@ public abstract class BaseViewMvc<ListenerType> implements ObservableViewMvc<Lis
     }
 
     @Override
+    public void initFromSavedState(@Nullable Bundle savedState) {}
+
+    @Override
     public Bundle getState() {
         Bundle bundle = new Bundle();
         getState(bundle);
         return bundle;
-    }
-
-    @Override
-    public void invalidate() {
-        rootView.invalidate();
     }
 }

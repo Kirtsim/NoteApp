@@ -18,7 +18,10 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         MainViewMvc viewMvc = new MainViewMvcImpl(getLayoutInflater(), null);
         setContentView(viewMvc.getRootView());
-        requestFragmentChange(NotesListFragment.class, null, createInitialAnimations(), false, null);
+        if (savedInstanceState == null) {
+            requestFragmentChange(NotesListFragment.class, null, createInitialAnimations(), false,
+                    NotesListFragment.class.getSimpleName());
+        }
     }
 
     private Animations createInitialAnimations() {

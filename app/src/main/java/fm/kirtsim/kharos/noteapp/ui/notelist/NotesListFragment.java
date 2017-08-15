@@ -1,7 +1,5 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -216,7 +214,6 @@ public class NotesListFragment extends BaseFragment implements
         }
     }
 
-    @MainThread
     @Override
     public void onNoteItemVisible(Note note, NotesListItemViewMvc noteItemView) {
         noteItemView.setText(note.getText());
@@ -238,23 +235,20 @@ public class NotesListFragment extends BaseFragment implements
      *                 NotesManagerListener methods
      * ************************************************************************/
 
-    @MainThread
     @Override
     public void onNotesFetched(@NonNull List<Note> notes) {
         listAdapter.setNewNotesList(notes);
+        listAdapter.updateDataSet();
     }
 
-    @MainThread
     @Override public void onNewNoteAdded(@NonNull Note note) {
         showToast(R.string.note_saved_message, "");
     }
 
-    @MainThread
     @Override public void onNoteUpdated(@NonNull Note note) {
         onNewNoteAdded(note);
     }
 
-    @MainThread
     @Override
     public void onNoteDeleted(@NonNull Note note) {
         clearNoteHighlighting();
@@ -265,7 +259,6 @@ public class NotesListFragment extends BaseFragment implements
             notesManager.fetchNotes();
     }
 
-    @MainThread
     @Override
     public void onMultipleNotesDeleted(@NonNull List<Note> notes) {
         clearNoteHighlighting();

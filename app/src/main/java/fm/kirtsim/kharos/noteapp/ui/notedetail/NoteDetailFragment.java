@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,9 +16,9 @@ import javax.inject.Inject;
 import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerComponent;
+import fm.kirtsim.kharos.noteapp.dummy.DummyFragment;
 import fm.kirtsim.kharos.noteapp.manager.NotesManager;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
-import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListFragment;
 import fm.kirtsim.kharos.noteapp.utils.DateUtils;
 import fm.kirtsim.kharos.noteapp.utils.StringUtils;
 
@@ -79,9 +78,19 @@ public class NoteDetailFragment extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        viewMvc = new NoteDetailViewMvcImpl(inflater, container);
-        viewMvc.registerListener(this);
+        if (viewMvc == null) {
+            viewMvc = new NoteDetailViewMvcImpl(inflater, container);
+            viewMvc.registerListener(this);
+        }
         return viewMvc.getRootView();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState == null) {
+            displayNoteDetailsFromArguments(getArguments());
+        }
     }
 
     @Override
@@ -94,44 +103,48 @@ public class NoteDetailFragment extends BaseFragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.save:
-                if (!onSaveNoteMenuItemClicked())
-                    onDeleteNoteMenuItemClicked();
+                startNewFragment(DummyFragment.class, null, null, true);
+                Note note = createNoteFromDetails();
+                if (!saveNote(note))
+                    deleteNote(note);
+                popFromBackStack();
                 break;
-            case R.id.delete: onDeleteNoteMenuItemClicked(); break;
-            case android.R.id.home:
-                Log.d(getClassName(), "home button clicked");
-                if (!onSaveNoteMenuItemClicked())
-                    onDeleteNoteMenuItemClicked();
+            case R.id.delete:
+                deleteNote(createNoteFromDetails());
+                popFromBackStack();
                 break;
             default: return super.onOptionsItemSelected(item);
         }
         return true;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        displayNoteDetailsFromArguments(getArguments());
-    }
-
     private void displayNoteDetailsFromArguments(Bundle arguments) {
         if (noteId == -1) {
-            viewMvc.setTitleColor(defaultTextColor);
-            viewMvc.setTextColor(defaultTextColor);
-            viewMvc.setNoteText(getString(R.string.default_text));
+            setDefaultNoteDetails();
         } else {
-            String noteTitle = "", noteText = "";
-            if (arguments != null) {
-                noteTitle = arguments.getString(ARG_NOTE_TITLE, "");
-                noteText = arguments.getString(ARG_NOTE_TEXT, "");
+            assignValuesFromArguments(arguments);
+            if (!validateNoteTitle()) {
+                viewMvc.setNoteTitle(getString(R.string.default_title));
+                viewMvc.setTitleColor(defaultTextColor);
             }
-            validateNoteTitle(noteTitle, userTextColor);
-            validateNoteText(noteText, userTextColor);
+            if (!validateNoteText()) {
+                viewMvc.setNoteText(getString(R.string.default_text));
+                viewMvc.setTextColor(defaultTextColor);
+            }
+        }
+    }
 
-            viewMvc.setNoteTitle(isTitleDefault ? getString(R.string.default_title) : noteTitle);
-            viewMvc.setTitleColor(isTitleDefault ? defaultTextColor : userTextColor);
-            viewMvc.setNoteText(isTextDefault ? getString(R.string.default_text) : noteText);
-            viewMvc.setTextColor(isTextDefault ? defaultTextColor : userTextColor);
+    private void setDefaultNoteDetails() {
+        viewMvc.setTitleColor(defaultTextColor);
+        viewMvc.setTextColor(defaultTextColor);
+        viewMvc.setNoteTitle(getString(R.string.default_title));
+        viewMvc.setNoteText(getString(R.string.default_text));
+    }
+
+    private void assignValuesFromArguments(Bundle arguments) {
+        if (arguments != null) {
+            viewMvc.setNoteTitle(arguments.getString(ARG_NOTE_TITLE, ""));
+            viewMvc.setNoteText(arguments.getString(ARG_NOTE_TEXT, ""));
         }
     }
 
@@ -149,39 +162,39 @@ public class NoteDetailFragment extends BaseFragment implements
         viewMvc = null;
     }
 
-    private boolean onSaveNoteMenuItemClicked() {
-        timestamp = System.currentTimeMillis();
-        String noteTitle = viewMvc.getTitle();
-        String noteText = viewMvc.getText();
-        validateNoteTitle(noteTitle, viewMvc.getTitleColor());
-        validateNoteText(noteText, viewMvc.getTextColor());
-        if (isTextDefault && isTitleDefault)
-            return false;
-
-        if (isTitleDefault) {
-            noteTitle = StringUtils.extractFirstWordsUpToLength(noteText, NOTE_TITLE_MAX_LETTER_COUNT);
-            if (noteTitle.isEmpty())
-                noteTitle = DateUtils.getDateStringFromTimestamp(timestamp);
-        }
-
-        Note note = new Note(noteId, noteTitle, noteText, timestamp);
+    private boolean saveNote(Note note) {
+        if (note == null) return false;
+        timestamp = note.getTimestamp();
         if (noteId == -1) {
             notesManager.addNewNote(note);
         } else {
             notesManager.updateNote(note);
         }
-        popFromBackStack(NotesListFragment.class.getSimpleName());
         return true;
     }
 
-    private void onDeleteNoteMenuItemClicked() {
-        if (noteId != -1) {
-            Note note = new Note(noteId, viewMvc.getTitle(), viewMvc.getText(), timestamp);
+    @Nullable
+    private Note createNoteFromDetails() {
+        if (!validateNoteTitle() && !validateNoteText())
+            return null;
+        String noteTitle = viewMvc.getTitle();
+        String noteText = viewMvc.getText();
+        final long time = System.currentTimeMillis();
+        if (isTitleDefault) {
+            noteTitle = StringUtils.extractFirstWordsUpToLength(noteText,
+                    NOTE_TITLE_MAX_LETTER_COUNT);
+            if (noteTitle.isEmpty())
+                noteTitle = DateUtils.getDateStringFromTimestamp(time);
+        }
+        return new Note(noteId, noteTitle, noteText, time);
+    }
+
+    private void deleteNote(Note note) {
+        if (note != null) {
             notesManager.removeNote(note);
         } else {
             showToast(R.string.note_discarded_message);
         }
-        popFromBackStack(NotesListFragment.class.getSimpleName());
     }
 
 
@@ -190,7 +203,8 @@ public class NoteDetailFragment extends BaseFragment implements
      * ****************************************************/
     @Override
     public void onNoteTitleFocusChanged(boolean hasFocus) {
-        if (!hasFocus && !validateNoteTitle(viewMvc.getTitle(), viewMvc.getTitleColor())) {
+        validateNoteTitle();
+        if (!hasFocus && isTitleDefault) {
             viewMvc.setTitleColor(defaultTextColor);
             viewMvc.setNoteTitle(getString(R.string.default_title));
         } else if (isTitleDefault) {
@@ -199,16 +213,19 @@ public class NoteDetailFragment extends BaseFragment implements
         }
     }
 
-    private boolean validateNoteTitle(String text, @ColorInt int textColor) {
+    private boolean validateNoteTitle() {
+        String title = viewMvc.getTitle();
+        int color = viewMvc.getTitleColor();
         isTitleDefault =
-                text == null || text.isEmpty() || StringUtils.getFirstWordIndex(text) == -1 ||
-                textColor == defaultTextColor;
+                title == null || title.isEmpty() || StringUtils.getFirstWordIndex(title) == -1 ||
+                color == defaultTextColor;
         return !isTitleDefault;
     }
 
     @Override
     public void onNoteTextFocusChanged(boolean hasFocus) {
-        if (!hasFocus && !validateNoteText(viewMvc.getText(), viewMvc.getTextColor())) {
+        validateNoteText();
+        if (!hasFocus && isTextDefault) {
             viewMvc.setTextColor(defaultTextColor);
             viewMvc.setNoteText(getString(R.string.default_text));
         } else if (isTextDefault) {
@@ -217,14 +234,18 @@ public class NoteDetailFragment extends BaseFragment implements
         }
     }
 
-    private boolean validateNoteText(String text, @ColorInt int textColor) {
-        isTextDefault = (text == null || text.isEmpty()) || textColor == defaultTextColor;
+    private boolean validateNoteText() {
+        String text = viewMvc.getText();
+        int color = viewMvc.getTextColor();
+        isTextDefault = (text == null || text.isEmpty()) || color == defaultTextColor;
         return !isTextDefault;
     }
 
     @Override
     protected void onBackPressed() {
-        if (!onSaveNoteMenuItemClicked())
-            onDeleteNoteMenuItemClicked();
+        Note note = createNoteFromDetails();
+        if (!saveNote(note))
+            deleteNote(note);
+        popFromBackStack();
     }
 }

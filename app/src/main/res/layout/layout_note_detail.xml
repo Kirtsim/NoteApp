@@ -16,7 +16,8 @@
         android:background="@android:color/transparent"
         android:fontFamily="monospace"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:freezesText="false"/>
 
     <FrameLayout
         android:id="@+id/detail_note_delimiter"
@@ -32,5 +33,6 @@
         android:textAppearance="?android:textAppearanceMedium"
         android:background="@android:color/transparent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:freezesText="false"/>
 </LinearLayout>

@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.google.common.collect.Sets;
 
@@ -47,6 +46,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
     }
 
+    @SuppressWarnings("UnusedParameters")
     protected boolean performDependencyInjection(ControllerComponent component) {
         return false;
     }
@@ -61,9 +61,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        Log.d(getClass().getSimpleName(), "backPressed");
         backPressListeners.forEach(BackPressListener::onBackPressed);
-//        super.onBackPressed();
     }
 
     @Override
@@ -80,8 +78,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (fragment != null) {
             fragment.setArguments(arguments);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            if (addToBackStack)
+            if (addToBackStack) {
                 transaction.addToBackStack(backStackStateName);
+            }
             if (animations != null)
                 animations.applyAnimationsToTransaction(transaction);
             transaction.replace(R.id.main_fragment_holder, fragment, class_.getSimpleName());
@@ -101,9 +100,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public void popBackStack(String backStackStateName) {
-        Log.d(getClass().getSimpleName(), "popping from back stack");
-        if (getSupportFragmentManager().findFragmentByTag(backStackStateName) == null)
-            Log.d(getClass().getSimpleName(), "could not find the fragment transaction");
         getSupportFragmentManager().popBackStack(backStackStateName,
                 FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
