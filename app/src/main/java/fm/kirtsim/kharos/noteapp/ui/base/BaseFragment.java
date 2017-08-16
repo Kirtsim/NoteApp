@@ -75,8 +75,9 @@ public abstract class BaseFragment extends Fragment {
         popFromBackStack(getClassName());
     }
 
-    protected void onBackPressed() {
+    protected boolean onBackPressed() {
         popFromBackStack();
+        return true;
     }
 
     protected void showToast(@StringRes int resId) {

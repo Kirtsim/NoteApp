@@ -27,10 +27,12 @@ import fm.kirtsim.kharos.noteapp.ui.Animations;
 public abstract class BaseActivity extends AppCompatActivity implements
         BaseFragment.BaseFragmentListener {
 
+    private boolean finalBackPressTag = false;
+
     @SuppressWarnings("WeakerAccess")
     @FunctionalInterface
     public interface BackPressListener {
-        void onBackPressed();
+        boolean onBackPressed();
     }
 
     @Inject BackgroundThreadPoster backgroundThread;
@@ -61,7 +63,16 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        backPressListeners.forEach(BackPressListener::onBackPressed);
+        finalBackPressTag = true;
+        backPressListeners.forEach(this::notifyListenerAboutBackPress);
+        if (finalBackPressTag)
+            super.onBackPressed();
+    }
+
+    private void notifyListenerAboutBackPress(BackPressListener listener) {
+        if (listener.onBackPressed()) {
+            finalBackPressTag = false;
+        }
     }
 
     @Override

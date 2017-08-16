@@ -242,10 +242,11 @@ public class NoteDetailFragment extends BaseFragment implements
     }
 
     @Override
-    protected void onBackPressed() {
+    protected boolean onBackPressed() {
         Note note = createNoteFromDetails();
         if (!saveNote(note))
             deleteNote(note);
         popFromBackStack();
+        return true;
     }
 }

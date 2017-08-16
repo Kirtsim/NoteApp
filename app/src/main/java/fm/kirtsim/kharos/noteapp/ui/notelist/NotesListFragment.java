@@ -156,6 +156,15 @@ public class NotesListFragment extends BaseFragment implements
         return this.getClass().getSimpleName();
     }
 
+    @Override
+    protected boolean onBackPressed() {
+        if (!highlightedNotes.isEmpty()) {
+            clearNoteHighlighting();
+            return true;
+        }
+        return false;
+    }
+
     // ###################### BaseFragment ########################
 
 
