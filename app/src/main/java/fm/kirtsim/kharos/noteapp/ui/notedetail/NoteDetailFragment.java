@@ -177,10 +177,12 @@ public class NoteDetailFragment extends BaseFragment implements
 
     @Nullable
     private Note createNoteFromDetails() {
-        if (!validateNoteTitle() && !validateNoteText())
-            return null;
+        validateNoteTitle();
+        validateNoteText();
+        if (isTitleDefault && isTextDefault) return null;
+
         String noteTitle = viewMvc.getTitle();
-        String noteText = viewMvc.getText();
+        String noteText = isTextDefault ? "" : viewMvc.getText();
         final long time = System.currentTimeMillis();
         if (isTitleDefault) {
             noteTitle = StringUtils.extractFirstWordsUpToLength(noteText,
