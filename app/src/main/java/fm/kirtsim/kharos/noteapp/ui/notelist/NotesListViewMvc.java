@@ -9,7 +9,7 @@ import fm.kirtsim.kharos.noteapp.ui.base.ObservableViewMvc;
  * Created by kharos on 29/07/2017
  */
 
-public interface NotesListViewMvc extends
+interface NotesListViewMvc extends
         ObservableViewMvc<NotesListViewMvc.NotesListViewMvcListener>
 {
     interface NotesListViewMvcListener {
@@ -19,6 +19,8 @@ public interface NotesListViewMvc extends
     @MainThread void showAddButton();
 
     @MainThread void hideAddButton();
+
+    void addNoteItemDecoration(NotesListItemDecoration decoration);
 
     @SuppressWarnings("unused")
     RecyclerView.Adapter getRecyclerViewAdapter();

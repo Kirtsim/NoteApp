@@ -15,7 +15,7 @@ import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
  * Created by kharos on 31/07/2017
  */
 
-public class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDetailViewMvcListener>
+class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDetailViewMvcListener>
         implements NoteDetailViewMvc {
 
     private static final String ARG_NOTE_TITLE = "NOTE_TITLE";
@@ -25,10 +25,10 @@ public class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDet
 
     private EditText titleET;
     private EditText textET;
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private FrameLayout delimiterFL;
 
-    public NoteDetailViewMvcImpl(LayoutInflater inflater, ViewGroup container) {
+    NoteDetailViewMvcImpl(LayoutInflater inflater, ViewGroup container) {
         setRootView(inflater.inflate(R.layout.layout_note_detail, container, false));
         initializeViews();
         titleET.setOnFocusChangeListener((v, focus) -> listeners.

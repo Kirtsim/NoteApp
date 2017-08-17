@@ -8,7 +8,7 @@ import fm.kirtsim.kharos.noteapp.ui.base.ObservableViewMvc;
  * Created by kharos on 31/07/2017
  */
 
-public interface NoteDetailViewMvc extends
+interface NoteDetailViewMvc extends
         ObservableViewMvc<NoteDetailViewMvc.NoteDetailViewMvcListener> {
     interface NoteDetailViewMvcListener {
         void onNoteTitleFocusChanged(boolean hasFocus);

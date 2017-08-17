@@ -1,7 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
 import android.support.design.widget.FloatingActionButton;
@@ -11,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import fm.kirtsim.kharos.noteapp.R;
-import fm.kirtsim.kharos.noteapp.ui.adapter.BaseListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.ListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
 
@@ -19,7 +17,7 @@ import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
  * Created by kharos on 29/07/2017
  */
 
-public class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvcListener>
+class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvcListener>
         implements NotesListViewMvc {
 
     private static final int MAX_TRANSLATION_Y = 220;
@@ -28,8 +26,8 @@ public class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesList
     private RecyclerView notesList;
     private FloatingActionButton addNoteButton;
 
-    public NotesListViewMvcImpl(LayoutInflater inflater, ViewGroup container, ListAdapter adapter,
-                                RecyclerView.LayoutManager layoutManager) {
+    NotesListViewMvcImpl(LayoutInflater inflater, ViewGroup container, ListAdapter adapter,
+                         RecyclerView.LayoutManager layoutManager) {
         setRootView(inflater.inflate(R.layout.layout_notes_list, container, false));
         initializeViews();
         initializeRecyclerView((RecyclerView.Adapter<? extends RecyclerView.ViewHolder>) adapter,
@@ -80,5 +78,12 @@ public class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesList
     @Override
     public RecyclerView.Adapter<?> getRecyclerViewAdapter() {
         return notesList.getAdapter();
+    }
+
+    @Override
+    public void addNoteItemDecoration(NotesListItemDecoration decoration) {
+        if (decoration != null) {
+            notesList.addItemDecoration(decoration);
+        }
     }
 }

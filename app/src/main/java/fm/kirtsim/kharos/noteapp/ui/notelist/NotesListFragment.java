@@ -32,6 +32,7 @@ import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
 import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailFragment;
+import fm.kirtsim.kharos.noteapp.utils.Units;
 
 /**
  * Created by kharos on 29/07/2017
@@ -95,6 +96,8 @@ public class NotesListFragment extends BaseFragment implements
         mvcView = new NotesListViewMvcImpl(inflater, container, listAdapter,
                 new LinearLayoutManager(inflater.getContext()));
         mvcView.registerListener(this);
+        mvcView.addNoteItemDecoration(new NotesListItemDecorationImpl(
+                Units.dp2px(3, getResources().getDisplayMetrics())));
         actionBarMvc.setTitle(getString(R.string.your_notes_title));
         return mvcView.getRootView();
     }
