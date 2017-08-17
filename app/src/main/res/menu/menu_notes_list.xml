@@ -2,16 +2,18 @@
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
-        android:id="@+id/save"
+        android:id="@+id/mi_select_all"
         android:title="@string/save_menu_title"
-        android:icon="@drawable/confirm_vd_24dp"
+        android:icon="@drawable/select_all_vd_24"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/delete"
+        android:id="@+id/mi_delete"
         android:title="@string/delete_menu_title"
         android:icon="@drawable/delete_vd_24dp"
         app:showAsAction="ifRoom" />
+
 
 </menu>

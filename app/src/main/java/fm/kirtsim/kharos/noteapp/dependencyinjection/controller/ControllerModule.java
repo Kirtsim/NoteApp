@@ -7,6 +7,8 @@ import dagger.Provides;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseActivity;
+import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailActionBarViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailActionBarViewMvcImpl;
 import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListActionBarViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListActionBarViewMvcImpl;
 
@@ -34,7 +36,12 @@ public class ControllerModule {
     }
 
     @Provides
-    public NotesListActionBarViewMvc notesListMenuViewMvc() {
+    public NotesListActionBarViewMvc notesListActionBarViewMvc() {
         return new NotesListActionBarViewMvcImpl(activity.getSupportActionBar());
+    }
+
+    @Provides
+    public NoteDetailActionBarViewMvc noteDetailActionBarViewMvc() {
+        return new NoteDetailActionBarViewMvcImpl(activity.getSupportActionBar());
     }
 }

@@ -20,6 +20,8 @@ public interface NotesListAdapter extends ListAdapter<NotesListAdapter.NotesList
 
     void setNewNotesList(List<Note> newNotes);
 
+    List<Note> getListOfAllNotes();
+
     boolean addNotes(List<Note> newNotes);
 
     boolean removeNote(Note note);

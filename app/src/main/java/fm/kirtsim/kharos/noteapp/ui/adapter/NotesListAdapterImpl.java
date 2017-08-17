@@ -4,7 +4,8 @@ import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
+import com.google.common.collect.Lists;
+
 import java.util.List;
 
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
@@ -26,7 +27,7 @@ public class NotesListAdapterImpl extends
 
     public NotesListAdapterImpl(LayoutInflater layoutInflater) {
         super(layoutInflater);
-        notes = new ArrayList<>();
+        notes = Lists.newArrayList();
         noteIdsMappingToIndexes = new SparseIntArray(1);
     }
 
@@ -95,6 +96,11 @@ public class NotesListAdapterImpl extends
     public void setNewNotesList(List<Note> newNotes) {
         notes.clear();
         addNotes(newNotes);
+    }
+
+    @Override
+    public List<Note> getListOfAllNotes() {
+        return Lists.newArrayList(notes);
     }
 
     @Override

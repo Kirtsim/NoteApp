@@ -40,7 +40,7 @@ public abstract class BaseActionBarViewMvc implements ActionBarViewMvc {
 
     @Override
     public void setTitle(String title) {
-
+        actionBar.setTitle(title);
     }
 
     @Override

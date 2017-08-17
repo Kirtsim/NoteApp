@@ -37,6 +37,7 @@ public class NoteDetailFragment extends BaseFragment implements
     public static final String ARG_NOTE_TIME = "DETAIL_NOTE_TIMESTAMP";
 
     @Inject NotesManager notesManager;
+    @Inject NoteDetailActionBarViewMvc actionBarView;
     private NoteDetailViewMvc viewMvc;
 
     private int noteId = -1;
@@ -96,20 +97,20 @@ public class NoteDetailFragment extends BaseFragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_save_delete, menu);
+        actionBarView.setMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.save:
+            case R.id.mi_save:
                 startNewFragment(DummyFragment.class, null, null, true);
                 Note note = createNoteFromDetails();
                 if (!saveNote(note))
                     deleteNote(note);
                 popFromBackStack();
                 break;
-            case R.id.delete:
+            case R.id.mi_delete:
                 deleteNote(createNoteFromDetails());
                 popFromBackStack();
                 break;
@@ -163,6 +164,7 @@ public class NoteDetailFragment extends BaseFragment implements
     }
 
     private boolean saveNote(Note note) {
+        // TODO: default text gets saved instead of leaving the note body empty
         if (note == null) return false;
         timestamp = note.getTimestamp();
         if (noteId == -1) {

@@ -14,4 +14,5 @@
     <string name="save_menu_title">Save</string>
     <string name="delete_menu_title">Delete</string>
     <string name="note_discarded_message">Note discarded</string>
+    <string name="your_notes_title">Your notes</string>
 </resources>

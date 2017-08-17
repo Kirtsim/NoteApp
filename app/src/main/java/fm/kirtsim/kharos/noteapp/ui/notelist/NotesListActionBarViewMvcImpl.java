@@ -15,6 +15,7 @@ import fm.kirtsim.kharos.noteapp.ui.base.BaseActionBarViewMvc;
 public class NotesListActionBarViewMvcImpl extends BaseActionBarViewMvc implements NotesListActionBarViewMvc {
 
     private MenuItem deleteMI;
+    private MenuItem selectAllMI;
 
     public NotesListActionBarViewMvcImpl(ActionBar actionBar) {
         super(actionBar);
@@ -25,13 +26,13 @@ public class NotesListActionBarViewMvcImpl extends BaseActionBarViewMvc implemen
      * **********************************************************/
 
     @Override
-    public void hideDeleteMenuItem() {
-        deleteMI.setVisible(false);
+    public void setSelectAllMenuItemVisible(boolean visible) {
+        selectAllMI.setVisible(visible);
     }
 
     @Override
-    public void showDeleteMenuItem() {
-        deleteMI.setVisible(true);
+    public void setDeleteMenuItemVisible(boolean visible) {
+        deleteMI.setVisible(visible);
     }
 
     /* **********************************************************
@@ -41,19 +42,15 @@ public class NotesListActionBarViewMvcImpl extends BaseActionBarViewMvc implemen
 
     @Override
     public void setMenu(Menu menu, MenuInflater menuInflater) {
-        menuInflater.inflate(R.menu.menu_save_delete, menu);
+        menuInflater.inflate(R.menu.menu_notes_list, menu);
         setMenu(menu);
 
         initializeMenuItems();
-        removeRedundantMenuItems();
         deleteMI.setVisible(false);
     }
 
     private void initializeMenuItems() {
-        deleteMI = menu.findItem(R.id.delete);
-    }
-
-    private void removeRedundantMenuItems() {
-        menu.removeItem(R.id.save);
+        deleteMI = menu.findItem(R.id.mi_delete);
+        selectAllMI = menu.findItem(R.id.mi_select_all);
     }
 }

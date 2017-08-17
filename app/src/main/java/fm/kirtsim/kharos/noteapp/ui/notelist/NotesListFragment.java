@@ -16,8 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -44,10 +44,10 @@ public class NotesListFragment extends BaseFragment implements
 
     @Inject NotesListAdapter listAdapter;
     @Inject NotesManager notesManager;
-    @Inject NotesListActionBarViewMvc menuViewMvc;
+    @Inject NotesListActionBarViewMvc actionBarMvc;
 
     private NotesListViewMvc mvcView;
-    private final Set<Integer> highlightedNotes = new HashSet<>(1);
+    private final Set<Integer> highlightedNotes = Sets.newHashSet();
 
     private Animations noteDetailAnimations;
 
@@ -62,8 +62,7 @@ public class NotesListFragment extends BaseFragment implements
 
         listAdapter.setListener(this);
         notesManager.registerListener(this);
-        menuViewMvc.setShowHomeButton(false);
-
+        actionBarMvc.setShowHomeButton(false);
         noteDetailAnimations = getAnimationsForNoteDetailFragment();
     }
 
@@ -96,6 +95,7 @@ public class NotesListFragment extends BaseFragment implements
         mvcView = new NotesListViewMvcImpl(inflater, container, listAdapter,
                 new LinearLayoutManager(inflater.getContext()));
         mvcView.registerListener(this);
+        actionBarMvc.setTitle(getString(R.string.your_notes_title));
         return mvcView.getRootView();
     }
 
@@ -119,21 +119,23 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        menuViewMvc.setMenu(menu, inflater);
-        menuViewMvc.hideDeleteMenuItem();
+        actionBarMvc.setMenu(menu, inflater);
+        actionBarMvc.setDeleteMenuItemVisible(false);
+        actionBarMvc.setSelectAllMenuItemVisible(false);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.delete: deleteHighlightedNotes();break;
+            case R.id.mi_delete: deleteHighlightedNotes();break;
+            case R.id.mi_select_all: addAllNotesToHighlighted(); break;
             case android.R.id.home: clearNoteHighlighting(); break;
             default: return super.onOptionsItemSelected(item);
         }
         return true;
     }
 
-    void deleteHighlightedNotes() {
+    private void deleteHighlightedNotes() {
         List<Note> notes = Lists.newArrayListWithCapacity(highlightedNotes.size());
         final Note defaultNote = new Note(-1, null, null, 0);
         highlightedNotes.forEach(id ->
@@ -141,7 +143,14 @@ public class NotesListFragment extends BaseFragment implements
         notesManager.removeNotes(notes);
     }
 
-    void clearNoteHighlighting() {
+    private void addAllNotesToHighlighted() {
+        List<Note> notes = listAdapter.getListOfAllNotes();
+        notes.forEach(note -> highlightedNotes.add(note.getId()));
+        onNoteIdAddedToHighlighted();
+        listAdapter.updateDataSet();
+    }
+
+    private void clearNoteHighlighting() {
         highlightedNotes.clear();
         onNoteIdRemovedFromHighlighted();
         listAdapter.updateDataSet();
@@ -204,23 +213,28 @@ public class NotesListFragment extends BaseFragment implements
         }
         setNoteItemBackground(noteItemView, isHighlighted);
         listAdapter.updateItemAtPosition(notePosition);
-        // TODO: hide or show FAB to avoid bugs
     }
 
     private void onNoteIdRemovedFromHighlighted() {
         if (highlightedNotes.isEmpty()) {
-            menuViewMvc.hideDeleteMenuItem();
-            menuViewMvc.setDisplayHomeAsUp(false);
+            actionBarMvc.setDeleteMenuItemVisible(false);
+            actionBarMvc.setSelectAllMenuItemVisible(false);
+            actionBarMvc.setDisplayHomeAsUp(false);
+            actionBarMvc.setTitle(getString(R.string.your_notes_title));
             mvcView.showAddButton();
+        } else {
+            actionBarMvc.setTitle(String.valueOf(highlightedNotes.size()));
         }
     }
 
     private void onNoteIdAddedToHighlighted() {
         if (highlightedNotes.size() == 1) {
-            menuViewMvc.showDeleteMenuItem();
-            menuViewMvc.setDisplayHomeAsUp(true);
+            actionBarMvc.setDeleteMenuItemVisible(true);
+            actionBarMvc.setDisplayHomeAsUp(true);
+            actionBarMvc.setSelectAllMenuItemVisible(true);
             mvcView.hideAddButton();
         }
+        actionBarMvc.setTitle(String.valueOf(highlightedNotes.size()));
     }
 
     @Override

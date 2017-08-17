@@ -8,6 +8,7 @@ import fm.kirtsim.kharos.noteapp.ui.main.ActionBarViewMvc;
 
 public interface NotesListActionBarViewMvc extends ActionBarViewMvc {
 
-    void hideDeleteMenuItem();
-    void showDeleteMenuItem();
+    void setSelectAllMenuItemVisible(boolean visible);
+
+    void setDeleteMenuItemVisible(boolean visible);
 }
