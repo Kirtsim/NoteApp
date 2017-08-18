@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
@@ -23,6 +24,7 @@ class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDetailView
     private static final String ARG_NOTE_TITLE_COLOR = "NOTE_TITLE_COLOR";
     private static final String ARG_NOTE_TEXT_COLOR = "NOTE_TEXT_COLOR";
 
+    private TextView dateTimeTV;
     private EditText titleET;
     private EditText textET;
     @SuppressWarnings({"unused", "FieldCanBeLocal"})
@@ -38,7 +40,7 @@ class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDetailView
     }
 
     private void initializeViews() {
-        Log.d(this.getClass().getSimpleName(), "initializing Views");
+        dateTimeTV = (TextView) rootView.findViewById(R.id.detail_note_date_time);
         titleET = (EditText) rootView.findViewById(R.id.detail_note_title);
         textET = (EditText) rootView.findViewById(R.id.detail_note_text);
         delimiterFL = (FrameLayout) rootView.findViewById(R.id.detail_note_delimiter);
@@ -73,6 +75,11 @@ class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDetailView
     /* ***************************************
      *         NoteDetailViewMvc methods
      * ***************************************/
+
+    @Override
+    public void setNoteDateAndTime(String dateAndTime) {
+        dateTimeTV.setText(dateAndTime);
+    }
 
     @Override
     public void setNoteTitle(String title) {

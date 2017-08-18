@@ -136,6 +136,8 @@ public class NoteDetailFragment extends BaseFragment implements
     }
 
     private void setDefaultNoteDetails() {
+        viewMvc.setNoteDateAndTime(
+                DateUtils.getDateAndTimeStringFromTimeStamp(System.currentTimeMillis()));
         viewMvc.setTitleColor(defaultTextColor);
         viewMvc.setTextColor(defaultTextColor);
         viewMvc.setNoteTitle(getString(R.string.default_title));
@@ -146,6 +148,8 @@ public class NoteDetailFragment extends BaseFragment implements
         if (arguments != null) {
             viewMvc.setNoteTitle(arguments.getString(ARG_NOTE_TITLE, ""));
             viewMvc.setNoteText(arguments.getString(ARG_NOTE_TEXT, ""));
+            long time = arguments.getLong(ARG_NOTE_TIME, System.currentTimeMillis());
+            viewMvc.setNoteDateAndTime(DateUtils.getDateAndTimeStringFromTimeStamp(time));
         }
     }
 
@@ -183,7 +187,7 @@ public class NoteDetailFragment extends BaseFragment implements
 
         String noteTitle = viewMvc.getTitle();
         String noteText = isTextDefault ? "" : viewMvc.getText();
-        final long time = System.currentTimeMillis();
+        final long time = createModificationTime();
         if (isTitleDefault) {
             noteTitle = StringUtils.extractFirstWordsUpToLength(noteText,
                     NOTE_TITLE_MAX_LETTER_COUNT);
@@ -191,6 +195,20 @@ public class NoteDetailFragment extends BaseFragment implements
                 noteTitle = DateUtils.getDateStringFromTimestamp(time);
         }
         return new Note(noteId, noteTitle, noteText, time);
+    }
+
+    private long createModificationTime() {
+        Bundle args = getArguments();
+        if (hasNoteBeenModified())
+            return System.currentTimeMillis();
+        return args != null ? args.getLong(ARG_NOTE_TIME) : System.currentTimeMillis();
+    }
+
+    private boolean hasNoteBeenModified() {
+        if (noteId == -1) return true;
+        final Bundle args = getArguments();
+        return args == null || !viewMvc.getTitle().equals(args.getString(ARG_NOTE_TITLE)) ||
+                !viewMvc.getText().equals(args.getString(ARG_NOTE_TEXT));
     }
 
     private void deleteNote(Note note) {

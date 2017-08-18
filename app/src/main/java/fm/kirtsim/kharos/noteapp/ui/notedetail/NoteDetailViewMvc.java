@@ -15,6 +15,7 @@ interface NoteDetailViewMvc extends
         void onNoteTextFocusChanged(boolean hasFocus);
     }
 
+    void setNoteDateAndTime(String dateAndTime);
     void setNoteTitle(String title);
     void setNoteText(String text);
     void setTitleColor(int rgb);

@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingStart="@dimen/layout_left_right_padding"
     android:paddingEnd="@dimen/layout_left_right_padding"
-    android:paddingTop="@dimen/layout_top_bottom_padding"
+    android:paddingTop="@dimen/layout_left_right_padding"
     android:paddingBottom="@dimen/layout_top_bottom_padding">
+
+    <TextView
+        android:id="@+id/detail_note_date_time"
+        android:text="@string/dummy_date_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"/>
 
     <EditText
         android:id="@+id/detail_note_title"
@@ -17,12 +25,13 @@
         android:fontFamily="monospace"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:freezesText="false"/>
+        android:freezesText="false"
+        tools:ignore="LabelFor,TextFields" />
 
     <FrameLayout
         android:id="@+id/detail_note_delimiter"
         android:layout_width="match_parent"
-        android:layout_height="3dp"
+        android:layout_height="1dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="10dp"
         android:background="@color/colorPrimaryDark" />
@@ -34,5 +43,6 @@
         android:background="@android:color/transparent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:freezesText="false"/>
+        android:freezesText="false"
+        tools:ignore="LabelFor,TextFields" />
 </LinearLayout>
