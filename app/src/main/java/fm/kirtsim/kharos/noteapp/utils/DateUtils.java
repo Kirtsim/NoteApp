@@ -1,6 +1,5 @@
 package fm.kirtsim.kharos.noteapp.utils;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -11,7 +10,9 @@ import java.util.Locale;
 
 public class DateUtils {
 
-    private static DateFormat dateFormatter;
+    private static SimpleDateFormat dateFormatter;
+    private static SimpleDateFormat timeFormatter;
+    private static SimpleDateFormat dateAndTimeFormatter;
 
     public static String getDateStringFromTimestamp(long timestamp) {
         if (dateFormatter == null)
@@ -19,7 +20,29 @@ public class DateUtils {
         return dateFormatter.format(new Date(timestamp));
     }
 
+    @SuppressWarnings("unused")
+    public static String getTimeStringFromTimestamp(long timestamp) {
+        if (timeFormatter == null)
+            initializeTimeFormatter();
+        return timeFormatter.format(new Date(timestamp));
+    }
+
+    @SuppressWarnings("unused")
+    public static String getDateAndTimeStringFromTimeStamp(long timestamp) {
+        if (dateAndTimeFormatter == null)
+            initializeDateAndTimeFormatter();
+        return dateAndTimeFormatter.format(new Date(timestamp));
+    }
+
+    private static void initializeTimeFormatter() {
+        timeFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+    }
+
     private static void initializeDateFormatter() {
-        dateFormatter = SimpleDateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
+        dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    }
+
+    private static void initializeDateAndTimeFormatter() {
+        dateAndTimeFormatter = new SimpleDateFormat("EEE dd/MM/yyyy  -  HH:mm", Locale.getDefault());
     }
 }
