@@ -4,7 +4,8 @@
     android:id="@+id/note_list_item_outer_background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="2dp">
+    android:padding="2dp"
+    android:elevation="2dp">
 
     <LinearLayout
         android:id="@+id/note_list_item_inner_background"
