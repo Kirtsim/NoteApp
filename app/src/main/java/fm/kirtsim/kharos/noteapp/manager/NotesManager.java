@@ -23,6 +23,7 @@ public class NotesManager {
         void onNotesFetched(@NonNull List<Note> notes);
         void onNewNoteAdded(@NonNull Note note);
         void onNoteUpdated(@NonNull Note note);
+        void onMultipleNotesUpdated(@NonNull List<Note> notes);
         void onNoteDeleted(@NonNull Note note);
         void onMultipleNotesDeleted(@NonNull List<Note> notes);
     }
@@ -41,6 +42,10 @@ public class NotesManager {
         this.backgroundThreadPoster = backgroundThreadPoster;
     }
 
+    /**
+     * Inserts a new Note into the database
+     * @param note note that has been inserted also containing the Id it has been assigned
+     */
     public void addNewNote(Note note) {
         backgroundThreadPoster.post(() -> insertNote(note));
     }
@@ -76,6 +81,17 @@ public class NotesManager {
                 mainThreadPoster.post(() ->
                         listeners.forEach(listener -> listener.onNoteUpdated(noteCopy)));
             }
+        }
+    }
+
+    public void updateNotes(List<Note> notes) {
+        backgroundThreadPoster.post(() -> updateMultipleNotes(notes));
+    }
+
+    private void updateMultipleNotes(List<Note> notes) {
+        if (notes != null && !notes.isEmpty()) {
+            notesDatabase.updateNotes(notes);
+            mainThreadPoster.post(() -> listeners.forEach(l -> l.onMultipleNotesUpdated(notes)));
         }
     }
 

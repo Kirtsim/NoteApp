@@ -1,5 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.notedetail;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
@@ -32,6 +33,9 @@ public class NoteDetailFragment extends BaseFragment implements
         NoteDetailViewMvc.NoteDetailViewMvcListener {
 
     public static final String ARG_NOTE_ID = "DETAIL_NOTE_ID";
+    public static final String ARG_NOTE_ORDER_NO = "DETAIL_NOTE_ORDER_NO";
+    public static final String ARG_NOTE_COLOR = "DETAIL_NOTE_COLOR";
+    public static final String ARG_NOTE_PINNED = "DETAIL_NOTE_PINNED";
     public static final String ARG_NOTE_TITLE = "DETAIL_NOTE_TITLE";
     public static final String ARG_NOTE_TEXT = "DETAIL_NOTE_TEXT";
     public static final String ARG_NOTE_TIME = "DETAIL_NOTE_TIMESTAMP";
@@ -41,6 +45,9 @@ public class NoteDetailFragment extends BaseFragment implements
     private NoteDetailViewMvc viewMvc;
 
     private int noteId = -1;
+    private int orderNo = 0;
+    private int color = Color.WHITE;
+    private boolean pinned = false;
     private long timestamp = -1;
 
     private boolean isTitleDefault = true;
@@ -59,6 +66,9 @@ public class NoteDetailFragment extends BaseFragment implements
     private void initNoteDetailsFromArguments(Bundle arguments) {
         if (arguments != null) {
             noteId = arguments.getInt(ARG_NOTE_ID, noteId);
+            orderNo = arguments.getInt(ARG_NOTE_ORDER_NO, orderNo);
+            color = arguments.getInt(ARG_NOTE_COLOR, color);
+            pinned = arguments.getBoolean(ARG_NOTE_PINNED, pinned);
             timestamp = arguments.getLong(ARG_NOTE_TIME, timestamp);
         }
     }
@@ -91,7 +101,7 @@ public class NoteDetailFragment extends BaseFragment implements
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState == null) {
             displayNoteDetailsFromArguments(getArguments());
-        }
+        } // TODO: savedInstanceState is no longer null when TextView is present in the layout
     }
 
     @Override
@@ -168,7 +178,6 @@ public class NoteDetailFragment extends BaseFragment implements
     }
 
     private boolean saveNote(Note note) {
-        // TODO: default text gets saved instead of leaving the note body empty
         if (note == null) return false;
         timestamp = note.getTimestamp();
         if (noteId == -1) {
@@ -194,7 +203,7 @@ public class NoteDetailFragment extends BaseFragment implements
             if (noteTitle.isEmpty())
                 noteTitle = DateUtils.getDateStringFromTimestamp(time);
         }
-        return new Note(noteId, noteTitle, noteText, time);
+        return new Note(noteId, orderNo, color, pinned, noteTitle, noteText, time);
     }
 
     private long createModificationTime() {

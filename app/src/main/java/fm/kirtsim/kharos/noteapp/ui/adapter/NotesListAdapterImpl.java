@@ -158,6 +158,14 @@ public class NotesListAdapterImpl extends
     }
 
     @Override
+    public void notifyNoteChanged(Note note) {
+        final int index = noteIdsMappingToIndexes.get(note.getId());
+        if (index != -1) {
+            notifyItemChanged(index);
+        }
+    }
+
+    @Override
     public void notifyNoteRemoved(Note note) {
         final int index = noteIdsMappingToIndexes.get(note.getId());
         if (index != -1) {

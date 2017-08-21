@@ -27,6 +27,7 @@ import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerComponent;
 import fm.kirtsim.kharos.noteapp.manager.NotesManager;
+import fm.kirtsim.kharos.noteapp.threading.BackgroundThreadPoster;
 import fm.kirtsim.kharos.noteapp.ui.Animations;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
@@ -46,6 +47,7 @@ public class NotesListFragment extends BaseFragment implements
     @Inject NotesListAdapter listAdapter;
     @Inject NotesManager notesManager;
     @Inject NotesListActionBarViewMvc actionBarMvc;
+    @Inject BackgroundThreadPoster backgroundPoster;
 
     private NotesListViewMvc mvcView;
     private final Set<Integer> highlightedNotes = Sets.newHashSet();
@@ -102,7 +104,6 @@ public class NotesListFragment extends BaseFragment implements
         return mvcView.getRootView();
     }
 
-    @Override
     public void onStart() {
         super.onStart();
         notesManager.fetchNotes();
@@ -140,7 +141,7 @@ public class NotesListFragment extends BaseFragment implements
 
     private void deleteHighlightedNotes() {
         List<Note> notes = Lists.newArrayListWithCapacity(highlightedNotes.size());
-        final Note defaultNote = new Note(-1, null, null, 0);
+        final Note defaultNote = new Note(-1, -1, -1, false, null, null, 0);
         highlightedNotes.forEach(id ->
                 notes.add(listAdapter.getNoteWithIdOrDefault(id, defaultNote)));
         notesManager.removeNotes(notes);
@@ -197,6 +198,9 @@ public class NotesListFragment extends BaseFragment implements
     private void displayDetailsOfNote(Note note) {
         Bundle arguments = new Bundle(4);
         arguments.putInt(NoteDetailFragment.ARG_NOTE_ID, note.getId());
+        arguments.putInt(NoteDetailFragment.ARG_NOTE_ORDER_NO, note.getOrderNo());
+        arguments.putInt(NoteDetailFragment.ARG_NOTE_COLOR, note.getColor());
+        arguments.putBoolean(NoteDetailFragment.ARG_NOTE_PINNED, note.isPinned());
         arguments.putString(NoteDetailFragment.ARG_NOTE_TITLE, note.getTitle());
         arguments.putString(NoteDetailFragment.ARG_NOTE_TEXT, note.getText());
         arguments.putLong(NoteDetailFragment.ARG_NOTE_TIME, note.getTimestamp());
@@ -268,11 +272,43 @@ public class NotesListFragment extends BaseFragment implements
     }
 
     @Override public void onNewNoteAdded(@NonNull Note note) {
-        showToast(R.string.note_saved_message, "");
+        if (note.getId() != -1)
+            backgroundPoster.post(() -> updateOrderNumbersOfNotesStartingWithNote(note));
+        else
+            notesManager.fetchNotes();
+    }
+
+    private void updateOrderNumbersOfNotesStartingWithNote(Note newNote) {
+        List<Note> notes = listAdapter.getListOfAllNotes();
+        List<Note> updatedNotes = Lists.newArrayListWithCapacity(notes.size() + 1);
+        if (notes.isEmpty() || !notes.get(0).equals(newNote))
+            updatedNotes.add(incrementNoteOrderNumber(newNote));
+        notes.forEach(note -> updatedNotes.add(incrementNoteOrderNumber(note)));
+//        updatedNotes.forEach(note -> Log.d(getClassName(), "" + note.getOrderNo()));
+        notesManager.updateNotes(updatedNotes);
+    }
+
+    private Note incrementNoteOrderNumber(@NonNull Note note) {
+        return new Note(
+                note.getId(),
+                note.getOrderNo() + 1,
+                note.getColor(),
+                note.isPinned(),
+                note.getTitle(),
+                note.getText(),
+                note.getTimestamp()
+        );
     }
 
     @Override public void onNoteUpdated(@NonNull Note note) {
-        onNewNoteAdded(note);
+        listAdapter.notifyNoteChanged(note);
+    }
+
+    @Override
+    public void onMultipleNotesUpdated(@NonNull List<Note> notes) {
+        showToast(R.string.note_saved_message, "");
+        listAdapter.setNewNotesList(notes);
+        listAdapter.updateDataSet();
     }
 
     @Override
