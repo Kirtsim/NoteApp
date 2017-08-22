@@ -1,7 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -218,7 +217,7 @@ public class NotesListFragment extends BaseFragment implements
             highlightedNotes.add(note.getId());
             onNoteIdAddedToHighlighted();
         }
-        setNoteItemBackground(noteItemView, isHighlighted);
+        setNoteItemBackground(note, noteItemView);
         listAdapter.updateItemAtPosition(notePosition);
     }
 
@@ -248,14 +247,15 @@ public class NotesListFragment extends BaseFragment implements
     public void onNoteItemVisible(Note note, NotesListItemViewMvc noteItemView) {
         noteItemView.setText(note.getText());
         noteItemView.setTitle(note.getTitle());
-        setNoteItemBackground(noteItemView, highlightedNotes.contains(note.getId()));
+        setNoteItemBackground(note, noteItemView);
     }
 
-    private void setNoteItemBackground(NotesListItemViewMvc noteItemView, boolean isHighlighted) {
-        if (isHighlighted) {
+    private void setNoteItemBackground(Note note, NotesListItemViewMvc noteItemView) {
+        if (highlightedNotes.contains(note.getId())) {
             noteItemView.setBackgroundColors(COLOR_HIGHLIGHTED_FRAME, COLOR_HIGHLIGHTED_BACKGROUND);
         } else {
-            noteItemView.setBackgroundColors(Color.WHITE, Color.WHITE);
+            final int color = note.getColor();
+            noteItemView.setBackgroundColors(color, color);
         }
     }
     // ###################### NoteListAdapterListener ########################
