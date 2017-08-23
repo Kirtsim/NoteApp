@@ -16,7 +16,7 @@ public abstract class BaseViewMvc<ListenerType> implements ObservableViewMvc<Lis
     protected View rootView;
     protected final Set<ListenerType> listeners = new HashSet<>(1);
 
-    public void setRootView(View view) {
+    protected void setRootView(View view) {
         this.rootView = view;
     }
 

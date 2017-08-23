@@ -4,8 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/mi_color_picker"
+        android:title="@string/colors_menu_item"
+        android:icon="@drawable/color_picker_vd_24dp"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/mi_select_all"
-        android:title="@string/save_menu_title"
+        android:title="@string/select_all_menu_item"
         android:icon="@drawable/select_all_vd_24"
         app:showAsAction="ifRoom" />
 

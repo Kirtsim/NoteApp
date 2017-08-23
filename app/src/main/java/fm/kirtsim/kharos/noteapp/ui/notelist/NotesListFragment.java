@@ -31,6 +31,8 @@ import fm.kirtsim.kharos.noteapp.ui.Animations;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
+import fm.kirtsim.kharos.noteapp.ui.colorPicker.ColorPickerViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.colorPicker.ColorPickerViewMvcImpl;
 import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailFragment;
 import fm.kirtsim.kharos.noteapp.utils.Units;
 
@@ -43,12 +45,13 @@ public class NotesListFragment extends BaseFragment implements
         NotesListViewMvc.NotesListViewMvcListener,
         NotesManager.NotesManagerListener {
 
-    @Inject NotesListAdapter listAdapter;
+    @Inject NotesListAdapter notesListAdapter;
     @Inject NotesManager notesManager;
     @Inject NotesListActionBarViewMvc actionBarMvc;
     @Inject BackgroundThreadPoster backgroundPoster;
 
-    private NotesListViewMvc mvcView;
+    private NotesListViewMvc viewMvc;
+    private ColorPickerViewMvc colorPickerViewMvc;
     private final Set<Integer> highlightedNotes = Sets.newHashSet();
 
     private Animations noteDetailAnimations;
@@ -62,7 +65,7 @@ public class NotesListFragment extends BaseFragment implements
         initializeColors(getResources());
         setHasOptionsMenu(true);
 
-        listAdapter.setListener(this);
+        notesListAdapter.setListener(this);
         notesManager.registerListener(this);
         actionBarMvc.setShowHomeButton(false);
         noteDetailAnimations = getAnimationsForNoteDetailFragment();
@@ -94,13 +97,17 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        mvcView = new NotesListViewMvcImpl(inflater, container, listAdapter,
+        viewMvc = new NotesListViewMvcImpl(inflater, container, notesListAdapter,
                 new LinearLayoutManager(inflater.getContext()));
-        mvcView.registerListener(this);
-        mvcView.addNoteItemDecoration(new NotesListItemDecorationImpl(
+        viewMvc.registerListener(this);
+        viewMvc.addNoteItemDecoration(new NotesListItemDecorationImpl(
                 Units.dp2px(3, getResources().getDisplayMetrics())));
+
+        colorPickerViewMvc = new ColorPickerViewMvcImpl(inflater, null);
+        viewMvc.addViewToRightSideContainer(colorPickerViewMvc.getRootView());
+
         actionBarMvc.setTitle(getString(R.string.your_notes_title));
-        return mvcView.getRootView();
+        return viewMvc.getRootView();
     }
 
     public void onStart() {
@@ -111,12 +118,12 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onDetach() {
         super.onDetach();
-        listAdapter = null;
+        notesListAdapter = null;
         notesManager.removeListener(this);
         notesManager = null;
 
-        mvcView.unregisterListener(this);
-        mvcView = null;
+        viewMvc.unregisterListener(this);
+        viewMvc = null;
     }
 
     @Override
@@ -132,31 +139,39 @@ public class NotesListFragment extends BaseFragment implements
         switch (item.getItemId()) {
             case R.id.mi_delete: deleteHighlightedNotes();break;
             case R.id.mi_select_all: addAllNotesToHighlighted(); break;
+            case R.id.mi_color_picker: showOrHideColorPicker(); break;
             case android.R.id.home: clearNoteHighlighting(); break;
             default: return super.onOptionsItemSelected(item);
         }
         return true;
     }
 
+    private void showOrHideColorPicker() {
+        if (viewMvc.isRightSideContainerVisible())
+            viewMvc.hideColorPicker();
+        else
+            viewMvc.showColorPicker();
+    }
+
     private void deleteHighlightedNotes() {
         List<Note> notes = Lists.newArrayListWithCapacity(highlightedNotes.size());
         final Note defaultNote = new Note(-1, -1, -1, false, null, null, 0);
         highlightedNotes.forEach(id ->
-                notes.add(listAdapter.getNoteWithIdOrDefault(id, defaultNote)));
+                notes.add(notesListAdapter.getNoteWithIdOrDefault(id, defaultNote)));
         notesManager.removeNotes(notes);
     }
 
     private void addAllNotesToHighlighted() {
-        List<Note> notes = listAdapter.getListOfAllNotes();
+        List<Note> notes = notesListAdapter.getListOfAllNotes();
         notes.forEach(note -> highlightedNotes.add(note.getId()));
         onNoteIdAddedToHighlighted();
-        listAdapter.updateDataSet();
+        notesListAdapter.updateDataSet();
     }
 
     private void clearNoteHighlighting() {
         highlightedNotes.clear();
         onNoteIdRemovedFromHighlighted();
-        listAdapter.updateDataSet();
+        notesListAdapter.updateDataSet();
     }
 
     /* ************************************************************************
@@ -218,7 +233,7 @@ public class NotesListFragment extends BaseFragment implements
             onNoteIdAddedToHighlighted();
         }
         setNoteItemBackground(note, noteItemView);
-        listAdapter.updateItemAtPosition(notePosition);
+        notesListAdapter.updateItemAtPosition(notePosition);
     }
 
     private void onNoteIdRemovedFromHighlighted() {
@@ -227,7 +242,7 @@ public class NotesListFragment extends BaseFragment implements
             actionBarMvc.setSelectAllMenuItemVisible(false);
             actionBarMvc.setDisplayHomeAsUp(false);
             actionBarMvc.setTitle(getString(R.string.your_notes_title));
-            mvcView.showAddButton();
+            viewMvc.showAddButton();
         } else {
             actionBarMvc.setTitle(String.valueOf(highlightedNotes.size()));
         }
@@ -238,7 +253,7 @@ public class NotesListFragment extends BaseFragment implements
             actionBarMvc.setDeleteMenuItemVisible(true);
             actionBarMvc.setDisplayHomeAsUp(true);
             actionBarMvc.setSelectAllMenuItemVisible(true);
-            mvcView.hideAddButton();
+            viewMvc.hideAddButton();
         }
         actionBarMvc.setTitle(String.valueOf(highlightedNotes.size()));
     }
@@ -267,8 +282,8 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onNotesFetched(@NonNull List<Note> notes) {
-        listAdapter.setNewNotesList(notes);
-        listAdapter.updateDataSet();
+        notesListAdapter.setNewNotesList(notes);
+        notesListAdapter.updateDataSet();
     }
 
     @Override public void onNewNoteAdded(@NonNull Note note) {
@@ -279,7 +294,7 @@ public class NotesListFragment extends BaseFragment implements
     }
 
     private void updateOrderNumbersOfNotesStartingWithNote(Note newNote) {
-        List<Note> notes = listAdapter.getListOfAllNotes();
+        List<Note> notes = notesListAdapter.getListOfAllNotes();
         List<Note> updatedNotes = Lists.newArrayListWithCapacity(notes.size() + 1);
         if (notes.isEmpty() || !notes.get(0).equals(newNote))
             updatedNotes.add(incrementNoteOrderNumber(newNote));
@@ -301,21 +316,21 @@ public class NotesListFragment extends BaseFragment implements
     }
 
     @Override public void onNoteUpdated(@NonNull Note note) {
-        listAdapter.notifyNoteChanged(note);
+        notesListAdapter.notifyNoteChanged(note);
     }
 
     @Override
     public void onMultipleNotesUpdated(@NonNull List<Note> notes) {
         showToast(R.string.note_saved_message, "");
-        listAdapter.setNewNotesList(notes);
-        listAdapter.updateDataSet();
+        notesListAdapter.setNewNotesList(notes);
+        notesListAdapter.updateDataSet();
     }
 
     @Override
     public void onNoteDeleted(@NonNull Note note) {
         clearNoteHighlighting();
-        if (listAdapter.removeNote(note)) {
-            listAdapter.notifyNoteRemoved(note);
+        if (notesListAdapter.removeNote(note)) {
+            notesListAdapter.notifyNoteRemoved(note);
             showToast(R.string.note_deleted_message, "");
         } else
             notesManager.fetchNotes();
@@ -324,8 +339,8 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onMultipleNotesDeleted(@NonNull List<Note> notes) {
         clearNoteHighlighting();
-        if (listAdapter.removeNotes(notes)) {
-            listAdapter.updateDataSet();
+        if (notesListAdapter.removeNotes(notes)) {
+            notesListAdapter.updateDataSet();
             showToast(R.string.note_deleted_message, "s");
         } else
             notesManager.fetchNotes();

@@ -15,4 +15,6 @@
     <string name="delete_menu_title">Delete</string>
     <string name="note_discarded_message">Note discarded</string>
     <string name="your_notes_title">Your notes</string>
+    <string name="select_all_menu_item">Select all</string>
+    <string name="colors_menu_item">Colors</string>
 </resources>
