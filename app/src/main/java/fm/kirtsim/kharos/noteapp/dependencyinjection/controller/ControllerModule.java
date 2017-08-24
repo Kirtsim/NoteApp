@@ -4,6 +4,8 @@ import android.content.Context;
 
 import dagger.Module;
 import dagger.Provides;
+import fm.kirtsim.kharos.noteapp.ui.adapter.ColorPickerAdapter;
+import fm.kirtsim.kharos.noteapp.ui.adapter.ColorPickerAdapterImpl;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseActivity;
@@ -33,6 +35,11 @@ public class ControllerModule {
     @Provides
     public NotesListAdapter notesListAdapter() {
         return new NotesListAdapterImpl(activity.getLayoutInflater());
+    }
+
+    @Provides
+    public ColorPickerAdapter colorPickerAdapter() {
+        return new ColorPickerAdapterImpl(activity.getLayoutInflater());
     }
 
     @Provides

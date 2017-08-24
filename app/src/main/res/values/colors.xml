@@ -9,4 +9,26 @@
 
     <color name="note_detail_selected_background">#aae0ff</color>
     <color name="note_detail_selected_frame">#0537ff</color>
+
+    <color name="color_picker_rainbow_pink">#ffb3ba</color>
+    <color name="color_picker_rainbow_dark_pink">#ff8b94</color>
+    <color name="color_picker_rainbow_orange">#ffdfba</color>
+    <color name="color_picker_rainbow_yellow">#ffffba</color>
+    <color name="color_picker_rainbow_green">#baffc9</color>
+    <color name="color_picker_rainbow_lighter_green">#a1fb86</color>
+    <color name="color_picker_rainbow_light_blue">#bae1ff</color>
+    <color name="color_picker_rainbow_med_blue">#71b2fb</color>
+    <color name="color_picker_rainbow_purple">#ECCDFA</color>
+
+    <array name="color_picker_colors">
+        <item>@color/color_picker_rainbow_pink</item>
+        <item>@color/color_picker_rainbow_dark_pink</item>
+        <item>@color/color_picker_rainbow_orange</item>
+        <item>@color/color_picker_rainbow_yellow</item>
+        <item>@color/color_picker_rainbow_green</item>
+        <item>@color/color_picker_rainbow_lighter_green</item>
+        <item>@color/color_picker_rainbow_light_blue</item>
+        <item>@color/color_picker_rainbow_med_blue</item>
+        <item>@color/color_picker_rainbow_purple</item>
+    </array>
 </resources>

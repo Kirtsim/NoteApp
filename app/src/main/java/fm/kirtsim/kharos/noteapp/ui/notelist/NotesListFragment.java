@@ -2,6 +2,7 @@ package fm.kirtsim.kharos.noteapp.ui.notelist;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -28,6 +30,7 @@ import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerCompon
 import fm.kirtsim.kharos.noteapp.manager.NotesManager;
 import fm.kirtsim.kharos.noteapp.threading.BackgroundThreadPoster;
 import fm.kirtsim.kharos.noteapp.ui.Animations;
+import fm.kirtsim.kharos.noteapp.ui.adapter.ColorPickerAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
@@ -43,14 +46,16 @@ import fm.kirtsim.kharos.noteapp.utils.Units;
 public class NotesListFragment extends BaseFragment implements
         NotesListAdapterImpl.NotesListAdapterListener,
         NotesListViewMvc.NotesListViewMvcListener,
-        NotesManager.NotesManagerListener {
+        NotesManager.NotesManagerListener,
+        ColorPickerAdapter.ColorPickerAdapterListener {
 
     @Inject NotesListAdapter notesListAdapter;
+    @Inject ColorPickerAdapter colorsListAdapter;
     @Inject NotesManager notesManager;
     @Inject NotesListActionBarViewMvc actionBarMvc;
     @Inject BackgroundThreadPoster backgroundPoster;
 
-    private NotesListViewMvc viewMvc;
+    private NotesListViewMvc notesListViewMvc;
     private ColorPickerViewMvc colorPickerViewMvc;
     private final Set<Integer> highlightedNotes = Sets.newHashSet();
 
@@ -66,6 +71,9 @@ public class NotesListFragment extends BaseFragment implements
         setHasOptionsMenu(true);
 
         notesListAdapter.setListener(this);
+        colorsListAdapter.setListener(this);
+        colorsListAdapter.setColors(getContext().getResources()
+                .getIntArray(R.array.color_picker_colors));
         notesManager.registerListener(this);
         actionBarMvc.setShowHomeButton(false);
         noteDetailAnimations = getAnimationsForNoteDetailFragment();
@@ -97,17 +105,19 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        viewMvc = new NotesListViewMvcImpl(inflater, container, notesListAdapter,
+        notesListViewMvc = new NotesListViewMvcImpl(inflater, container, notesListAdapter,
                 new LinearLayoutManager(inflater.getContext()));
-        viewMvc.registerListener(this);
-        viewMvc.addNoteItemDecoration(new NotesListItemDecorationImpl(
+        notesListViewMvc.registerListener(this);
+        notesListViewMvc.addNoteItemDecoration(new NotesListItemDecorationImpl(
                 Units.dp2px(3, getResources().getDisplayMetrics())));
 
         colorPickerViewMvc = new ColorPickerViewMvcImpl(inflater, null);
-        viewMvc.addViewToRightSideContainer(colorPickerViewMvc.getRootView());
+        colorPickerViewMvc.setLayoutManager(new LinearLayoutManager(getContext()));
+        colorPickerViewMvc.setAdapter(colorsListAdapter);
+        notesListViewMvc.addViewToRightSideContainer(colorPickerViewMvc.getRootView());
 
         actionBarMvc.setTitle(getString(R.string.your_notes_title));
-        return viewMvc.getRootView();
+        return notesListViewMvc.getRootView();
     }
 
     public void onStart() {
@@ -118,12 +128,15 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onDetach() {
         super.onDetach();
+        colorsListAdapter.unregisterListener();
+
+        notesListAdapter.unregisterListener();
         notesListAdapter = null;
         notesManager.removeListener(this);
         notesManager = null;
 
-        viewMvc.unregisterListener(this);
-        viewMvc = null;
+        notesListViewMvc.unregisterListener(this);
+        notesListViewMvc = null;
     }
 
     @Override
@@ -147,10 +160,10 @@ public class NotesListFragment extends BaseFragment implements
     }
 
     private void showOrHideColorPicker() {
-        if (viewMvc.isRightSideContainerVisible())
-            viewMvc.hideColorPicker();
+        if (notesListViewMvc.isRightSideContainerVisible())
+            notesListViewMvc.hideColorPicker();
         else
-            viewMvc.showColorPicker();
+            notesListViewMvc.showColorPicker();
     }
 
     private void deleteHighlightedNotes() {
@@ -242,7 +255,7 @@ public class NotesListFragment extends BaseFragment implements
             actionBarMvc.setSelectAllMenuItemVisible(false);
             actionBarMvc.setDisplayHomeAsUp(false);
             actionBarMvc.setTitle(getString(R.string.your_notes_title));
-            viewMvc.showAddButton();
+            notesListViewMvc.showAddButton();
         } else {
             actionBarMvc.setTitle(String.valueOf(highlightedNotes.size()));
         }
@@ -253,7 +266,7 @@ public class NotesListFragment extends BaseFragment implements
             actionBarMvc.setDeleteMenuItemVisible(true);
             actionBarMvc.setDisplayHomeAsUp(true);
             actionBarMvc.setSelectAllMenuItemVisible(true);
-            viewMvc.hideAddButton();
+            notesListViewMvc.hideAddButton();
         }
         actionBarMvc.setTitle(String.valueOf(highlightedNotes.size()));
     }
@@ -355,5 +368,15 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onNewNoteRequested() {
         startNewFragment(NoteDetailFragment.class, null, noteDetailAnimations, true);
+    }
+
+
+    /* ************************************************************************
+     *                 ColorPickerAdapterListener methods
+     * ************************************************************************/
+
+    @Override
+    public void onColorClicked(@ColorInt int color) {
+        Toast.makeText(getContext(), "Color clicked", Toast.LENGTH_SHORT).show();
     }
 }
