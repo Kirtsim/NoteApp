@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.ui.adapter.ListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.BaseListItemDecoration;
 
 /**
  * Created by kharos on 22/08/2017
@@ -30,6 +31,11 @@ public class ColorPickerViewMvcImpl extends BaseViewMvc implements ColorPickerVi
     @Override
     public void setLayoutManager(RecyclerView.LayoutManager layoutManager) {
         recyclerView.setLayoutManager(layoutManager);
+    }
+
+    @Override
+    public void addColorItemsDecoration(BaseListItemDecoration decoration) {
+        recyclerView.addItemDecoration(decoration);
     }
 
     @Override

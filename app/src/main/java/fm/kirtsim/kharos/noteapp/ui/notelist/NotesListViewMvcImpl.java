@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.ui.adapter.ListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.BaseListItemDecoration;
 import fm.kirtsim.kharos.noteapp.utils.Units;
 
 /**
@@ -92,13 +93,11 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
 
     @Override
     public void showColorPicker() {
-        Log.d(getClass().getSimpleName(), "show anim");
         rightSideContainerAnimator.reverse();
     }
 
     @Override
     public void hideColorPicker() {
-        Log.d(getClass().getSimpleName(), "hide anim");
         rightSideContainerAnimator.start();
     }
 
@@ -123,7 +122,7 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
     }
 
     @Override
-    public void addNoteItemDecoration(NotesListItemDecoration decoration) {
+    public void addNoteItemDecoration(BaseListItemDecoration decoration) {
         if (decoration != null) {
             notesList.addItemDecoration(decoration);
         }

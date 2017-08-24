@@ -39,7 +39,10 @@ public class ColorPickerAdapterImpl extends
 
     @Override
     public ColorViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ColorViewHolder(new ColorPickerItemViewMvcImpl(layoutInflater, parent));
+        ColorViewHolder holder = new ColorViewHolder(
+                new ColorPickerItemViewMvcImpl(layoutInflater, parent));
+        addViewHolder(holder);
+        return holder;
     }
 
     @Override
@@ -65,13 +68,9 @@ public class ColorPickerAdapterImpl extends
 
     @Override
     public void onColorClicked(int pos, ColorPickerItemViewMvc colorItemMvc) {
-        final int oldHighlightedAt = highlightedAt;
         resetHighlighting();
         highlightColor(pos, colorItemMvc);
         listener.onColorClicked(colorsList.get(pos));
-        notifyItemChanged(pos);
-        if (oldHighlightedAt != -1)
-            notifyItemChanged(oldHighlightedAt);
     }
 
     @Override

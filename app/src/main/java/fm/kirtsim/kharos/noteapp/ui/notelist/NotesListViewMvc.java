@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import fm.kirtsim.kharos.noteapp.ui.base.ObservableViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.BaseListItemDecoration;
 
 /**
  * Created by kharos on 29/07/2017
@@ -31,7 +32,7 @@ interface NotesListViewMvc extends
 
     boolean isRightSideContainerVisible();
 
-    void addNoteItemDecoration(NotesListItemDecoration decoration);
+    void addNoteItemDecoration(BaseListItemDecoration decoration);
 
     @SuppressWarnings("unused")
     RecyclerView.Adapter getRecyclerViewAdapter();

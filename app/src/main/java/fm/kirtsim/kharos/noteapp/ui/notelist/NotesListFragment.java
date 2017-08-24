@@ -1,6 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.MainThread;
@@ -14,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -36,6 +36,8 @@ import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
 import fm.kirtsim.kharos.noteapp.ui.colorPicker.ColorPickerViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.colorPicker.ColorPickerViewMvcImpl;
+import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.ColorPickerItemDecoration;
+import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.NotesListItemDecorationImpl;
 import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailFragment;
 import fm.kirtsim.kharos.noteapp.utils.Units;
 
@@ -56,6 +58,7 @@ public class NotesListFragment extends BaseFragment implements
     @Inject BackgroundThreadPoster backgroundPoster;
 
     private NotesListViewMvc notesListViewMvc;
+    @SuppressWarnings("FieldCanBeLocal")
     private ColorPickerViewMvc colorPickerViewMvc;
     private final Set<Integer> highlightedNotes = Sets.newHashSet();
 
@@ -74,6 +77,7 @@ public class NotesListFragment extends BaseFragment implements
         colorsListAdapter.setListener(this);
         colorsListAdapter.setColors(getContext().getResources()
                 .getIntArray(R.array.color_picker_colors));
+        colorsListAdapter.setHighlightColor(Color.BLACK);
         notesManager.registerListener(this);
         actionBarMvc.setShowHomeButton(false);
         noteDetailAnimations = getAnimationsForNoteDetailFragment();
@@ -114,6 +118,8 @@ public class NotesListFragment extends BaseFragment implements
         colorPickerViewMvc = new ColorPickerViewMvcImpl(inflater, null);
         colorPickerViewMvc.setLayoutManager(new LinearLayoutManager(getContext()));
         colorPickerViewMvc.setAdapter(colorsListAdapter);
+        colorPickerViewMvc.addColorItemsDecoration(new ColorPickerItemDecoration(
+                Units.dp2px(10, getResources().getDisplayMetrics())));
         notesListViewMvc.addViewToRightSideContainer(colorPickerViewMvc.getRootView());
 
         actionBarMvc.setTitle(getString(R.string.your_notes_title));
@@ -246,7 +252,7 @@ public class NotesListFragment extends BaseFragment implements
             onNoteIdAddedToHighlighted();
         }
         setNoteItemBackground(note, noteItemView);
-        notesListAdapter.updateItemAtPosition(notePosition);
+//        notesListAdapter.updateItemAtPosition(notePosition);
     }
 
     private void onNoteIdRemovedFromHighlighted() {
@@ -377,6 +383,5 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onColorClicked(@ColorInt int color) {
-        Toast.makeText(getContext(), "Color clicked", Toast.LENGTH_SHORT).show();
     }
 }

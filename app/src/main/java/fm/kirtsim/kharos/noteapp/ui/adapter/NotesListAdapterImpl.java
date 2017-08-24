@@ -39,10 +39,7 @@ public class NotesListAdapterImpl extends
     public NotesListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         NotesListItemViewMvc mvcView = new NotesListItemViewMvcImpl(layoutInflater, parent);
         NotesListViewHolder viewHolder = new NotesListViewHolder(mvcView);
-        viewHolders.add(viewHolder);
-        if (listener != null) {
-            registerTouchListener(viewHolder);
-        }
+        addViewHolder(viewHolder);
         return viewHolder;
     }
 

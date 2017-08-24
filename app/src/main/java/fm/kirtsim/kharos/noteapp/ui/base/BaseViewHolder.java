@@ -7,7 +7,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.ui.main.ViewMvc;
 
 /**
@@ -58,7 +57,7 @@ public abstract class BaseViewHolder<ListenerType, MvcView extends ViewMvc>
 
         private BaseViewHolder<?,?> holder;
 
-        public TouchListener(BaseViewHolder<?,?> holder) {
+        TouchListener(BaseViewHolder<?, ?> holder) {
             this.holder = holder;
         }
 
@@ -87,7 +86,7 @@ public abstract class BaseViewHolder<ListenerType, MvcView extends ViewMvc>
         private final GestureDetectorCompat gestureDetector;
 
 
-        public ViewCustomTouchListener(GestureDetectorCompat gestureDetector) {
+        ViewCustomTouchListener(GestureDetectorCompat gestureDetector) {
             this.gestureDetector = gestureDetector;
         }
 

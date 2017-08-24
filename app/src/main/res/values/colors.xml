@@ -21,8 +21,8 @@
     <color name="color_picker_rainbow_purple">#ECCDFA</color>
 
     <array name="color_picker_colors">
-        <item>@color/color_picker_rainbow_pink</item>
         <item>@color/color_picker_rainbow_dark_pink</item>
+        <item>@color/color_picker_rainbow_pink</item>
         <item>@color/color_picker_rainbow_orange</item>
         <item>@color/color_picker_rainbow_yellow</item>
         <item>@color/color_picker_rainbow_green</item>

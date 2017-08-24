@@ -24,7 +24,7 @@ public class ColorPickerItemViewMvcImpl extends BaseViewMvc implements ColorPick
     private FrameLayout highlightColorFL;
 
     public ColorPickerItemViewMvcImpl(LayoutInflater inflater, ViewGroup container) {
-        ELEVATION_HEIGHT = Units.dp2px(2, inflater.getContext().getResources().getDisplayMetrics());
+        ELEVATION_HEIGHT = Units.dp2px(5, inflater.getContext().getResources().getDisplayMetrics());
         setRootView(inflater.inflate(R.layout.layout_color_item, container, false));
         initializeViews();
     }

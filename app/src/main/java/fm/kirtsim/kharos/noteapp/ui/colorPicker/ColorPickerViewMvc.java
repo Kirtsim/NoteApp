@@ -3,6 +3,7 @@ package fm.kirtsim.kharos.noteapp.ui.colorPicker;
 import android.support.v7.widget.RecyclerView;
 
 import fm.kirtsim.kharos.noteapp.ui.adapter.ListAdapter;
+import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.BaseListItemDecoration;
 import fm.kirtsim.kharos.noteapp.ui.main.ViewMvc;
 
 /**
@@ -15,4 +16,5 @@ public interface ColorPickerViewMvc extends ViewMvc {
 
     void setLayoutManager(RecyclerView.LayoutManager layoutManager);
 
+    void addColorItemsDecoration(BaseListItemDecoration decoration);
 }

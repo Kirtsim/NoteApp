@@ -1,5 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.viewHolder;
 
+import android.util.Log;
 import android.view.MotionEvent;
 
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewHolder;

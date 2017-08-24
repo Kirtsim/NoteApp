@@ -65,4 +65,10 @@ public abstract class BaseListAdapter<AdapterListener, Holder extends BaseViewHo
     protected void stopListeningToTouches() {
         viewHolders.forEach(Holder::removeListener);
     }
+
+    protected void addViewHolder(Holder holder) {
+        viewHolders.add(holder);
+        if (listener != null)
+            registerTouchListener(holder);
+    }
 }
