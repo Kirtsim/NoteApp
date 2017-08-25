@@ -26,8 +26,9 @@
     <FrameLayout
         android:id="@+id/color_picker_container"
         android:background="#fffffe"
-        android:layout_width="100dp"
+        android:layout_width="80dp"
         android:layout_height="match_parent"
+        android:translationX="80dp"
         android:elevation="6dp"
         app:layout_anchor="@id/notes_recycler_view"
         app:layout_anchorGravity="end" >

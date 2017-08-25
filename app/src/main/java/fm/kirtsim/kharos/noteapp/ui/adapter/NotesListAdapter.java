@@ -27,6 +27,8 @@ public interface NotesListAdapter extends ListAdapter<NotesListAdapter.NotesList
 
     boolean removeNotes(List<Note> _notes);
 
+    boolean updateNote(Note old, Note new_);
+
     Note getNoteWithIdOrDefault(int id, Note _default);
 
     void notifyNoteChanged(Note note);

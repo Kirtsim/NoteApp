@@ -16,6 +16,7 @@ public class NotesListActionBarViewMvcImpl extends BaseActionBarViewMvc implemen
 
     private MenuItem deleteMI;
     private MenuItem selectAllMI;
+    private MenuItem colorPaletteMI;
 
     public NotesListActionBarViewMvcImpl(ActionBar actionBar) {
         super(actionBar);
@@ -35,6 +36,11 @@ public class NotesListActionBarViewMvcImpl extends BaseActionBarViewMvc implemen
         deleteMI.setVisible(visible);
     }
 
+    @Override
+    public void setColorPaletteItemVisible(boolean visible) {
+        colorPaletteMI.setVisible(visible);
+    }
+
     /* **********************************************************
      *                ActionBarViewMvc methods
      * **********************************************************/
@@ -52,5 +58,6 @@ public class NotesListActionBarViewMvcImpl extends BaseActionBarViewMvc implemen
     private void initializeMenuItems() {
         deleteMI = menu.findItem(R.id.mi_delete);
         selectAllMI = menu.findItem(R.id.mi_select_all);
+        colorPaletteMI = menu.findItem(R.id.mi_color_picker);
     }
 }

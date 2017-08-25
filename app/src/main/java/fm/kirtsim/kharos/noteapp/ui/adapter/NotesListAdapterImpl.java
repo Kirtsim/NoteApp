@@ -147,6 +147,21 @@ public class NotesListAdapterImpl extends
     }
 
     @Override
+    public boolean updateNote(Note old, Note new_) {
+        if (old == null || new_ == null) return false;
+        final int index = noteIdsMappingToIndexes.get(old.getId());
+        if (index != -1) {
+            notes.set(index, new_);
+            if (old.getId() != new_.getId()) {
+                noteIdsMappingToIndexes.delete(old.getId());
+                noteIdsMappingToIndexes.put(new_.getId(), index);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public Note getNoteWithIdOrDefault(int id, Note _default) {
         final int index = noteIdsMappingToIndexes.get(id);
         if (index != -1)

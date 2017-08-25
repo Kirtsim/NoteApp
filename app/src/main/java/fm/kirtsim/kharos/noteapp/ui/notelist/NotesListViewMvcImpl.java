@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.MainThread;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.ui.adapter.ListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.BaseListItemDecoration;
-import fm.kirtsim.kharos.noteapp.utils.Units;
 
 /**
  * Created by kharos on 29/07/2017
@@ -24,8 +22,8 @@ import fm.kirtsim.kharos.noteapp.utils.Units;
 class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvcListener>
         implements NotesListViewMvc {
 
-    private static final int FAB_MAX_TRANSLATION_Y = 220;
-    private final int RIGHT_SIDE_CONTAINER_MAX_TRANSLATION_X;
+    private float FAB_MAX_TRANSLATION_Y;
+    private float RIGHT_SIDE_CONTAINER_MAX_TRANSLATION_X;
 
     private ObjectAnimator fabAnimator;
     private ObjectAnimator rightSideContainerAnimator;
@@ -37,12 +35,11 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
 
     NotesListViewMvcImpl(LayoutInflater inflater, ViewGroup container, ListAdapter adapter,
                          RecyclerView.LayoutManager layoutManager) {
-        RIGHT_SIDE_CONTAINER_MAX_TRANSLATION_X = Units.dp2px(100, inflater.getContext()
-                .getResources().getDisplayMetrics());
         setRootView(inflater.inflate(R.layout.layout_notes_list, container, false));
         initializeViews();
         initializeRecyclerView((RecyclerView.Adapter<? extends RecyclerView.ViewHolder>) adapter,
                 layoutManager);
+        initializeTranslationBounds();
         initializeAnimators();
         addNoteButton.setOnClickListener(this::onAddNewButtonClicked);
     }
@@ -59,12 +56,17 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
         notesList.setLayoutManager(layoutManager);
     }
 
+    private void initializeTranslationBounds() {
+        FAB_MAX_TRANSLATION_Y = 220;
+        RIGHT_SIDE_CONTAINER_MAX_TRANSLATION_X = rightSideContainer.getTranslationX();
+    }
+
     private void initializeAnimators() {
         fabAnimator = ObjectAnimator.ofFloat(addNoteButton, "translationY", FAB_MAX_TRANSLATION_Y);
         fabAnimator.setDuration(300);
 
         rightSideContainerAnimator = ObjectAnimator.ofFloat(rightSideContainer, "translationX",
-                RIGHT_SIDE_CONTAINER_MAX_TRANSLATION_X);
+                0, RIGHT_SIDE_CONTAINER_MAX_TRANSLATION_X);
         rightSideContainerAnimator.setDuration(300);
     }
 
@@ -92,12 +94,12 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
     }
 
     @Override
-    public void showColorPicker() {
+    public void showRightSideContainer() {
         rightSideContainerAnimator.reverse();
     }
 
     @Override
-    public void hideColorPicker() {
+    public void hideRightSideContainer() {
         rightSideContainerAnimator.start();
     }
 

@@ -22,9 +22,9 @@ interface NotesListViewMvc extends
 
     @MainThread void hideAddButton();
 
-    void showColorPicker();
+    void showRightSideContainer();
 
-    void hideColorPicker();
+    void hideRightSideContainer();
 
     void addViewToRightSideContainer(View view);
 

@@ -11,4 +11,6 @@ public interface NotesListActionBarViewMvc extends ActionBarViewMvc {
     void setSelectAllMenuItemVisible(boolean visible);
 
     void setDeleteMenuItemVisible(boolean visible);
+
+    void setColorPaletteItemVisible(boolean visible);
 }
