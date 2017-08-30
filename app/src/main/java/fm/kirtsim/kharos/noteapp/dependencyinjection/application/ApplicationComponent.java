@@ -15,6 +15,5 @@ import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ViewMvcModule;
 @Component(modules={ApplicationModule.class})
 public interface ApplicationComponent {
 
-    ControllerComponent newControllerComponent(ControllerModule controllerModule,
-                                               ViewMvcModule viewMvcModule);
+    ControllerComponent plus(ControllerModule controllerModule, ViewMvcModule viewMvcModule);
 }

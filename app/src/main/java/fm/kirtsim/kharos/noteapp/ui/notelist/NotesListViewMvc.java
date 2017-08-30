@@ -34,6 +34,8 @@ interface NotesListViewMvc extends
 
     void addNoteItemDecoration(BaseListItemDecoration decoration);
 
+    RecyclerView getRecyclerView();
+
     @SuppressWarnings("unused")
     RecyclerView.Adapter getRecyclerViewAdapter();
 }

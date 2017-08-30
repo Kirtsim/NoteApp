@@ -12,7 +12,7 @@ import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListFragment;
 
 @Subcomponent(modules={ControllerModule.class, ViewMvcModule.class})
 public interface ControllerComponent {
-
+// TODO: split into individual subcomponents with their own scopes!!
     public void inject(BaseActivity baseActivity);
 
     public void inject(BaseFragment baseActivity);

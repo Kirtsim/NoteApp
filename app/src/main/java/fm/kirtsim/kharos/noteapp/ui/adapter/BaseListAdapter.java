@@ -7,14 +7,18 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
+import fm.kirtsim.kharos.noteapp.ui.adapter.touchCallback.ItemTouchCallbackListener;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewHolder;
 
 /**
  * Created by kharos on 07/08/2017
  */
 
+@SuppressWarnings("WeakerAccess")
 public abstract class BaseListAdapter<AdapterListener, Holder extends BaseViewHolder>
-        extends RecyclerView.Adapter<Holder> implements ListAdapter<AdapterListener> {
+        extends RecyclerView.Adapter<Holder> implements
+        ListAdapter<AdapterListener>,
+        ItemTouchCallbackListener {
 
     protected AdapterListener listener;
     protected final List<Holder> viewHolders;
@@ -29,7 +33,7 @@ public abstract class BaseListAdapter<AdapterListener, Holder extends BaseViewHo
     public void setListener(AdapterListener listener) {
         if (listener == null)
             throw new IllegalArgumentException("listener " +
-                    NotesListAdapterImpl.NotesListAdapterListener.class.getSimpleName() + " cannot be null");
+                    NotesListAdapter.NotesListAdapterListener.class.getSimpleName() + " cannot be null");
         this.listener = listener;
         startListeningToTouches();
     }
@@ -71,4 +75,12 @@ public abstract class BaseListAdapter<AdapterListener, Holder extends BaseViewHo
         if (listener != null)
             registerTouchListener(holder);
     }
+
+    @Override
+    public boolean onItemMove(int posFrom, int posTo) {
+        return false;
+    }
+
+    @Override
+    public void dragFinished(int startedFrom, int finishedAt) {}
 }

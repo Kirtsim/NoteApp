@@ -18,4 +18,6 @@
     <string name="select_all_menu_item">Select all</string>
     <string name="colors_menu_item">Colors</string>
     <string name="color_description_iv">a circle filled with the corresponding color</string>
+    <string name="reorder_menut_item">Reorder</string>
+    <string name="notes_reorder_title">Notes reorder</string>
 </resources>

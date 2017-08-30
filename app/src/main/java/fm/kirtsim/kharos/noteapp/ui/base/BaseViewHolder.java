@@ -38,6 +38,7 @@ public abstract class BaseViewHolder<ListenerType, MvcView extends ViewMvc>
         itemView.setOnTouchListener(null);
     }
 
+    @SuppressWarnings("WeakerAccess")
     protected Context getContext() {
         return itemView.getContext();
     }

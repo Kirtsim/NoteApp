@@ -2,7 +2,6 @@ package fm.kirtsim.kharos.noteapp.ui.viewHolder;
 
 import android.view.MotionEvent;
 
-import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewHolder;
 import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListItemViewMvc;
 
@@ -18,14 +17,8 @@ public class NotesListViewHolder extends
         void onNoteLongClicked(int position, NotesListItemViewMvc noteItemView);
     }
 
-    private boolean isHighlighted;
-
     public NotesListViewHolder(NotesListItemViewMvc itemView) {
         super(itemView);
-    }
-
-    public boolean isHighlighted() {
-        return isHighlighted;
     }
 
     @Override

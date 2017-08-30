@@ -95,12 +95,14 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
 
     @Override
     public void showRightSideContainer() {
-        rightSideContainerAnimator.reverse();
+        if (!isRightSideContainerVisible())
+            rightSideContainerAnimator.reverse();
     }
 
     @Override
     public void hideRightSideContainer() {
-        rightSideContainerAnimator.start();
+        if (rightSideContainer.getTranslationX() != RIGHT_SIDE_CONTAINER_MAX_TRANSLATION_X)
+            rightSideContainerAnimator.start();
     }
 
     @Override
@@ -128,5 +130,10 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
         if (decoration != null) {
             notesList.addItemDecoration(decoration);
         }
+    }
+
+    @Override
+    public RecyclerView getRecyclerView() {
+        return notesList;
     }
 }

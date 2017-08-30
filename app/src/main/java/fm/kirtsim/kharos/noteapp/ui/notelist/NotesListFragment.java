@@ -34,6 +34,8 @@ import fm.kirtsim.kharos.noteapp.ui.Animations;
 import fm.kirtsim.kharos.noteapp.ui.adapter.ColorPickerAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
+import fm.kirtsim.kharos.noteapp.ui.adapter.itemTouchHelper.NotesListItemTouchHelper;
+import fm.kirtsim.kharos.noteapp.ui.adapter.touchCallback.NotesListItemTouchCallback;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
 import fm.kirtsim.kharos.noteapp.ui.colorPicker.ColorPickerViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.colorPicker.ColorPickerViewMvcImpl;
@@ -65,6 +67,7 @@ public class NotesListFragment extends BaseFragment implements
     private final Map<Integer, Note> highlightedNotes = Maps.newConcurrentMap();
 
     private Animations noteDetailAnimations;
+    private NotesListItemTouchHelper notesTouchHelper;
 
     private int selectedNoteColor;
     private int COLOR_HIGHLIGHTED_FRAME;
@@ -86,8 +89,10 @@ public class NotesListFragment extends BaseFragment implements
                 .getIntArray(R.array.color_picker_colors));
         colorsListAdapter.setHighlightColor(Color.BLACK);
         notesManager.registerListener(this);
-        actionBarMvc.setShowHomeButton(false);
+        actionBarMvc.setHomeButtonVisible(false);
         noteDetailAnimations = getAnimationsForNoteDetailFragment();
+        notesTouchHelper = new NotesListItemTouchHelper(
+                new NotesListItemTouchCallback(notesListAdapter), null);
     }
 
     @Override
@@ -127,6 +132,8 @@ public class NotesListFragment extends BaseFragment implements
         colorPickerViewMvc.addColorItemsDecoration(new ColorPickerItemDecoration(
                 Units.dp2px(10, getResources().getDisplayMetrics())));
         notesListViewMvc.addViewToRightSideContainer(colorPickerViewMvc.getRootView());
+        notesTouchHelper.attachToRecyclerView(notesListViewMvc.getRecyclerView());
+        notesTouchHelper.listen(false);
 
         actionBarMvc.setTitle(getString(R.string.your_notes_title));
         return notesListViewMvc.getRootView();
@@ -165,10 +172,18 @@ public class NotesListFragment extends BaseFragment implements
             case R.id.mi_delete: deleteHighlightedNotes();break;
             case R.id.mi_select_all: addAllNotesToHighlighted(); break;
             case R.id.mi_color_picker: showOrHideColorPicker(); break;
+            case R.id.mi_reorder:
+                actionBarMvc.setHomeButtonVisible(true);
+                actionBarMvc.setColorPaletteItemVisible(false);
+                actionBarMvc.setReorderItemVisible(false);
+                notesTouchHelper.listen(true);
+                break;
             case android.R.id.home: clearNoteHighlighting();
                 if (notesListViewMvc.isRightSideContainerVisible())
                     notesListViewMvc.hideRightSideContainer();
+                actionBarMvc.setReorderItemVisible(true);
                 actionBarMvc.setColorPaletteItemVisible(true);
+                notesTouchHelper.listen(false);
                 break;
             default: return super.onOptionsItemSelected(item);
         }
@@ -182,8 +197,7 @@ public class NotesListFragment extends BaseFragment implements
             notesListViewMvc.showRightSideContainer();
             if (highlightedNotes.isEmpty()) { // TODO: a bad design BLEUH!
                 actionBarMvc.setColorPaletteItemVisible(false);
-                actionBarMvc.setDisplayHomeAsUp(true); // duplication!! AAH can't take it anymore!
-                actionBarMvc.setShowHomeButton(true);
+                actionBarMvc.setHomeButtonVisible(true);
             }
         }
     }
@@ -287,7 +301,7 @@ public class NotesListFragment extends BaseFragment implements
         if (highlightedNotes.isEmpty()) {
             actionBarMvc.setDeleteMenuItemVisible(false);
             actionBarMvc.setSelectAllMenuItemVisible(false);
-            actionBarMvc.setDisplayHomeAsUp(false);
+            actionBarMvc.setHomeButtonVisible(false);
             actionBarMvc.setTitle(getString(R.string.your_notes_title));
             notesListViewMvc.showAddButton();
         } else {
@@ -298,7 +312,7 @@ public class NotesListFragment extends BaseFragment implements
     private void onNoteAddedToHighlighted() {
         if (highlightedNotes.size() == 1) {
             actionBarMvc.setDeleteMenuItemVisible(true);
-            actionBarMvc.setDisplayHomeAsUp(true);
+            actionBarMvc.setHomeButtonVisible(true);
             actionBarMvc.setSelectAllMenuItemVisible(true);
             notesListViewMvc.hideAddButton();
         }
@@ -310,6 +324,28 @@ public class NotesListFragment extends BaseFragment implements
         noteItemView.setText(note.getText());
         noteItemView.setTitle(note.getTitle());
         setNoteItemBackground(note, noteItemView);
+    }
+
+    @Override
+    public void onNoteItemPositionChanged(Note note, int posFrom, int posTo) {
+        backgroundPoster.post(() -> reorderNotesDueToNotePositionChange(note, posFrom, posTo));
+    }
+
+    private void reorderNotesDueToNotePositionChange(Note note, int posFrom, int posTo) {
+        if (posFrom != posTo) {
+            int startIndex = Math.min(posFrom, posTo);
+            int endIndex = Math.max(posFrom, posTo);
+            int orderNumberChange = posFrom < posTo ? -1 : +1;
+            List<Note> notes = notesListAdapter.getListOfAllNotes();
+            List<Note> reordered = getNotesInRangeWithUpdatedOrderNoByAnAmount(notes, startIndex,
+                    endIndex, orderNumberChange);
+            Note updatedNote = changeNoteOrderNumberTo(note, posTo + 1);
+            if (posTo < posFrom)
+                reordered.set(0, updatedNote);
+            else
+                reordered.set(reordered.size() - 1, updatedNote);
+            updateNotesInDatabase(reordered, UPDATE_ORDERING);
+        }
     }
 
     private void setNoteItemBackground(Note note, NotesListItemViewMvc noteItemView) {
@@ -341,17 +377,30 @@ public class NotesListFragment extends BaseFragment implements
 
     private void updateOrderNumbersOfNotesStartingWithNote(Note newNote) {
         List<Note> notes = notesListAdapter.getListOfAllNotes();
-        List<Note> updatedNotes = Lists.newArrayListWithCapacity(notes.size() + 1);
         if (notes.isEmpty() || !notes.get(0).equals(newNote))
-            updatedNotes.add(incrementNoteOrderNumber(newNote));
-        notes.forEach(note -> updatedNotes.add(incrementNoteOrderNumber(note)));
+            notes.add(0, newNote);
+        List<Note> updatedNotes =
+                getNotesInRangeWithUpdatedOrderNoByAnAmount(notes, 0, notes.size() - 1, 1);
         updateNotesInDatabase(updatedNotes, UPDATE_ORDERING);
     }
 
-    private Note incrementNoteOrderNumber(@NonNull Note note) {
+    private List<Note> getNotesInRangeWithUpdatedOrderNoByAnAmount(List<Note> notes, int startInc,
+                                                                   int endInc, int amount) {
+        if (endInc < startInc)
+            throw new IllegalArgumentException("end index must be greater than start index");
+
+        List<Note> updatedNotes = Lists.newArrayListWithCapacity(endInc - startInc + 1);
+        for (int i = startInc; i <= endInc; ++i) {
+            Note oldNote = notes.get(i);
+            updatedNotes.add(changeNoteOrderNumberTo(oldNote, oldNote.getOrderNo() + amount));
+        }
+        return updatedNotes;
+    }
+
+    private Note changeNoteOrderNumberTo(@NonNull Note note, int orderNumber) {
         return new Note(
                 note.getId(),
-                note.getOrderNo() + 1,
+                orderNumber,
                 note.getColor(),
                 note.isPinned(),
                 note.getTitle(),
@@ -371,7 +420,7 @@ public class NotesListFragment extends BaseFragment implements
     public void onMultipleNotesUpdated(@NonNull List<Note> notes) {
         if (updateOperationFlag == UPDATE_ORDERING) {
             showToast(R.string.note_saved_message, "");
-            notesListAdapter.setNewNotesList(notes);
+            notesListAdapter.replaceNotesStartingFrom(notes, notes.get(0).getOrderNo() -1);
             notesListAdapter.updateDataSet();
         } else if (updateOperationFlag == UPDATE_COLOR) {
             notesListAdapter.updateDataSet();

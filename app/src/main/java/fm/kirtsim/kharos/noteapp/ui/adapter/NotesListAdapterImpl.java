@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import com.google.common.collect.Lists;
 
+import java.util.Collections;
 import java.util.List;
 
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
@@ -18,15 +19,14 @@ import fm.kirtsim.kharos.noteapp.utils.ListUtils;
  * Created by kharos on 29/07/2017
  */
 
-public class NotesListAdapterImpl extends
-        BaseListAdapter<NotesListAdapter.NotesListAdapterListener, NotesListViewHolder>
-        implements NotesListAdapter, NotesListViewHolder.NotesListViewHolderListener {
+public class NotesListAdapterImpl extends NotesListAdapter {
 
     private List<Note> notes;
     private final SparseIntArray noteIdsMappingToIndexes;
 
     public NotesListAdapterImpl(LayoutInflater layoutInflater) {
         super(layoutInflater);
+        setHasStableIds(true);
         notes = Lists.newArrayList();
         noteIdsMappingToIndexes = new SparseIntArray(1);
     }
@@ -50,6 +50,11 @@ public class NotesListAdapterImpl extends
         if (listener != null) {
             listener.onNoteItemVisible(note, listItemView);
         }
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return notes.get(position).getId();
     }
 
     @Override
@@ -86,13 +91,26 @@ public class NotesListAdapterImpl extends
         }
     }
 
-
     // ************** NotesListAdapter ***************************
 
     @Override
     public void setNewNotesList(List<Note> newNotes) {
         notes.clear();
         addNotes(newNotes);
+    }
+
+    @Override
+    public void replaceNotesStartingFrom(List<Note> newNotes, int from) {
+        int index = from;
+        int currentSize = notes.size();
+        for (Note note : newNotes) {
+            if (index < currentSize) {
+                notes.set(index, note);
+                index++;
+            } else {
+                notes.add(note);
+            }
+        }
     }
 
     @Override
@@ -183,5 +201,26 @@ public class NotesListAdapterImpl extends
         if (index != -1) {
             notifyItemRemoved(index);
         }
+    }
+
+    @Override
+    public boolean onItemMove(int posFrom, int posTo) {
+        int lower = Math.min(posFrom, posTo);
+        int higher = Math.max(posFrom, posTo);
+        while (lower < higher) {
+            Collections.swap(notes, lower, lower + 1);
+            lower++;
+        }
+        notifyItemMoved(posFrom, posTo);
+        return true;
+    }
+
+    @Override
+    public void dragFinished(int startedFrom, int finishedAt) {
+        listener.onNoteItemPositionChanged(notes.get(finishedAt), startedFrom, finishedAt);
+    }
+
+    @Override
+    public void setAnimateDragAndDrop(boolean animate) {
     }
 }

@@ -58,7 +58,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
             throw new IllegalStateException("controller component can be used only once at a time");
         isControllerComponentUsed = true;
         return ((NoteApplication) getApplication()).getApplicationComponent()
-                .newControllerComponent(new ControllerModule(this), new ViewMvcModule());
+                .plus(new ControllerModule(this), new ViewMvcModule());
     }
 
     @Override

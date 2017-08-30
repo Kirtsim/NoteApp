@@ -4,6 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/mi_reorder"
+        android:title="@string/reorder_menut_item"
+        android:icon="@drawable/reorder_vd_24dp"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/mi_color_picker"
         android:title="@string/colors_menu_item"
         android:icon="@drawable/color_picker_vd_24dp"

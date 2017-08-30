@@ -11,9 +11,7 @@ public interface ActionBarViewMvc {
 
     void setMenu(Menu menu, MenuInflater menuInflater);
 
-    void setDisplayHomeAsUp(boolean homeAsUp);
-
-    void setShowHomeButton(boolean showHomeButton);
+    void setHomeButtonVisible(boolean visible);
 
     void setTitle(String title);
 

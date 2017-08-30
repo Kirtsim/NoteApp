@@ -50,7 +50,7 @@ public abstract class BaseFragment extends Fragment {
             throw new IllegalStateException("controller component can be used only once at a time");
         isControllerComponentUsed = true;
         return ((NoteApplication) getActivity().getApplication()).getApplicationComponent()
-                .newControllerComponent(
+                .plus(
                         new ControllerModule((BaseActivity) getActivity()), new ViewMvcModule());
     }
 

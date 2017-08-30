@@ -15,9 +15,9 @@ import fm.kirtsim.kharos.noteapp.ui.base.BaseActionBarViewMvc;
 public class NoteDetailActionBarViewMvcImpl extends BaseActionBarViewMvc implements
         NoteDetailActionBarViewMvc {
 
-    @SuppressWarnings("FieldCanBeLocal")
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private MenuItem saveMenuItem;
-    @SuppressWarnings("FieldCanBeLocal")
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private MenuItem deleteMenuItem;
 
     public NoteDetailActionBarViewMvcImpl(ActionBar actionBar) {

@@ -29,13 +29,9 @@ public abstract class BaseActionBarViewMvc implements ActionBarViewMvc {
     }
 
     @Override
-    public void setDisplayHomeAsUp(boolean homeAsUp) {
-        actionBar.setDisplayHomeAsUpEnabled(homeAsUp);
-    }
-
-    @Override
-    public void setShowHomeButton(boolean showHomeButton) {
-        actionBar.setDisplayShowHomeEnabled(showHomeButton);
+    public void setHomeButtonVisible(boolean visible) {
+        actionBar.setDisplayHomeAsUpEnabled(visible);
+        actionBar.setDisplayShowHomeEnabled(visible);
     }
 
     @Override
