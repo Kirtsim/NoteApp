@@ -41,7 +41,9 @@ public class NotesListItemTouchCallback extends ItemTouchHelper.Callback {
     @Override
     public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
-        listener.dragFinished(startPos, viewHolder.getAdapterPosition());
-        startPos = -1;
+        if (startPos != -1) {
+            listener.dragFinished(startPos, viewHolder.getAdapterPosition());
+            startPos = -1;
+        }
     }
 }

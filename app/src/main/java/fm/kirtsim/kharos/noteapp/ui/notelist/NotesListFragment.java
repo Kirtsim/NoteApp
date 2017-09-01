@@ -17,10 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -36,6 +34,7 @@ import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
 import fm.kirtsim.kharos.noteapp.ui.adapter.itemTouchHelper.NotesListItemTouchHelper;
 import fm.kirtsim.kharos.noteapp.ui.adapter.touchCallback.NotesListItemTouchCallback;
+import fm.kirtsim.kharos.noteapp.ui.adapterItemCoordinator.AdapterNotesListCoordinator;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
 import fm.kirtsim.kharos.noteapp.ui.colorPicker.ColorPickerViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.colorPicker.ColorPickerViewMvcImpl;
@@ -62,9 +61,10 @@ public class NotesListFragment extends BaseFragment implements
     @Inject BackgroundThreadPoster backgroundPoster;
 
     private NotesListViewMvc notesListViewMvc;
+    private AdapterNotesListCoordinator notesCoordinator;
     @SuppressWarnings("FieldCanBeLocal")
     private ColorPickerViewMvc colorPickerViewMvc;
-    private final Map<Integer, Note> highlightedNotes = Maps.newConcurrentMap();
+//    private final Map<Integer, Note> highlightedNotes = Maps.newConcurrentMap();
 
     private Animations noteDetailAnimations;
     private NotesListItemTouchHelper notesTouchHelper;
@@ -83,6 +83,7 @@ public class NotesListFragment extends BaseFragment implements
         initializeColors(getResources());
         setHasOptionsMenu(true);
 
+        notesCoordinator = notesListAdapter.getNotesCoordinator();
         notesListAdapter.setListener(this);
         colorsListAdapter.setListener(this);
         colorsListAdapter.setColors(getContext().getResources()
@@ -195,7 +196,7 @@ public class NotesListFragment extends BaseFragment implements
             notesListViewMvc.hideRightSideContainer();
         else {
             notesListViewMvc.showRightSideContainer();
-            if (highlightedNotes.isEmpty()) { // TODO: a bad design BLEUH!
+            if (!notesCoordinator.containsHighlightedNotes()) { // TODO: a bad design BLEUH!
                 actionBarMvc.setColorPaletteItemVisible(false);
                 actionBarMvc.setHomeButtonVisible(true);
             }
@@ -203,20 +204,18 @@ public class NotesListFragment extends BaseFragment implements
     }
 
     private void deleteHighlightedNotes() {
-        List<Note> notes = Lists.newArrayListWithCapacity(highlightedNotes.size());
-        highlightedNotes.forEach((id, note) -> notes.add(note));
+        List<Note> notes = notesCoordinator.getListOfHighlightedNotes();
         notesManager.removeNotes(notes);
     }
 
     private void addAllNotesToHighlighted() {
-        List<Note> notes = notesListAdapter.getListOfAllNotes();
-        notes.forEach(note -> highlightedNotes.put(note.getId(), note));
+        notesCoordinator.addAllNotesToHighlighted();
         onNoteAddedToHighlighted();
         notesListAdapter.updateDataSet();
     }
 
     private void clearNoteHighlighting() {
-        highlightedNotes.clear();
+        notesCoordinator.removeAllNotesFromHighlighted();
         onNoteRemovedFromHighlighted();
         notesListAdapter.updateDataSet();
     }
@@ -232,7 +231,7 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     protected boolean onBackPressed() {
-        if (!highlightedNotes.isEmpty()) {
+        if (notesCoordinator.containsHighlightedNotes()) {
             clearNoteHighlighting();
             return true;
         }
@@ -250,7 +249,7 @@ public class NotesListFragment extends BaseFragment implements
     public void onNoteItemSingleClicked(Note note, NotesListItemViewMvc noteItemView,
                                         int notePosition) {
 
-        if (!highlightedNotes.isEmpty())
+        if (notesCoordinator.containsHighlightedNotes())
             onNoteItemLongClicked(note, noteItemView, notePosition);
         else if (notesListViewMvc.isRightSideContainerVisible()) {
             Note coloredNote = createColorUpdatedNote(note, selectedNoteColor);
@@ -263,7 +262,7 @@ public class NotesListFragment extends BaseFragment implements
     private Note createColorUpdatedNote(Note note, @ColorInt int color) {
         Note updated = new Note(note.getId(), note.getOrderNo(), color, note.isPinned(),
                 note.getTitle(), note.getText(), note.getTimestamp());
-        if (notesListAdapter.updateNote(note, updated)) {
+        if (notesCoordinator.updateNote(note, updated)) {
             return updated;
         }
         return new Note(-1, -1, -1, false, "", "", 0);
@@ -286,37 +285,36 @@ public class NotesListFragment extends BaseFragment implements
     public void onNoteItemLongClicked(Note note, NotesListItemViewMvc noteItemView, int notePosition) {
         if (notesListViewMvc.isRightSideContainerVisible())
             return;
-        final boolean isHighlighted = highlightedNotes.containsKey(note.getId());
-        if (isHighlighted) {
-            highlightedNotes.remove(note.getId());
+        if (notesCoordinator.isNoteHighlighted(note)) {
+            notesCoordinator.removeNoteFromHighlighted(note);
             onNoteRemovedFromHighlighted();
         } else {
-            highlightedNotes.put(note.getId(), note);
+            notesCoordinator.addNoteToHighlighted(note);
             onNoteAddedToHighlighted();
         }
         setNoteItemBackground(note, noteItemView);
     }
 
     private void onNoteRemovedFromHighlighted() {
-        if (highlightedNotes.isEmpty()) {
+        if (!notesCoordinator.containsHighlightedNotes()) {
             actionBarMvc.setDeleteMenuItemVisible(false);
             actionBarMvc.setSelectAllMenuItemVisible(false);
             actionBarMvc.setHomeButtonVisible(false);
             actionBarMvc.setTitle(getString(R.string.your_notes_title));
             notesListViewMvc.showAddButton();
         } else {
-            actionBarMvc.setTitle(String.valueOf(highlightedNotes.size()));
+            actionBarMvc.setTitle(String.valueOf(notesCoordinator.getHighlightedCount()));
         }
     }
 
     private void onNoteAddedToHighlighted() {
-        if (highlightedNotes.size() == 1) {
+        if (notesCoordinator.getHighlightedCount() == 1) {
             actionBarMvc.setDeleteMenuItemVisible(true);
             actionBarMvc.setHomeButtonVisible(true);
             actionBarMvc.setSelectAllMenuItemVisible(true);
             notesListViewMvc.hideAddButton();
         }
-        actionBarMvc.setTitle(String.valueOf(highlightedNotes.size()));
+        actionBarMvc.setTitle(String.valueOf(notesCoordinator.getHighlightedCount()));
     }
 
     @Override
@@ -331,25 +329,15 @@ public class NotesListFragment extends BaseFragment implements
         backgroundPoster.post(() -> reorderNotesDueToNotePositionChange(note, posFrom, posTo));
     }
 
+    @SuppressWarnings("UnusedParameters")
     private void reorderNotesDueToNotePositionChange(Note note, int posFrom, int posTo) {
-        if (posFrom != posTo) {
-            int startIndex = Math.min(posFrom, posTo);
-            int endIndex = Math.max(posFrom, posTo);
-            int orderNumberChange = posFrom < posTo ? -1 : +1;
-            List<Note> notes = notesListAdapter.getListOfAllNotes();
-            List<Note> reordered = getNotesInRangeWithUpdatedOrderNoByAnAmount(notes, startIndex,
-                    endIndex, orderNumberChange);
-            Note updatedNote = changeNoteOrderNumberTo(note, posTo + 1);
-            if (posTo < posFrom)
-                reordered.set(0, updatedNote);
-            else
-                reordered.set(reordered.size() - 1, updatedNote);
-            updateNotesInDatabase(reordered, UPDATE_ORDERING);
-        }
+        NotesReorderer reorderer = new NotesReorderer(notesCoordinator.getListOfAllNotes());
+        reorderer.changeOrderNumbersDueToPositionChange(posFrom, posTo);
+        updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
     }
 
     private void setNoteItemBackground(Note note, NotesListItemViewMvc noteItemView) {
-        final boolean isHighlighted = highlightedNotes.containsKey(note.getId());
+        final boolean isHighlighted = notesCoordinator.isNoteHighlighted(note);
         final int highlightColor = isHighlighted ? COLOR_HIGHLIGHTED_FRAME : note.getColor();
         noteItemView.setBackgroundColors(highlightColor, note.getColor());
     }
@@ -362,13 +350,12 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onNotesFetched(@NonNull List<Note> notes) {
-        notesListAdapter.setNewNotesList(notes);
+        notesCoordinator.setNewNotesList(notes);
         notesListAdapter.updateDataSet();
     }
 
     @Override public void onNewNoteAdded(@NonNull Note note) {
         if (note.getId() != -1) {
-            updateOperationFlag = UPDATE_ORDERING;
             backgroundPoster.post(() -> updateOrderNumbersOfNotesStartingWithNote(note));
         }
         else
@@ -376,42 +363,17 @@ public class NotesListFragment extends BaseFragment implements
     }
 
     private void updateOrderNumbersOfNotesStartingWithNote(Note newNote) {
-        List<Note> notes = notesListAdapter.getListOfAllNotes();
+        List<Note> notes = notesCoordinator.getListOfAllNotes();
         if (notes.isEmpty() || !notes.get(0).equals(newNote))
             notes.add(0, newNote);
-        List<Note> updatedNotes =
-                getNotesInRangeWithUpdatedOrderNoByAnAmount(notes, 0, notes.size() - 1, 1);
-        updateNotesInDatabase(updatedNotes, UPDATE_ORDERING);
-    }
-
-    private List<Note> getNotesInRangeWithUpdatedOrderNoByAnAmount(List<Note> notes, int startInc,
-                                                                   int endInc, int amount) {
-        if (endInc < startInc)
-            throw new IllegalArgumentException("end index must be greater than start index");
-
-        List<Note> updatedNotes = Lists.newArrayListWithCapacity(endInc - startInc + 1);
-        for (int i = startInc; i <= endInc; ++i) {
-            Note oldNote = notes.get(i);
-            updatedNotes.add(changeNoteOrderNumberTo(oldNote, oldNote.getOrderNo() + amount));
-        }
-        return updatedNotes;
-    }
-
-    private Note changeNoteOrderNumberTo(@NonNull Note note, int orderNumber) {
-        return new Note(
-                note.getId(),
-                orderNumber,
-                note.getColor(),
-                note.isPinned(),
-                note.getTitle(),
-                note.getText(),
-                note.getTimestamp()
-        );
+        NotesReorderer reorderer = new NotesReorderer(notesCoordinator.getListOfAllNotes());
+        reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(0, 1);
+        updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
     }
 
     @Override public void onNoteUpdated(@NonNull Note note) {
         if (updateOperationFlag == UPDATE_COLOR) {
-            notesListAdapter.updateNote(note, note); // it updates based on the ID
+            notesCoordinator.updateNote(note, note); // it updates based on the ID
             notesListAdapter.notifyNoteChanged(note);
         }
     }
@@ -420,7 +382,7 @@ public class NotesListFragment extends BaseFragment implements
     public void onMultipleNotesUpdated(@NonNull List<Note> notes) {
         if (updateOperationFlag == UPDATE_ORDERING) {
             showToast(R.string.note_saved_message, "");
-            notesListAdapter.replaceNotesStartingFrom(notes, notes.get(0).getOrderNo() -1);
+            notesCoordinator.replaceNotesStartingFrom(notes, notes.get(0).getOrderNo() -1);
             notesListAdapter.updateDataSet();
         } else if (updateOperationFlag == UPDATE_COLOR) {
             notesListAdapter.updateDataSet();
@@ -430,8 +392,8 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onNoteDeleted(@NonNull Note note) {
         clearNoteHighlighting();
-        if (notesListAdapter.removeNote(note)) {
-            notesListAdapter.notifyNoteRemoved(note);
+        if (notesCoordinator.removeNote(note)) {
+            notesListAdapter.notifyNoteRemoved(note); //TODO: reordering!!
             showToast(R.string.note_deleted_message, "");
         } else
             notesManager.fetchNotes();
@@ -440,8 +402,8 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onMultipleNotesDeleted(@NonNull List<Note> notes) {
         clearNoteHighlighting();
-        if (notesListAdapter.removeNotes(notes)) {
-            notesListAdapter.updateDataSet();
+        if (notesCoordinator.removeNotes(notes)) {
+            notesListAdapter.updateDataSet(); // TODO: reordering!
             showToast(R.string.note_deleted_message, "s");
         } else
             notesManager.fetchNotes();
@@ -466,15 +428,16 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onColorClicked(@ColorInt int color) {
         selectedNoteColor = color;
-        if (!highlightedNotes.isEmpty()) {
+        if (notesCoordinator.containsHighlightedNotes()) {
             updateOperationFlag = UPDATE_COLOR;
-            backgroundPoster.post(() -> updateHighlightedNotesiWithColor(color));
+            backgroundPoster.post(() -> updateHighlightedNotesWithColor(color));
         }
     }
 
-    private void updateHighlightedNotesiWithColor(@ColorInt int color) {
-        final List<Note> toUpdate = Lists.newArrayListWithCapacity(highlightedNotes.size());
-        highlightedNotes.forEach((id, note) -> toUpdate.add(createColorUpdatedNote(note, color)));
+    private void updateHighlightedNotesWithColor(@ColorInt int color) {
+        final List<Note> highlighted = notesCoordinator.getListOfHighlightedNotes();
+        final List<Note> toUpdate = Lists.newArrayListWithCapacity(highlighted.size());
+        highlighted.forEach(note -> toUpdate.add(createColorUpdatedNote(note, color)));
         notesManager.updateNotes(toUpdate);
     }
 

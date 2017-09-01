@@ -10,6 +10,7 @@ import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
 import fm.kirtsim.kharos.noteapp.ui.adapter.itemTouchHelper.NotesListItemTouchHelper;
 import fm.kirtsim.kharos.noteapp.ui.adapter.touchCallback.NotesListItemTouchCallback;
+import fm.kirtsim.kharos.noteapp.ui.adapterItemCoordinator.AdapterNotesListCoordinatorImpl;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseActivity;
 import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailActionBarViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailActionBarViewMvcImpl;
@@ -37,7 +38,8 @@ public class ControllerModule {
 
     @Provides
     public NotesListAdapter notesListAdapter() {
-        return new NotesListAdapterImpl(activity.getLayoutInflater());
+        return new NotesListAdapterImpl(activity.getLayoutInflater(),
+                new AdapterNotesListCoordinatorImpl());
     }
 
     @Provides

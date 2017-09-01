@@ -1,11 +1,9 @@
 package fm.kirtsim.kharos.noteapp.ui.adapter;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 
-import java.util.List;
-
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
+import fm.kirtsim.kharos.noteapp.ui.adapterItemCoordinator.AdapterNotesListCoordinator;
 import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListItemViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.viewHolder.NotesListViewHolder;
 
@@ -17,6 +15,9 @@ public abstract class NotesListAdapter extends
         BaseListAdapter<NotesListAdapter.NotesListAdapterListener, NotesListViewHolder>
         implements NotesListViewHolder.NotesListViewHolderListener{
 
+    @SuppressWarnings("WeakerAccess")
+    protected AdapterNotesListCoordinator notesCoordinator;
+
     public interface NotesListAdapterListener {
         void onNoteItemSingleClicked(Note note, NotesListItemViewMvc noteItemView, int listPosition);
         void onNoteItemLongClicked(Note note, NotesListItemViewMvc noteItemView, int listPosition);
@@ -25,30 +26,19 @@ public abstract class NotesListAdapter extends
         void onNoteItemPositionChanged(Note note, int posFrom, int posTo);
     }
 
+    public void setNotesCoordinator(AdapterNotesListCoordinator coordinator) {
+        notesCoordinator = coordinator;
+    }
+
     NotesListAdapter(LayoutInflater layoutInflater) {
         super(layoutInflater);
     }
-
-    public abstract void setNewNotesList(List<Note> newNotes);
-
-    public abstract void replaceNotesStartingFrom(List<Note> newNotes, int from);
-
-    public abstract List<Note> getListOfAllNotes();
-
-    public abstract boolean addNotes(List<Note> newNotes);
-
-    public abstract boolean removeNote(Note note);
-
-    public abstract boolean removeNotes(List<Note> _notes);
-
-    public abstract boolean updateNote(Note old, Note new_);
-
-    @SuppressWarnings("unused")
-    public abstract Note getNoteWithIdOrDefault(int id, Note _default);
 
     public abstract void notifyNoteChanged(Note note);
 
     public abstract void notifyNoteRemoved(Note note);
 
-    public abstract void setAnimateDragAndDrop(boolean animate);
+    public AdapterNotesListCoordinator getNotesCoordinator() {
+        return notesCoordinator;
+    }
 }
