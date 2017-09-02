@@ -1,5 +1,7 @@
 package fm.kirtsim.kharos.noteapp.dataholder;
 
+import android.support.annotation.ColorInt;
+
 /**
  * Created by kharos on 29/07/2017
  */
@@ -76,5 +78,84 @@ public class Note {
                     note.getTimestamp() == timestamp;
         }
         return false;
+    }
+
+    public static Note copyOf(Note note) {
+        return new Note(
+                note.getId(),
+                note.getOrderNo(),
+                note.getColor(),
+                note.isPinned(),
+                note.getTitle(),
+                note.getText(),
+                note.getTimestamp()
+        );
+    }
+
+    public static class NoteBuilder {
+
+        private Note note;
+
+        public NoteBuilder() {
+            note = new Note(-1, -1, -1, false, "", "", 0);
+        }
+
+        public NoteBuilder(Note baseNote) {
+            this.note = Note.copyOf(baseNote);
+        }
+
+        public NoteBuilder id(int id) {
+            note.id = id;
+            return this;
+        }
+
+        public NoteBuilder orderNumber(int orderNumber) {
+            note.orderNo = orderNumber;
+            return this;
+        }
+
+        public NoteBuilder color(@ColorInt int color) {
+            note.color = color;
+            return this;
+        }
+
+        public NoteBuilder pinned(boolean isPinned) {
+            note.isPinned = isPinned;
+            return this;
+        }
+
+        public NoteBuilder title(String title) {
+            note.title = title;
+            return this;
+        }
+
+        public NoteBuilder text(String text) {
+            note.text = text;
+            return this;
+        }
+
+        public NoteBuilder timeStamp(long timestamp) {
+            note.timestamp = timestamp;
+            return this;
+        }
+
+        public NoteBuilder copyValuesFrom(Note srcNote) {
+            note.id = srcNote.id;
+            note.orderNo = srcNote.orderNo;
+            note.color = srcNote.color;
+            note.isPinned = srcNote.isPinned;
+            note.title = srcNote.title;
+            note.text = srcNote.text;
+            note.timestamp = srcNote.timestamp;
+            return this;
+        }
+
+        public Note build() {
+            return Note.copyOf(note);
+        }
+
+        public static Note createDefaultNote() {
+            return new Note(-1, -1, -1, false, "title", "text", 0);
+        }
     }
 }

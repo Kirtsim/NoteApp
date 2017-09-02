@@ -260,12 +260,11 @@ public class NotesListFragment extends BaseFragment implements
     }
 
     private Note createColorUpdatedNote(Note note, @ColorInt int color) {
-        Note updated = new Note(note.getId(), note.getOrderNo(), color, note.isPinned(),
-                note.getTitle(), note.getText(), note.getTimestamp());
+        Note updated = new Note.NoteBuilder(note).color(color).build();
         if (notesCoordinator.updateNote(note, updated)) {
             return updated;
         }
-        return new Note(-1, -1, -1, false, "", "", 0);
+        return Note.NoteBuilder.createDefaultNote();
     }
 
     private void displayDetailsOfNote(Note note) {

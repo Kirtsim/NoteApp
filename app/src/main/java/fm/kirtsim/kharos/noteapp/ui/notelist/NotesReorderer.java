@@ -15,12 +15,14 @@ import fm.kirtsim.kharos.noteapp.dataholder.Note;
 
 public class NotesReorderer {
 
+    private final Note.NoteBuilder noteBuilder;
     private final List<Note> notes;
     private final ArrayList<Note> updatedNotes;
 
     private int indexStart, indexEnd;
 
     public NotesReorderer(List<Note> notesList) {
+        noteBuilder = new Note.NoteBuilder();
         notes = Lists.newArrayList(notesList);
         updatedNotes = Lists.newArrayList();
     }
@@ -77,17 +79,11 @@ public class NotesReorderer {
     }
 
     private Note changeNoteOrderNumberTo(@NonNull Note note, int orderNumber) {
-        return new Note(
-                note.getId(),
-                orderNumber,
-                note.getColor(),
-                note.isPinned(),
-                note.getTitle(),
-                note.getText(),
-                note.getTimestamp()
-        );
+        noteBuilder.copyValuesFrom(note);
+        return noteBuilder.orderNumber(orderNumber).build();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void reset() {
         updatedNotes.clear();
     }
