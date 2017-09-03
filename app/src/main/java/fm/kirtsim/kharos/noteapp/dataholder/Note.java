@@ -92,6 +92,18 @@ public class Note {
         );
     }
 
+    @Override
+    public String toString() {
+        return "Note" +
+                "\nid:        " + id +
+                "\norderNo:   " + orderNo +
+                "\ncolor:     " + color +
+                "\npinned:    " + isPinned +
+                "\ntitle:    \"" + title + "\"" +
+                "\ntext:     \"" + text + "\"" +
+                "\ntimestamp: " + timestamp;
+    }
+
     public static class NoteBuilder {
 
         private Note note;

@@ -21,6 +21,8 @@ public interface AdapterNotesListCoordinator {
 
     int getIndexOfNote(Note note);
 
+    boolean addNote(Note note);
+
     boolean addNotes(List<Note> newNotes);
 
     void addNoteToHighlighted(Note note);

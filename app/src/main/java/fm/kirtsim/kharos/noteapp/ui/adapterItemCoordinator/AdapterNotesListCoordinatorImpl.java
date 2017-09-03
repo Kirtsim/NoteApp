@@ -71,15 +71,21 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     }
 
     @Override
+    public boolean addNote(Note note) {
+        if (note != null) {
+            if (noteIdsMappingToIndexes.get(note.getId()) != null)
+                throw new IllegalArgumentException("note with the same id already exists");
+            noteIdsMappingToIndexes.put(note.getId(), notes.size());
+            return notes.add(note);
+        }
+        return false;
+    }
+
+    @Override
     public boolean addNotes(List<Note> newNotes) {
         if (newNotes != null) {
-            final int noteCount = notes.size();
-            int index = noteCount;
-            for (Note note : newNotes) {
-                notes.add(note);
-                noteIdsMappingToIndexes.put(note.getId(), index++);
-            }
-            return index > noteCount;
+            newNotes.forEach(this::addNote);
+            return true;
         }
         return false;
     }
@@ -122,7 +128,7 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
 
     private boolean removeNoteFromNotesListAndIdsMapping(Note note, boolean remFromHighlighted) {
         final int id = note.getId();
-        final int index = noteIdsMappingToIndexes.get(id);
+        final int index = getNoteIndex(id);
         if (index != -1) {
             notes.set(index, null);
             noteIdsMappingToIndexes.remove(id);
@@ -131,6 +137,13 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
             return true;
         }
         return false;
+    }
+
+    private int getNoteIndex(int id) {
+        Integer index = noteIdsMappingToIndexes.get(id);
+        if (index == null)
+            return -1;
+        return index;
     }
 
     @Override
@@ -146,7 +159,7 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     @Override
     public boolean updateNote(Note old, Note new_) {
         if (old == null || new_ == null) return false;
-        final int index = noteIdsMappingToIndexes.get(old.getId());
+        final int index = getNoteIndex(old.getId());
         if (index != -1) {
             notes.set(index, new_);
             if (old.getId() != new_.getId()) {
@@ -167,7 +180,7 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
 
     @Override
     public Note getNoteWithIdOrDefault(int id, Note _default) {
-        final int index = noteIdsMappingToIndexes.get(id);
+        final int index = getNoteIndex(id);
         if (index != -1)
             return notes.get(index);
         return _default;
