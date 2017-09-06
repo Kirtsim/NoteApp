@@ -25,7 +25,7 @@ public interface AdapterNotesListCoordinator {
 
     boolean addNotes(List<Note> newNotes);
 
-    void addNoteToHighlighted(Note note);
+    boolean addNoteToHighlighted(Note note);
 
     void addAllNotesToHighlighted();
 
@@ -33,6 +33,7 @@ public interface AdapterNotesListCoordinator {
 
     boolean removeNotes(List<Note> _notes);
 
+    @SuppressWarnings("unused")
     boolean removeHighlightedNotes();
 
     void removeNoteFromHighlighted(Note note);

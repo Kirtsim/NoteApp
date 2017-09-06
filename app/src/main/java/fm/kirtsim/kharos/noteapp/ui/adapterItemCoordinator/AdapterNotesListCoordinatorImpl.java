@@ -74,7 +74,7 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     public boolean addNote(Note note) {
         if (note != null) {
             if (noteIdsMappingToIndexes.get(note.getId()) != null)
-                throw new IllegalArgumentException("note with the same id already exists");
+                throw new IllegalArgumentException("note with id "+ note.getId() + " already exists");
             noteIdsMappingToIndexes.put(note.getId(), notes.size());
             return notes.add(note);
         }
@@ -91,8 +91,12 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     }
 
     @Override
-    public void addNoteToHighlighted(Note note) {
-        highlighted.put(note.getId(), note);
+    public boolean addNoteToHighlighted(Note note) {
+        if (getNoteIndex(note.getId()) != -1) {
+            highlighted.put(note.getId(), note);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -103,7 +107,7 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     @Override
     public boolean removeNote(Note note) {
         if (note != null) {
-            removeNoteFromNotesListAndIdsMapping(note, true);
+            nullifyNoteFromNotesListAndIdsMapping(note, true);
             ListUtils.removeNullObjects(notes);
         }
         return false;
@@ -112,7 +116,7 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     @Override
     public boolean removeNotes(List<Note> _notes) {
         if (_notes != null && !_notes.isEmpty()) {
-            _notes.forEach(note -> removeNoteFromNotesListAndIdsMapping(note, true));
+            _notes.forEach(note -> nullifyNoteFromNotesListAndIdsMapping(note, true));
             ListUtils.removeNullObjects(notes);
             return true;
         }
@@ -121,12 +125,13 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
 
     @Override
     public boolean removeHighlightedNotes() {
-        highlighted.forEach((id, note) -> removeNoteFromNotesListAndIdsMapping(note, false));
+        highlighted.forEach((id, note) -> nullifyNoteFromNotesListAndIdsMapping(note, false));
+        ListUtils.removeNullObjects(notes);
         removeAllNotesFromHighlighted();
         return true;
     }
 
-    private boolean removeNoteFromNotesListAndIdsMapping(Note note, boolean remFromHighlighted) {
+    private boolean nullifyNoteFromNotesListAndIdsMapping(Note note, boolean remFromHighlighted) {
         final int id = note.getId();
         final int index = getNoteIndex(id);
         if (index != -1) {
