@@ -270,6 +270,20 @@ public class AdapterNotesListCoordinatorTest {
         assertNotInHighlighted();
     }
 
+    @Test
+    public void removeNoteThatIsAlsoHighlightedTest() {
+        final int NOTE_INDEX = 1;
+        fillCoordinatorWithNotes(COUNT_5);
+        fillListWithNotesStartingWithOrderNumber(expectedNotesList, START_ORDER_NO_DFLT, COUNT_5);
+
+        Note highlightedAndRemovedNote = coordinator.getNoteAt(NOTE_INDEX);
+        coordinator.addNoteToHighlighted(highlightedAndRemovedNote);
+        expectedHighlightedNotes.add(highlightedAndRemovedNote);
+
+        assertTrue("Note removal fail", coordinator.removeNote(highlightedAndRemovedNote));
+        assertNotInHighlighted();
+    }
+
 
 
 

@@ -109,6 +109,7 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
         if (note != null) {
             nullifyNoteFromNotesListAndIdsMapping(note, true);
             ListUtils.removeNullObjects(notes);
+            return true;
         }
         return false;
     }
