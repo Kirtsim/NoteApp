@@ -1,6 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.adapterItemCoordinator;
 
 import android.support.annotation.NonNull;
+import android.util.Pair;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -30,8 +31,14 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
 
     @Override
     public void setNewNotesList(List<Note> newNotes) {
-        notes.clear();
+        resetNoteData();
         addNotes(newNotes);
+    }
+
+    private void resetNoteData() {
+        notes.clear();
+        highlighted.clear();
+        noteIdsMappingToIndexes.clear();
     }
 
     @Override
@@ -40,6 +47,7 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
         int currentSize = notes.size();
         for (Note note : newNotes) {
             if (index < currentSize) {
+                nullifyNoteFromNotesListAndIdsMapping(notes.get(index), true);
                 notes.set(index, note);
                 index++;
             } else {
@@ -66,8 +74,18 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     }
 
     @Override
+    public Pair<Note, Integer> popLastDeletedNoteAndItsIndex() {
+        return null;
+    }
+
+    @Override
+    public List<Pair<Note, Integer>> popLastDeletedNotesAndTheirIndexes(int count) {
+        return null;
+    }
+
+    @Override
     public int getIndexOfNote(Note note) {
-        return noteIdsMappingToIndexes.get(note.getId() - 1);
+        return getNoteIndex(note.getId());
     }
 
     @Override

@@ -41,6 +41,11 @@ import fm.kirtsim.kharos.noteapp.ui.colorPicker.ColorPickerViewMvcImpl;
 import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.ColorPickerItemDecoration;
 import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.NotesListItemDecorationImpl;
 import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailFragment;
+import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ColorPaletteNonSelectionActionbarVisual;
+import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ColorPaletteSelectionActionbarVisual;
+import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.HomeActionbarVisual;
+import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ReorderActionbarVisual;
+import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.SelectionActionbarVisual;
 import fm.kirtsim.kharos.noteapp.utils.Units;
 
 /**
@@ -54,17 +59,17 @@ public class NotesListFragment extends BaseFragment implements
         ColorPickerAdapter.ColorPickerAdapterListener {
 
     @Inject NotesListAdapter notesListAdapter;
-    @Inject ColorPickerAdapter colorsListAdapter;
+    @Inject ColorPickerAdapter colorListAdapter;
     @Inject NotesManager notesManager;
-    @Inject NotesListActionBarViewMvc actionBarMvc;
+    @Inject NotesListActionbarManager actionbarManager;
     @Inject MainThreadPoster mainThreadPoster;
     @Inject BackgroundThreadPoster backgroundPoster;
+
 
     private NotesListViewMvc notesListViewMvc;
     private AdapterNotesListCoordinator notesCoordinator;
     @SuppressWarnings("FieldCanBeLocal")
     private ColorPickerViewMvc colorPickerViewMvc;
-//    private final Map<Integer, Note> highlightedNotes = Maps.newConcurrentMap();
 
     private Animations noteDetailAnimations;
     private NotesListItemTouchHelper notesTouchHelper;
@@ -85,12 +90,11 @@ public class NotesListFragment extends BaseFragment implements
 
         notesCoordinator = notesListAdapter.getNotesCoordinator();
         notesListAdapter.setListener(this);
-        colorsListAdapter.setListener(this);
-        colorsListAdapter.setColors(getContext().getResources()
+        colorListAdapter.setListener(this);
+        colorListAdapter.setColors(getContext().getResources()
                 .getIntArray(R.array.color_picker_colors));
-        colorsListAdapter.setHighlightColor(Color.BLACK);
+        colorListAdapter.setHighlightColor(Color.BLACK);
         notesManager.registerListener(this);
-        actionBarMvc.setHomeButtonVisible(false);
         noteDetailAnimations = getAnimationsForNoteDetailFragment();
         notesTouchHelper = new NotesListItemTouchHelper(
                 new NotesListItemTouchCallback(notesListAdapter), null);
@@ -129,14 +133,13 @@ public class NotesListFragment extends BaseFragment implements
 
         colorPickerViewMvc = new ColorPickerViewMvcImpl(inflater, null);
         colorPickerViewMvc.setLayoutManager(new LinearLayoutManager(getContext()));
-        colorPickerViewMvc.setAdapter(colorsListAdapter);
+        colorPickerViewMvc.setAdapter(colorListAdapter);
         colorPickerViewMvc.addColorItemsDecoration(new ColorPickerItemDecoration(
                 Units.dp2px(10, getResources().getDisplayMetrics())));
         notesListViewMvc.addViewToRightSideContainer(colorPickerViewMvc.getRootView());
         notesTouchHelper.attachToRecyclerView(notesListViewMvc.getRecyclerView());
         notesTouchHelper.listen(false);
 
-        actionBarMvc.setTitle(getString(R.string.your_notes_title));
         return notesListViewMvc.getRootView();
     }
 
@@ -148,7 +151,7 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onDetach() {
         super.onDetach();
-        colorsListAdapter.unregisterListener();
+        colorListAdapter.unregisterListener();
 
         notesListAdapter.unregisterListener();
         notesListAdapter = null;
@@ -162,9 +165,8 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        actionBarMvc.setMenu(menu, inflater);
-        actionBarMvc.setDeleteMenuItemVisible(false);
-        actionBarMvc.setSelectAllMenuItemVisible(false);
+        actionbarManager.inflateWithMenu(menu, inflater);
+        actionbarManager.applyVisual(new HomeActionbarVisual(), getString(R.string.your_notes_title));
     }
 
     @Override
@@ -172,35 +174,36 @@ public class NotesListFragment extends BaseFragment implements
         switch (item.getItemId()) {
             case R.id.mi_delete: deleteHighlightedNotes();break;
             case R.id.mi_select_all: addAllNotesToHighlighted(); break;
-            case R.id.mi_color_picker: showOrHideColorPicker(); break;
-            case R.id.mi_reorder:
-                actionBarMvc.setHomeButtonVisible(true);
-                actionBarMvc.setColorPaletteItemVisible(false);
-                actionBarMvc.setReorderItemVisible(false);
-                notesTouchHelper.listen(true);
-                break;
-            case android.R.id.home: clearNoteHighlighting();
-                if (notesListViewMvc.isRightSideContainerVisible())
-                    notesListViewMvc.hideRightSideContainer();
-                actionBarMvc.setReorderItemVisible(true);
-                actionBarMvc.setColorPaletteItemVisible(true);
-                notesTouchHelper.listen(false);
-                break;
+            case R.id.mi_color_picker: onColorPickerIconClicked(); break;
+            case R.id.mi_reorder: onReorderIconClicked(); break;
+            case android.R.id.home: onHomeBackButtonClicked(); break;
             default: return super.onOptionsItemSelected(item);
         }
         return true;
     }
 
-    private void showOrHideColorPicker() {
+    private void onColorPickerIconClicked() {
+        notesListViewMvc.showRightSideContainer();
+        if (notesCoordinator.containsHighlightedNotes()) {
+            actionbarManager.applyVisual(new ColorPaletteSelectionActionbarVisual(),
+                    getString(R.string.title_color_selected));
+        } else {
+            actionbarManager.applyVisual(new ColorPaletteNonSelectionActionbarVisual());
+            actionbarManager.setTitle(getString(R.string.title_color_notes));
+        }
+    }
+
+    private void onReorderIconClicked() {
+        actionbarManager.applyVisual(new ReorderActionbarVisual());
+        notesTouchHelper.listen(true);
+    }
+
+    private void onHomeBackButtonClicked() {
+        clearNoteHighlighting();
         if (notesListViewMvc.isRightSideContainerVisible())
             notesListViewMvc.hideRightSideContainer();
-        else {
-            notesListViewMvc.showRightSideContainer();
-            if (!notesCoordinator.containsHighlightedNotes()) { // TODO: a bad design BLEUH!
-                actionBarMvc.setColorPaletteItemVisible(false);
-                actionBarMvc.setHomeButtonVisible(true);
-            }
-        }
+        actionbarManager.applyVisual(new HomeActionbarVisual(), getString(R.string.your_notes_title));
+        notesTouchHelper.listen(false);
     }
 
     private void deleteHighlightedNotes() {
@@ -296,24 +299,20 @@ public class NotesListFragment extends BaseFragment implements
 
     private void onNoteRemovedFromHighlighted() {
         if (!notesCoordinator.containsHighlightedNotes()) {
-            actionBarMvc.setDeleteMenuItemVisible(false);
-            actionBarMvc.setSelectAllMenuItemVisible(false);
-            actionBarMvc.setHomeButtonVisible(false);
-            actionBarMvc.setTitle(getString(R.string.your_notes_title));
+            actionbarManager.applyVisual(new HomeActionbarVisual());
+            actionbarManager.setTitle(getString(R.string.your_notes_title));
             notesListViewMvc.showAddButton();
         } else {
-            actionBarMvc.setTitle(String.valueOf(notesCoordinator.getHighlightedCount()));
+            actionbarManager.setTitle(String.valueOf(notesCoordinator.getHighlightedCount()));
         }
     }
 
     private void onNoteAddedToHighlighted() {
         if (notesCoordinator.getHighlightedCount() == 1) {
-            actionBarMvc.setDeleteMenuItemVisible(true);
-            actionBarMvc.setHomeButtonVisible(true);
-            actionBarMvc.setSelectAllMenuItemVisible(true);
+            actionbarManager.applyVisual(new SelectionActionbarVisual());
             notesListViewMvc.hideAddButton();
         }
-        actionBarMvc.setTitle(String.valueOf(notesCoordinator.getHighlightedCount()));
+        actionbarManager.setTitle(String.valueOf(notesCoordinator.getHighlightedCount()));
     }
 
     @Override
@@ -390,12 +389,19 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onNoteDeleted(@NonNull Note note) {
-        clearNoteHighlighting();
-        if (notesCoordinator.removeNote(note)) {
-            notesListAdapter.notifyNoteRemoved(note); //TODO: reordering!!
-            showToast(R.string.note_deleted_message, "");
-        } else
-            notesManager.fetchNotes();
+        backgroundPoster.post(() -> {
+            clearNoteHighlighting();
+            if (notesCoordinator.removeNote(note)) {
+                int deletionIndex = notesCoordinator.popLastDeletedNoteAndItsIndex().second;
+                NotesReorderer reorderer = new NotesReorderer(notesCoordinator.getListOfAllNotes());
+                reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(deletionIndex,
+                        note.getOrderNo());
+                updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
+                notesListAdapter.notifyNoteRemoved(note);
+                mainThreadPoster.post(() -> showToast(R.string.note_deleted_message, ""));
+            } else
+                notesManager.fetchNotes();
+        });
     }
 
     @Override

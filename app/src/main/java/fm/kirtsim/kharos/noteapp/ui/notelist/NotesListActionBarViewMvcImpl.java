@@ -67,4 +67,12 @@ public class NotesListActionBarViewMvcImpl extends BaseActionBarViewMvc implemen
         colorPaletteMI = menu.findItem(R.id.mi_color_picker);
         reorderMI = menu.findItem(R.id.mi_reorder);
     }
+
+    @Override
+    public void hideAllIcons() {
+        deleteMI.setVisible(false);
+        selectAllMI.setVisible(false);
+        reorderMI.setVisible(false);
+        colorPaletteMI.setVisible(false);
+    }
 }

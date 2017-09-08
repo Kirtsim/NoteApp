@@ -1,5 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.adapterItemCoordinator;
 
+import android.util.Pair;
+
 import java.util.List;
 
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
@@ -18,6 +20,10 @@ public interface AdapterNotesListCoordinator {
     List<Note> getListOfHighlightedNotes();
 
     Note getNoteAt(int index);
+
+    Pair<Note, Integer> popLastDeletedNoteAndItsIndex();
+
+    List<Pair<Note, Integer>> popLastDeletedNotesAndTheirIndexes(int count);
 
     int getIndexOfNote(Note note);
 

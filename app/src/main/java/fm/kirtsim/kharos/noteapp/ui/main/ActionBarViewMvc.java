@@ -18,4 +18,6 @@ public interface ActionBarViewMvc {
     String getTitle();
 
     Menu getMenu();
+
+    void hideAllIcons();
 }

@@ -15,9 +15,7 @@ import fm.kirtsim.kharos.noteapp.ui.base.BaseActionBarViewMvc;
 public class NoteDetailActionBarViewMvcImpl extends BaseActionBarViewMvc implements
         NoteDetailActionBarViewMvc {
 
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private MenuItem saveMenuItem;
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private MenuItem deleteMenuItem;
 
     public NoteDetailActionBarViewMvcImpl(ActionBar actionBar) {
@@ -29,5 +27,11 @@ public class NoteDetailActionBarViewMvcImpl extends BaseActionBarViewMvc impleme
         menuInflater.inflate(R.menu.menu_note_detail, menu);
         saveMenuItem = menu.findItem(R.id.mi_save);
         deleteMenuItem = menu.findItem(R.id.mi_delete);
+    }
+
+    @Override
+    public void hideAllIcons() {
+        saveMenuItem.setVisible(false);
+        deleteMenuItem.setVisible(false);
     }
 }

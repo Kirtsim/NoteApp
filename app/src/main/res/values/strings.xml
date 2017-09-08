@@ -20,4 +20,7 @@
     <string name="color_description_iv">a circle filled with the corresponding color</string>
     <string name="reorder_menut_item">Reorder</string>
     <string name="notes_reorder_title">Notes reorder</string>
+    <string name="title_notes_coloring">Notes coloring</string>
+    <string name="title_color_selected">Color selected</string>
+    <string name="title_color_notes">Color notes</string>
 </resources>

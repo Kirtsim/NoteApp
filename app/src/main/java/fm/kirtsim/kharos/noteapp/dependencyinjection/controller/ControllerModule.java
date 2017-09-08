@@ -16,6 +16,7 @@ import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailActionBarViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailActionBarViewMvcImpl;
 import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListActionBarViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListActionBarViewMvcImpl;
+import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListActionbarManager;
 
 /**
  * Created by kharos on 27/07/2017
@@ -43,13 +44,18 @@ public class ControllerModule {
     }
 
     @Provides
-    public ColorPickerAdapter colorPickerAdapter() {
-        return new ColorPickerAdapterImpl(activity.getLayoutInflater());
+    public NotesListActionBarViewMvc notesListActionBarViewMvc() {
+        return new NotesListActionBarViewMvcImpl(activity.getSupportActionBar());
     }
 
     @Provides
-    public NotesListActionBarViewMvc notesListActionBarViewMvc() {
-        return new NotesListActionBarViewMvcImpl(activity.getSupportActionBar());
+    public NotesListActionbarManager notesListActionbarManager(NotesListActionBarViewMvc viewMvc) {
+        return new NotesListActionbarManager(viewMvc);
+    }
+
+    @Provides
+    public ColorPickerAdapter colorPickerAdapter() {
+        return new ColorPickerAdapterImpl(activity.getLayoutInflater());
     }
 
     @Provides
