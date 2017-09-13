@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/note_list_item_outer_background"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="2dp"
+    android:elevation="2dp">
+
+    <LinearLayout
+        android:id="@+id/note_list_item_inner_background"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/note_list_item_title"
+            android:text="@string/dummy_title"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/note_list_item_text"
+            android:text="@string/dummy_long_text"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:maxLines="3"
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="id: "
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/note_id"
+                tools:text="2"
+                android:textStyle="bold"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+            <TextView
+                android:text="orderNo: "
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/note_order_no"
+                android:maxLines="3"
+                android:textStyle="bold"
+                android:layout_margin="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="2"/>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

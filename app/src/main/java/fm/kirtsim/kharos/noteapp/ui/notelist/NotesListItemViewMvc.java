@@ -14,4 +14,5 @@ public interface NotesListItemViewMvc extends ViewMvc{
     void setText(String text);
     void setBackgroundColors(@ColorInt int outerBackgroundColor,
                              @ColorInt int innerBackgroundColor);
+    void setBorderColor(@ColorInt int color);
 }

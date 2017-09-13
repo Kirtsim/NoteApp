@@ -14,6 +14,5 @@ public class ColorPaletteNonSelectionActionbarVisual implements ActionbarVisual 
     public void accept(NotesListActionBarViewMvc actionBarViewMvc) {
         actionBarViewMvc.hideAllIcons();
         actionBarViewMvc.setHomeButtonVisible(true);
-        actionBarViewMvc.setTitle("Notes coloring");
     }
 }

@@ -14,6 +14,5 @@ public class HomeActionbarVisual implements ActionbarVisual {
         actionBarViewMvc.setHomeButtonVisible(false);
         actionBarViewMvc.setColorPaletteItemVisible(true);
         actionBarViewMvc.setReorderItemVisible(true);
-        actionBarViewMvc.setTitle("Your notes");
     }
 }

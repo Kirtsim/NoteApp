@@ -13,6 +13,5 @@ public class ReorderActionbarVisual implements ActionbarVisual {
         actionBarViewMvc.setHomeButtonVisible(true);
         actionBarViewMvc.hideAllIcons();
         actionBarViewMvc.setHomeButtonVisible(true);
-        actionBarViewMvc.setTitle("Reorder");
     }
 }

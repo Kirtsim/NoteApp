@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,6 +45,7 @@ import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailFragment;
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ColorPaletteNonSelectionActionbarVisual;
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ColorPaletteSelectionActionbarVisual;
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.HomeActionbarVisual;
+import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.NotesListItemViewMvcDebug;
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ReorderActionbarVisual;
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.SelectionActionbarVisual;
 import fm.kirtsim.kharos.noteapp.utils.Units;
@@ -66,6 +68,7 @@ public class NotesListFragment extends BaseFragment implements
     @Inject BackgroundThreadPoster backgroundPoster;
 
 
+    private State state;
     private NotesListViewMvc notesListViewMvc;
     private AdapterNotesListCoordinator notesCoordinator;
     @SuppressWarnings("FieldCanBeLocal")
@@ -84,9 +87,11 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d(getClassName(), "onCreate()");
         super.onCreate(savedInstanceState);
         initializeColors(getResources());
         setHasOptionsMenu(true);
+        state = new State();
 
         notesCoordinator = notesListAdapter.getNotesCoordinator();
         notesListAdapter.setListener(this);
@@ -96,8 +101,6 @@ public class NotesListFragment extends BaseFragment implements
         colorListAdapter.setHighlightColor(Color.BLACK);
         notesManager.registerListener(this);
         noteDetailAnimations = getAnimationsForNoteDetailFragment();
-        notesTouchHelper = new NotesListItemTouchHelper(
-                new NotesListItemTouchCallback(notesListAdapter), null);
     }
 
     @Override
@@ -125,22 +128,34 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        setupColorPicker(inflater);
+        setupViewMvc(inflater, container);
+        setupNotesListItemTouchHelper();
+        return notesListViewMvc.getRootView();
+    }
+
+    private void setupViewMvc(LayoutInflater inflater, @Nullable ViewGroup container) {
         notesListViewMvc = new NotesListViewMvcImpl(inflater, container, notesListAdapter,
                 new LinearLayoutManager(inflater.getContext()));
         notesListViewMvc.registerListener(this);
         notesListViewMvc.addNoteItemDecoration(new NotesListItemDecorationImpl(
                 Units.dp2px(3, getResources().getDisplayMetrics())));
+        notesListViewMvc.addViewToRightSideContainer(colorPickerViewMvc.getRootView());
+    }
 
+    private void setupColorPicker(LayoutInflater inflater) {
         colorPickerViewMvc = new ColorPickerViewMvcImpl(inflater, null);
         colorPickerViewMvc.setLayoutManager(new LinearLayoutManager(getContext()));
         colorPickerViewMvc.setAdapter(colorListAdapter);
         colorPickerViewMvc.addColorItemsDecoration(new ColorPickerItemDecoration(
                 Units.dp2px(10, getResources().getDisplayMetrics())));
-        notesListViewMvc.addViewToRightSideContainer(colorPickerViewMvc.getRootView());
+    }
+
+    private void setupNotesListItemTouchHelper() {
+        notesTouchHelper = new NotesListItemTouchHelper(
+                new NotesListItemTouchCallback(notesListAdapter), null);
         notesTouchHelper.attachToRecyclerView(notesListViewMvc.getRecyclerView());
         notesTouchHelper.listen(false);
-
-        return notesListViewMvc.getRootView();
     }
 
     public void onStart() {
@@ -184,17 +199,21 @@ public class NotesListFragment extends BaseFragment implements
 
     private void onColorPickerIconClicked() {
         notesListViewMvc.showRightSideContainer();
-        if (notesCoordinator.containsHighlightedNotes()) {
+        if (state.isInSelectionState()) {
             actionbarManager.applyVisual(new ColorPaletteSelectionActionbarVisual(),
                     getString(R.string.title_color_selected));
+            state.setState(State.SELECTION_COLOR);
         } else {
             actionbarManager.applyVisual(new ColorPaletteNonSelectionActionbarVisual());
             actionbarManager.setTitle(getString(R.string.title_color_notes));
+            state.setState(State.COLOR);
         }
     }
 
     private void onReorderIconClicked() {
+        state.setState(State.REORDER);
         actionbarManager.applyVisual(new ReorderActionbarVisual());
+        notesListViewMvc.hideAddButton();
         notesTouchHelper.listen(true);
     }
 
@@ -202,8 +221,9 @@ public class NotesListFragment extends BaseFragment implements
         clearNoteHighlighting();
         if (notesListViewMvc.isRightSideContainerVisible())
             notesListViewMvc.hideRightSideContainer();
-        actionbarManager.applyVisual(new HomeActionbarVisual(), getString(R.string.your_notes_title));
-        notesTouchHelper.listen(false);
+
+
+        state.setState(State.DEFAULT);
     }
 
     private void deleteHighlightedNotes() {
@@ -234,11 +254,30 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     protected boolean onBackPressed() {
-        if (notesCoordinator.containsHighlightedNotes()) {
-            clearNoteHighlighting();
-            return true;
-        }
-        return false;
+        if (state.isInDefaultState())
+            return false;
+        if (state.isInColoringState() || state.isInSelectionColoringState()) {
+            notesListViewMvc.hideRightSideContainer();
+        } else if (state.isInSelectionState()) {
+            onBackPressedInSelectionState();
+        } else if (state.isInReorderState())
+            notesListViewMvc.showAddButton();
+        setStateAfterBackPress();
+        return true;
+    }
+
+    private void onBackPressedInSelectionState() {
+        actionbarManager.applyVisual(new HomeActionbarVisual(), getString(R.string.your_notes_title));
+        notesTouchHelper.listen(false);
+        clearNoteHighlighting();
+        state.setState(State.DEFAULT);
+    }
+
+    private void setStateAfterBackPress() {
+        if (state.isInSelectionColoringState())
+            state.setState(State.SELECTION);
+        else
+            state.setState(State.DEFAULT);
     }
 
     // ###################### BaseFragment ########################
@@ -251,14 +290,12 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onNoteItemSingleClicked(Note note, NotesListItemViewMvc noteItemView,
                                         int notePosition) {
-
-        if (notesCoordinator.containsHighlightedNotes())
-            onNoteItemLongClicked(note, noteItemView, notePosition);
-        else if (notesListViewMvc.isRightSideContainerVisible()) {
-            Note coloredNote = createColorUpdatedNote(note, selectedNoteColor);
-            updateNoteInDatabase(coloredNote, UPDATE_COLOR);
-        } else {
+        if (state.isInDefaultState()) {
             displayDetailsOfNote(note);
+        } else if (state.isInSelectionState() || state.isInSelectionColoringState())
+            onNoteItemLongClicked(note, noteItemView, notePosition);
+        else if (state.isInColoringState()) {
+            updateNoteInDatabase(createColorUpdatedNote(note, selectedNoteColor), UPDATE_COLOR);
         }
     }
 
@@ -285,16 +322,27 @@ public class NotesListFragment extends BaseFragment implements
     @MainThread
     @Override
     public void onNoteItemLongClicked(Note note, NotesListItemViewMvc noteItemView, int notePosition) {
-        if (notesListViewMvc.isRightSideContainerVisible())
-            return;
-        if (notesCoordinator.isNoteHighlighted(note)) {
-            notesCoordinator.removeNoteFromHighlighted(note);
-            onNoteRemovedFromHighlighted();
-        } else {
+        if (state.isInDefaultState()) {
+            setNoteHighlighted(note, noteItemView, true);
+        } else if (state.isInSelectionState()) {
+            boolean highlightNote = !notesCoordinator.isNoteHighlighted(note);
+            setNoteHighlighted(note, noteItemView, highlightNote);
+        } else if (state.isInSelectionColoringState() && !notesCoordinator.isNoteHighlighted(note)) {
+            updateNoteInDatabase(createColorUpdatedNote(note, selectedNoteColor), UPDATE_COLOR);
+            setNoteHighlighted(note, noteItemView, true);
+        }
+    }
+
+    private void setNoteHighlighted(Note note, NotesListItemViewMvc noteViewMvc, boolean highlight) {
+        if (highlight) {
             notesCoordinator.addNoteToHighlighted(note);
             onNoteAddedToHighlighted();
+            noteViewMvc.setBorderColor(COLOR_HIGHLIGHTED_FRAME);
+        } else {
+            notesCoordinator.removeNoteFromHighlighted(note);
+            onNoteRemovedFromHighlighted();
+            noteViewMvc.setBorderColor(note.getColor());
         }
-        setNoteItemBackground(note, noteItemView);
     }
 
     private void onNoteRemovedFromHighlighted() {
@@ -302,6 +350,7 @@ public class NotesListFragment extends BaseFragment implements
             actionbarManager.applyVisual(new HomeActionbarVisual());
             actionbarManager.setTitle(getString(R.string.your_notes_title));
             notesListViewMvc.showAddButton();
+            state.setState(State.DEFAULT);
         } else {
             actionbarManager.setTitle(String.valueOf(notesCoordinator.getHighlightedCount()));
         }
@@ -311,12 +360,16 @@ public class NotesListFragment extends BaseFragment implements
         if (notesCoordinator.getHighlightedCount() == 1) {
             actionbarManager.applyVisual(new SelectionActionbarVisual());
             notesListViewMvc.hideAddButton();
+            state.setState(State.SELECTION);
         }
         actionbarManager.setTitle(String.valueOf(notesCoordinator.getHighlightedCount()));
     }
 
     @Override
     public void onNoteItemVisible(Note note, NotesListItemViewMvc noteItemView) {
+        NotesListItemViewMvcDebug viewMvc = (NotesListItemViewMvcDebug) noteItemView;
+        viewMvc.setId(note.getId());
+        viewMvc.setOrderNo(note.getOrderNo());
         noteItemView.setText(note.getText());
         noteItemView.setTitle(note.getTitle());
         setNoteItemBackground(note, noteItemView);
@@ -324,14 +377,10 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onNoteItemPositionChanged(Note note, int posFrom, int posTo) {
-        backgroundPoster.post(() -> reorderNotesDueToNotePositionChange(note, posFrom, posTo));
-    }
-
-    @SuppressWarnings("UnusedParameters")
-    private void reorderNotesDueToNotePositionChange(Note note, int posFrom, int posTo) {
-        NotesReorderer reorderer = new NotesReorderer(notesCoordinator.getListOfAllNotes());
-        reorderer.changeOrderNumbersDueToPositionChange(posFrom, posTo);
-        updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
+        backgroundPoster.post(() -> { // TODO: WRONG!!
+            final int lowerIndex = Math.min(posFrom, posTo);
+            updateOrderNumbersOfNotesStartingWithNote(notesCoordinator.getNoteAt(lowerIndex));
+        });
     }
 
     private void setNoteItemBackground(Note note, NotesListItemViewMvc noteItemView) {
@@ -348,23 +397,29 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onNotesFetched(@NonNull List<Note> notes) {
-        notesCoordinator.setNewNotesList(notes);
-        notesListAdapter.updateDataSet();
+        Log.d(getClassName(), "onNotesFetched()");
+        if (state.isInStartState()) {
+            Log.d(getClassName(), "onNotesFetched() : was in default state");
+            notesCoordinator.setNewNotesList(notes);
+            notesListAdapter.updateDataSet();
+            state.setState(State.DEFAULT);
+        }
     }
 
     @Override public void onNewNoteAdded(@NonNull Note note) {
+        Log.d(getClassName(), "onNewNoteAdded()");
         if (note.getId() != -1) {
             backgroundPoster.post(() -> updateOrderNumbersOfNotesStartingWithNote(note));
-        }
-        else
+        } else
             notesManager.fetchNotes();
+        state.setState(State.DEFAULT);
     }
 
     private void updateOrderNumbersOfNotesStartingWithNote(Note newNote) {
         List<Note> notes = notesCoordinator.getListOfAllNotes();
         if (notes.isEmpty() || !notes.get(0).equals(newNote))
             notes.add(0, newNote);
-        NotesReorderer reorderer = new NotesReorderer(notesCoordinator.getListOfAllNotes());
+        NotesReorderer reorderer = new NotesReorderer(notes);
         reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(0, 1);
         updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
     }
@@ -397,21 +452,27 @@ public class NotesListFragment extends BaseFragment implements
                 reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(deletionIndex,
                         note.getOrderNo());
                 updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
-                notesListAdapter.notifyNoteRemoved(note);
+//                notesListAdapter.notifyNoteRemoved(note);
                 mainThreadPoster.post(() -> showToast(R.string.note_deleted_message, ""));
             } else
                 notesManager.fetchNotes();
         });
+        state.setState(State.DEFAULT);
     }
 
     @Override
     public void onMultipleNotesDeleted(@NonNull List<Note> notes) {
         clearNoteHighlighting();
         if (notesCoordinator.removeNotes(notes)) {
-            notesListAdapter.updateDataSet(); // TODO: reordering!
-            showToast(R.string.note_deleted_message, "s");
+            NotesReorderer reorderer = new NotesReorderer(notesCoordinator.getListOfAllNotes());
+            reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(0, 1);
+            updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
+
+//            notesListAdapter.updateDataSet(); // TODO: reordering!
+            showToast(R.string.note_deleted_message, notes.size() == 1 ? "" : "s");
         } else
             notesManager.fetchNotes();
+        state.setState(State.DEFAULT);
     }
     // ###################### NotesManagerListener ########################
 
@@ -423,6 +484,7 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onNewNoteRequested() {
         startNewFragment(NoteDetailFragment.class, null, noteDetailAnimations, true);
+        state.setState(State.NEW_NOTE);
     }
 
 

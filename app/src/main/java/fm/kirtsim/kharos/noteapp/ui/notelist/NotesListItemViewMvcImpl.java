@@ -4,6 +4,8 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
+import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.v4.animation.ValueAnimatorCompat;
 import android.util.Log;
 import android.view.DragEvent;
@@ -29,7 +31,7 @@ public class NotesListItemViewMvcImpl extends BaseViewMvc implements NotesListIt
     private TextView textTV;
 
     public NotesListItemViewMvcImpl(LayoutInflater inflater, ViewGroup container) {
-        setRootView(inflater.inflate(R.layout.layout_note_list_item, container, false));
+        setRootView(inflater.inflate(getLayoutResourse(), container, false));
         initializeViews();
     }
 
@@ -38,6 +40,11 @@ public class NotesListItemViewMvcImpl extends BaseViewMvc implements NotesListIt
         innerBackground = (LinearLayout) rootView.findViewById(R.id.note_list_item_inner_background);
         titleTV = (TextView) rootView.findViewById(R.id.note_list_item_title);
         textTV = (TextView) rootView.findViewById(R.id.note_list_item_text);
+    }
+
+    @LayoutRes
+    protected int getLayoutResourse() {
+        return R.layout.layout_note_list_item;
     }
 
     @Override
@@ -60,6 +67,11 @@ public class NotesListItemViewMvcImpl extends BaseViewMvc implements NotesListIt
                                     @ColorInt int innerBackgroundColor) {
         outerBackground.setBackgroundColor(outerBackgroundColor);
         innerBackground.setBackgroundColor(innerBackgroundColor);
+    }
+
+    @Override
+    public void setBorderColor(@ColorInt int color) {
+        outerBackground.setBackgroundColor(color);
     }
 
     /*

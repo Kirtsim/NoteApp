@@ -7,6 +7,7 @@ import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.ui.adapterItemCoordinator.AdapterNotesListCoordinator;
 import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListItemViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListItemViewMvcImpl;
+import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.NotesListItemViewMvcImplDebug;
 import fm.kirtsim.kharos.noteapp.ui.viewHolder.NotesListViewHolder;
 
 /**
@@ -27,7 +28,7 @@ public class NotesListAdapterImpl extends NotesListAdapter {
      * ****************************************************/
     @Override
     public NotesListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        NotesListItemViewMvc mvcView = new NotesListItemViewMvcImpl(layoutInflater, parent);
+        NotesListItemViewMvc mvcView = new NotesListItemViewMvcImplDebug(layoutInflater, parent);
         NotesListViewHolder viewHolder = new NotesListViewHolder(mvcView);
         addViewHolder(viewHolder);
         return viewHolder;

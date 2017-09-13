@@ -11,7 +11,13 @@ import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ActionbarVisual;
 
 public class NotesListActionbarManager {
 
+    public static final int STATE_HOME = 0;
+    public static final int STATE_COLOR_NON_SELECTION = 1;
+    public static final int STATE_COLOR_SELECTION = 2;
+    public static final int STATE_REORDER = 3;
+
     private final NotesListActionBarViewMvc actionBarViewMvc;
+    private int actionbarVisualState;
 
     public NotesListActionbarManager(NotesListActionBarViewMvc actionBarViewMvc) {
         this.actionBarViewMvc = actionBarViewMvc;
