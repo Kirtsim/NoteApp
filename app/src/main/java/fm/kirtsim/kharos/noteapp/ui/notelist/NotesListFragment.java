@@ -379,7 +379,8 @@ public class NotesListFragment extends BaseFragment implements
     public void onNoteItemPositionChanged(Note note, int posFrom, int posTo) {
         backgroundPoster.post(() -> { // TODO: WRONG!!
             final int lowerIndex = Math.min(posFrom, posTo);
-            updateOrderNumbersOfNotesStartingWithNote(notesCoordinator.getNoteAt(lowerIndex));
+            final int startingOrderNumber = lowerIndex + 1;
+            updateNotesOrderNumberFromIndexStartingWithOrderNumber(lowerIndex, startingOrderNumber);
         });
     }
 
@@ -397,7 +398,6 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onNotesFetched(@NonNull List<Note> notes) {
-        Log.d(getClassName(), "onNotesFetched()");
         if (state.isInStartState()) {
             Log.d(getClassName(), "onNotesFetched() : was in default state");
             notesCoordinator.setNewNotesList(notes);
@@ -407,35 +407,35 @@ public class NotesListFragment extends BaseFragment implements
     }
 
     @Override public void onNewNoteAdded(@NonNull Note note) {
-        Log.d(getClassName(), "onNewNoteAdded()");
         if (note.getId() != -1) {
-            backgroundPoster.post(() -> updateOrderNumbersOfNotesStartingWithNote(note));
+            if (notesCoordinator.getNoteCount() == 0 || !notesCoordinator.getNoteAt(0).equals(note))
+                notesCoordinator.addNote(note, 0);
+            backgroundPoster.post(()
+                    -> updateNotesOrderNumberFromIndexStartingWithOrderNumber(0, 1));
         } else
             notesManager.fetchNotes();
         state.setState(State.DEFAULT);
     }
 
-    private void updateOrderNumbersOfNotesStartingWithNote(Note newNote) {
-        List<Note> notes = notesCoordinator.getListOfAllNotes();
-        if (notes.isEmpty() || !notes.get(0).equals(newNote))
-            notes.add(0, newNote);
+    private void updateNotesOrderNumberFromIndexStartingWithOrderNumber(int indexFromInc,
+                                                                        int startOrderNumber) {
+        List<Note> notes = notesCoordinator.getListOfNotes(
+                indexFromInc, notesCoordinator.getNoteCount() - indexFromInc);
         NotesReorderer reorderer = new NotesReorderer(notes);
-        reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(0, 1);
+        reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(0, startOrderNumber);
         updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
     }
 
     @Override public void onNoteUpdated(@NonNull Note note) {
-        if (updateOperationFlag == UPDATE_COLOR) {
-            notesCoordinator.updateNote(note, note); // it updates based on the ID
+        notesCoordinator.updateNote(note, note);
+        if (updateOperationFlag != UPDATE_ORDERING)
             notesListAdapter.notifyNoteChanged(note);
-        }
     }
 
     @Override
     public void onMultipleNotesUpdated(@NonNull List<Note> notes) {
         if (updateOperationFlag == UPDATE_ORDERING) {
-            showToast(R.string.note_saved_message, "");
-            notesCoordinator.replaceNotesStartingFrom(notes, notes.get(0).getOrderNo() -1);
+            notesCoordinator.replaceNotes(notes.get(0).getOrderNo() -1, notes);
             notesListAdapter.updateDataSet();
         } else if (updateOperationFlag == UPDATE_COLOR) {
             notesListAdapter.updateDataSet();
@@ -448,7 +448,7 @@ public class NotesListFragment extends BaseFragment implements
             clearNoteHighlighting();
             if (notesCoordinator.removeNote(note)) {
                 int deletionIndex = notesCoordinator.popLastDeletedNoteAndItsIndex().second;
-                NotesReorderer reorderer = new NotesReorderer(notesCoordinator.getListOfAllNotes());
+                NotesReorderer reorderer = new NotesReorderer(notesCoordinator.getListOfNotes());
                 reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(deletionIndex,
                         note.getOrderNo());
                 updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
@@ -464,7 +464,7 @@ public class NotesListFragment extends BaseFragment implements
     public void onMultipleNotesDeleted(@NonNull List<Note> notes) {
         clearNoteHighlighting();
         if (notesCoordinator.removeNotes(notes)) {
-            NotesReorderer reorderer = new NotesReorderer(notesCoordinator.getListOfAllNotes());
+            NotesReorderer reorderer = new NotesReorderer(notesCoordinator.getListOfNotes());
             reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(0, 1);
             updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
 

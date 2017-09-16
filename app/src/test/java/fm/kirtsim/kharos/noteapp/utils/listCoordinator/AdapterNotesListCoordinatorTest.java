@@ -349,7 +349,7 @@ public class AdapterNotesListCoordinatorTest {
     }
 
     private void assignResultNotesList() {
-        resultNotesList = coordinator.getListOfAllNotes();
+        resultNotesList = coordinator.getListOfNotes();
     }
 
     private Note createANote(int orderNo) {

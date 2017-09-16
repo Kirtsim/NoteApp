@@ -42,23 +42,38 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     }
 
     @Override
-    public void replaceNotesStartingFrom(List<Note> newNotes, int from) {
-        int index = from;
+    public void replaceNotes(int from, List<Note> newNotes) {
+        int indexToExc = Math.min(from + newNotes.size(), newNotes.size());
+        for (int i = from; i < indexToExc; ++i) {
+            if (getNoteAt(i) == null)
+                System.out.println("blah");
+            nullifyNoteFromNotesListAndIdsMapping(getNoteAt(i), true);
+        }
         int currentSize = notes.size();
+        int index = from;
+
         for (Note note : newNotes) {
             if (index < currentSize) {
-                nullifyNoteFromNotesListAndIdsMapping(notes.get(index), true);
-                notes.set(index, note);
-                index++;
-            } else {
-                notes.add(note);
-            }
+                setNoteAt(index++, note);
+            } else
+                addNote(note);
         }
     }
 
     @Override
-    public List<Note> getListOfAllNotes() {
-        return Lists.newArrayList(notes);
+    public List<Note> getListOfNotes() {
+        return getListOfNotes(0, notes.size());
+    }
+
+    @Override
+    public List<Note> getListOfNotes(int indexFromIncl, int count) {
+        if (indexFromIncl < 0 || count < 0)
+            throw new IllegalArgumentException("from index or count is less than 0");
+        final List<Note> retNotes = Lists.newArrayListWithCapacity(count);
+        final int endIndexExc = Math.min(indexFromIncl + count, notes.size());
+        for (int i = indexFromIncl; i < endIndexExc; ++i)
+            retNotes.add(notes.get(i));
+        return retNotes;
     }
 
     @Override
@@ -91,12 +106,24 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     @Override
     public boolean addNote(Note note) {
         if (note != null) {
-            if (noteIdsMappingToIndexes.get(note.getId()) != null)
+            if (isNoteIdTaken(note.getId()))
                 throw new IllegalArgumentException("note with id "+ note.getId() + " already exists");
             noteIdsMappingToIndexes.put(note.getId(), notes.size());
             return notes.add(note);
         }
         return false;
+    }
+
+    @Override
+    public boolean addNote(Note note, int index) {
+        if (index < 0 || index >= notes.size())
+            throw new IndexOutOfBoundsException("index: " + index + "  size: " + notes.size());
+        boolean success = addNote(note);
+        if (success) {
+            for (int i = notes.size() -1; i > index; --i)
+                swapNotesAt(i-1, i);
+        }
+        return success;
     }
 
     @Override
@@ -115,6 +142,10 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
             return true;
         }
         return false;
+    }
+
+    private boolean isNoteIdTaken(int id) {
+        return noteIdsMappingToIndexes.get(id) != null;
     }
 
     @Override
@@ -136,6 +167,18 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     public boolean removeNotes(List<Note> _notes) {
         if (_notes != null && !_notes.isEmpty()) {
             _notes.forEach(note -> nullifyNoteFromNotesListAndIdsMapping(note, true));
+            ListUtils.removeNullObjects(notes);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean removeNotes(int fromInc, int toExcl) {
+        if (fromInc >= 0 && fromInc <= toExcl) {
+            final int toIndexExcl = Math.min(toExcl, notes.size());
+            for (int index = fromInc; index < toIndexExcl; ++index)
+                nullifyNoteFromNotesListAndIdsMapping(getNoteAt(index), true);
             ListUtils.removeNullObjects(notes);
             return true;
         }
@@ -183,16 +226,26 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     @Override
     public boolean updateNote(Note old, Note new_) {
         if (old == null || new_ == null) return false;
-        final int index = getNoteIndex(old.getId());
-        if (index != -1) {
-            notes.set(index, new_);
-            if (old.getId() != new_.getId()) {
-                noteIdsMappingToIndexes.remove(old.getId());
-                noteIdsMappingToIndexes.put(new_.getId(), index);
-            }
-            return true;
+        boolean wasOldHighlighted = isNoteHighlighted(old);
+        boolean noteSet = setNoteAt(getIndexOfNote(old), new_);
+        if (noteSet && wasOldHighlighted) {
+            addNoteToHighlighted(new_);
         }
-        return false;
+        return noteSet;
+    }
+
+    @Override
+    public boolean setNoteAt(int index, Note note) {
+        if (index < 0 || index > notes.size()) return false;
+        boolean oldNoteExists = getNoteAt(index) != null;
+        final int currentId = oldNoteExists ? getNoteAt(index).getId() : -1;
+        if (oldNoteExists && currentId != note.getId() && isNoteIdTaken(note.getId()))
+            throw new IllegalArgumentException("note with id " + note.getId() + "already exists");
+        if (oldNoteExists)
+            nullifyNoteFromNotesListAndIdsMapping(getNoteAt(index), true);
+        notes.set(index, note);
+        noteIdsMappingToIndexes.put(note.getId(), index);
+        return true;
     }
 
     @Override

@@ -13,9 +13,11 @@ import fm.kirtsim.kharos.noteapp.dataholder.Note;
 public interface AdapterNotesListCoordinator {
     void setNewNotesList(List<Note> newNotes);
 
-    void replaceNotesStartingFrom(List<Note> newNotes, int from);
+    void replaceNotes(int fromInc, List<Note> newNotes);
 
-    List<Note> getListOfAllNotes();
+    List<Note> getListOfNotes();
+
+    List<Note> getListOfNotes(int from, int count);
 
     List<Note> getListOfHighlightedNotes();
 
@@ -29,6 +31,8 @@ public interface AdapterNotesListCoordinator {
 
     boolean addNote(Note note);
 
+    boolean addNote(Note note, int index);
+
     boolean addNotes(List<Note> newNotes);
 
     boolean addNoteToHighlighted(Note note);
@@ -39,6 +43,8 @@ public interface AdapterNotesListCoordinator {
 
     boolean removeNotes(List<Note> _notes);
 
+    boolean removeNotes(int fromIncl, int toExcl);
+
     @SuppressWarnings("unused")
     boolean removeHighlightedNotes();
 
@@ -47,6 +53,8 @@ public interface AdapterNotesListCoordinator {
     void removeAllNotesFromHighlighted();
 
     boolean updateNote(Note old, Note new_);
+
+    boolean setNoteAt(int index, Note note);
 
     void swapNotesAt(int indexOfFirst, int indexOfSecond);
 
