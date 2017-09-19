@@ -48,6 +48,7 @@ import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.HomeActionbarVisual
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.NotesListItemViewMvcDebug;
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ReorderActionbarVisual;
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.SelectionActionbarVisual;
+import fm.kirtsim.kharos.noteapp.utils.ListUtils;
 import fm.kirtsim.kharos.noteapp.utils.Units;
 
 /**
@@ -419,11 +420,13 @@ public class NotesListFragment extends BaseFragment implements
 
     private void updateNotesOrderNumberFromIndexStartingWithOrderNumber(int indexFromInc,
                                                                         int startOrderNumber) {
-        List<Note> notes = notesCoordinator.getListOfNotes(
-                indexFromInc, notesCoordinator.getNoteCount() - indexFromInc);
-        NotesReorderer reorderer = new NotesReorderer(notes);
-        reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(0, startOrderNumber);
-        updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
+        if (indexFromInc < notesCoordinator.getNoteCount()) {
+            List<Note> notes = notesCoordinator.getListOfNotes(
+                    indexFromInc, notesCoordinator.getNoteCount() - indexFromInc);
+            NotesReorderer reorderer = new NotesReorderer(notes);
+            reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(0, startOrderNumber);
+            updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
+        }
     }
 
     @Override public void onNoteUpdated(@NonNull Note note) {
@@ -435,7 +438,9 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onMultipleNotesUpdated(@NonNull List<Note> notes) {
         if (updateOperationFlag == UPDATE_ORDERING) {
-            notesCoordinator.replaceNotes(notes.get(0).getOrderNo() -1, notes);
+            ListUtils.sortNoteListByOrderNumber(notes);
+            final int replaceFromIndex = notes.get(0).getOrderNo() - 1;
+            notesCoordinator.replaceNotes(replaceFromIndex, notes);
             notesListAdapter.updateDataSet();
         } else if (updateOperationFlag == UPDATE_COLOR) {
             notesListAdapter.updateDataSet();
@@ -444,15 +449,11 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onNoteDeleted(@NonNull Note note) {
+        clearNoteHighlighting();
         backgroundPoster.post(() -> {
-            clearNoteHighlighting();
+            int deletionIndex = notesCoordinator.getIndexOfNote(note);
             if (notesCoordinator.removeNote(note)) {
-                int deletionIndex = notesCoordinator.popLastDeletedNoteAndItsIndex().second;
-                NotesReorderer reorderer = new NotesReorderer(notesCoordinator.getListOfNotes());
-                reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(deletionIndex,
-                        note.getOrderNo());
-                updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
-//                notesListAdapter.notifyNoteRemoved(note);
+                updateNotesOrderNumberFromIndexStartingWithOrderNumber(deletionIndex, note.getOrderNo());
                 mainThreadPoster.post(() -> showToast(R.string.note_deleted_message, ""));
             } else
                 notesManager.fetchNotes();
@@ -463,16 +464,18 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public void onMultipleNotesDeleted(@NonNull List<Note> notes) {
         clearNoteHighlighting();
-        if (notesCoordinator.removeNotes(notes)) {
-            NotesReorderer reorderer = new NotesReorderer(notesCoordinator.getListOfNotes());
-            reorderer.changeOrderNumberOfNotesFromIndexStartingWithNumber(0, 1);
-            updateNotesInDatabase(reorderer.getUpdatedNotes(), UPDATE_ORDERING);
-
-//            notesListAdapter.updateDataSet(); // TODO: reordering!
-            showToast(R.string.note_deleted_message, notes.size() == 1 ? "" : "s");
-        } else
-            notesManager.fetchNotes();
-        state.setState(State.DEFAULT);
+        backgroundPoster.post(() -> {
+            ListUtils.sortNoteListByOrderNumber(notes);
+            final int lowestDeletionIndex = notesCoordinator.getIndexOfNote(notes.get(0));
+            final int lowestDeletedOrderNumber = notes.get(0).getOrderNo();
+            if (notesCoordinator.removeNotes(notes)) {
+                updateNotesOrderNumberFromIndexStartingWithOrderNumber(
+                        lowestDeletionIndex, lowestDeletedOrderNumber);
+                showToast(R.string.note_deleted_message, notes.size() == 1 ? "" : "s");
+            } else
+                notesManager.fetchNotes();
+            state.setState(State.DEFAULT);
+        });
     }
     // ###################### NotesManagerListener ########################
 

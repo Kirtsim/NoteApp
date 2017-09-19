@@ -1,7 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.adapterItemCoordinator;
 
 import android.support.annotation.NonNull;
-import android.util.Pair;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -68,7 +67,7 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     @Override
     public List<Note> getListOfNotes(int indexFromIncl, int count) {
         if (indexFromIncl < 0 || count < 0)
-            throw new IllegalArgumentException("from index or count is less than 0");
+            throw new IllegalArgumentException("'from index' or count is less than 0");
         final List<Note> retNotes = Lists.newArrayListWithCapacity(count);
         final int endIndexExc = Math.min(indexFromIncl + count, notes.size());
         for (int i = indexFromIncl; i < endIndexExc; ++i)
@@ -83,19 +82,7 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
 
     @Override
     public Note getNoteAt(int index) {
-        if (index < notes.size() && index >= 0)
-            return notes.get(index);
-        return null;
-    }
-
-    @Override
-    public Pair<Note, Integer> popLastDeletedNoteAndItsIndex() {
-        return null;
-    }
-
-    @Override
-    public List<Pair<Note, Integer>> popLastDeletedNotesAndTheirIndexes(int count) {
-        return null;
+        return notes.get(index); // want to get IndexOutOfBoundsException, therefore no index checking
     }
 
     @Override
@@ -156,8 +143,10 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     @Override
     public boolean removeNote(Note note) {
         if (note != null) {
+            final int noteIndex = getIndexOfNote(note);
             nullifyNoteFromNotesListAndIdsMapping(note, true);
             ListUtils.removeNullObjects(notes);
+            updateNoteIdsMappingFromTo(noteIndex, notes.size());
             return true;
         }
         return false;
@@ -166,11 +155,31 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
     @Override
     public boolean removeNotes(List<Note> _notes) {
         if (_notes != null && !_notes.isEmpty()) {
-            _notes.forEach(note -> nullifyNoteFromNotesListAndIdsMapping(note, true));
+            int updateIdMappingFrom = getIndexOfNote(_notes.get(0));
+            for (Note note : _notes) {
+                int noteIndex = getNoteIndex(note.getId());
+                if (noteIndex != -1) {
+                    nullifyNoteFromNotesListAndIdsMapping(note, true);
+                    updateIdMappingFrom = Math.min(noteIndex, updateIdMappingFrom);
+                }
+            }
+
             ListUtils.removeNullObjects(notes);
+            updateNoteIdsMappingFromTo(updateIdMappingFrom, notes.size());
             return true;
         }
         return false;
+    }
+
+    private void updateNoteIdsMappingFromTo(int startIndexInc, int endIndexExc) {
+        final int noteCount = notes.size();
+        final int endIndex = Math.min(noteCount, endIndexExc);
+        if (startIndexInc >= 0) {
+            for (int i = startIndexInc; i < endIndex; ++i) {
+                Note note = notes.get(i);
+                noteIdsMappingToIndexes.put(note.getId(), i);
+            }
+        }
     }
 
     @Override

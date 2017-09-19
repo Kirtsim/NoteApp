@@ -23,10 +23,6 @@ public interface AdapterNotesListCoordinator {
 
     Note getNoteAt(int index);
 
-    Pair<Note, Integer> popLastDeletedNoteAndItsIndex();
-
-    List<Pair<Note, Integer>> popLastDeletedNotesAndTheirIndexes(int count);
-
     int getIndexOfNote(Note note);
 
     boolean addNote(Note note);

@@ -1,7 +1,11 @@
 package fm.kirtsim.kharos.noteapp.utils;
 
-import java.util.ArrayList;
+import com.google.common.collect.Collections2;
+
+import java.util.Collections;
 import java.util.List;
+
+import fm.kirtsim.kharos.noteapp.dataholder.Note;
 
 /**
  * Created by kharos on 06/08/2017
@@ -27,5 +31,16 @@ public class ListUtils {
         currentIndex = count -1;
         while(currentIndex > -1 && list.get(currentIndex) == null)
             list.remove(currentIndex--);
+    }
+
+    public static void sortNoteListByOrderNumber(List<Note> notes) {
+        Collections.sort(notes, (note1, note2) -> {
+            int orderNo1 = note1.getOrderNo();
+            int orderNo2 = note2.getOrderNo();
+
+            if (orderNo1 < orderNo2) return -1;
+            if (orderNo1 == orderNo2) return 0;
+            return 1;
+        });
     }
 }

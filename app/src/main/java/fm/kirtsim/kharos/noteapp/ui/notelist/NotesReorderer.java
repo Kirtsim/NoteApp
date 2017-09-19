@@ -71,7 +71,8 @@ public class NotesReorderer {
 
     private void throwIfInvalidIndexes() {
         if (indexStart < 0 || indexEnd >= notes.size())
-            throw new IllegalArgumentException("indexes out of bounds");
+            throw new IllegalArgumentException("indexes out of bounds. Start index = " + indexStart
+                + "  End index = " + indexEnd + "   size = " + notes.size());
     }
 
     private void resizeUpdatedNotesListCapacity(int capacity) {
