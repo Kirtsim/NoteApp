@@ -10,6 +10,7 @@ import android.view.View;
 
 public abstract class BaseListItemDecoration extends RecyclerView.ItemDecoration {
 
+    @SuppressWarnings("WeakerAccess")
     protected int space;
 
     void setSpacing(int spacePx) {

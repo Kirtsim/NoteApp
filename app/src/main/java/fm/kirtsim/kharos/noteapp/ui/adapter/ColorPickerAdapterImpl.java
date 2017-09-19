@@ -1,5 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.adapter;
 
+import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -77,6 +78,14 @@ public class ColorPickerAdapterImpl extends
     public void setColors(int[] colors) {
         colorsList.clear();
         for (int color : colors) colorsList.add(color);
+        initDefaultHighlighting();
+    }
+
+    private void initDefaultHighlighting() {
+        resetHighlighting();
+        if (!colorsList.isEmpty()) {
+            highlightedAt = 0;
+        }
     }
 
     @Override

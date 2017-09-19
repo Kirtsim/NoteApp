@@ -10,6 +10,9 @@
     <color name="note_detail_selected_background">#aae0ff</color>
     <color name="note_detail_selected_frame">#0537ff</color>
 
+    <color name="color_picker_background">#fffffc</color>
+
+    <color name="color_picker_white">#fff</color>
     <color name="color_picker_rainbow_pink">#ffb3ba</color>
     <color name="color_picker_rainbow_dark_pink">#ff8b94</color>
     <color name="color_picker_rainbow_orange">#ffdfba</color>
@@ -21,6 +24,7 @@
     <color name="color_picker_rainbow_purple">#ECCDFA</color>
 
     <array name="color_picker_colors">
+        <item>@color/color_picker_white</item>
         <item>@color/color_picker_rainbow_dark_pink</item>
         <item>@color/color_picker_rainbow_pink</item>
         <item>@color/color_picker_rainbow_orange</item>
