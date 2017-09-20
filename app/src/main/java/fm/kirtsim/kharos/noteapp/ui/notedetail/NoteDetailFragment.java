@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -114,7 +115,6 @@ public class NoteDetailFragment extends BaseFragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.mi_save:
-                startNewFragment(DummyFragment.class, null, null, true);
                 Note note = createNoteFromDetails();
                 if (!saveNote(note))
                     deleteNote(note);
