@@ -2,7 +2,6 @@ package fm.kirtsim.kharos.noteapp.ui.notedetail;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -23,6 +22,7 @@ class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDetailView
     private static final String ARG_NOTE_TEXT = "NOTE_TEXT";
     private static final String ARG_NOTE_TITLE_COLOR = "NOTE_TITLE_COLOR";
     private static final String ARG_NOTE_TEXT_COLOR = "NOTE_TEXT_COLOR";
+    private static final String ARG_NOTE_DATE_TIME = "NOTE_DATE_TIME";
 
     private TextView dateTimeTV;
     private EditText titleET;
@@ -55,11 +55,11 @@ class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDetailView
     public void initFromSavedState(@Nullable Bundle savedState) {
         super.initFromSavedState(savedState);
         if (savedState != null) {
-            Log.d(this.getClass().getSimpleName(), "initializing from Saved State");
             setNoteTitle(savedState.getString(ARG_NOTE_TITLE));
             setNoteText(savedState.getString(ARG_NOTE_TEXT));
             setTitleColor(savedState.getInt(ARG_NOTE_TITLE_COLOR, 0));
             setTextColor(savedState.getInt(ARG_NOTE_TEXT_COLOR, 0));
+            dateTimeTV.setText(savedState.getString(ARG_NOTE_DATE_TIME));
         }
     }
 
@@ -69,6 +69,7 @@ class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDetailView
         bundle.putString(ARG_NOTE_TEXT, getText());
         bundle.putInt(ARG_NOTE_TITLE_COLOR, getTitleColor());
         bundle.putInt(ARG_NOTE_TEXT_COLOR, getTextColor());
+        bundle.putString(ARG_NOTE_DATE_TIME, dateTimeTV.getText().toString());
     }
 
 
