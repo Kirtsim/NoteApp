@@ -43,4 +43,14 @@ public class ListUtils {
             return 1;
         });
     }
+
+    public static int[] extractNoteIdsIntoArray(List<Note> notes) {
+        if (notes != null) {
+            int [] ids = new int[notes.size()];
+            for (int i = 0; i < ids.length; ++i)
+                ids[i] = notes.get(i).getId();
+            return ids;
+        }
+        return new int[0];
+    }
 }
