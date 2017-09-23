@@ -1,5 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.adapter;
 
+import android.os.Bundle;
+
 /**
  * Created by kharos on 07/08/2017
  */

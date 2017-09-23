@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +24,7 @@ import javax.inject.Inject;
 
 import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
+import fm.kirtsim.kharos.noteapp.dataholder.TemporaryDataHolder;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerComponent;
 import fm.kirtsim.kharos.noteapp.manager.NotesManager;
 import fm.kirtsim.kharos.noteapp.threading.BackgroundThreadPoster;
@@ -61,6 +61,10 @@ public class NotesListFragment extends BaseFragment implements
         NotesManager.NotesManagerListener,
         ColorPickerAdapter.ColorPickerAdapterListener {
 
+    private static final String ARG_IDS_HIGHLIGHTED = "NOTES_LIST_IDS_HIGHLIGHTED";
+    private static final String ARG_STATE = "NOTES_LIST_STATE";
+    private static final String ARG_SELECTED_NOTE_COLOR = "NOTES_LIST_SELECTED_COLOR";
+
     @Inject NotesListAdapter notesListAdapter;
     @Inject ColorPickerAdapter colorListAdapter;
     @Inject NotesManager notesManager;
@@ -77,6 +81,7 @@ public class NotesListFragment extends BaseFragment implements
 
     private Animations noteDetailAnimations;
     private NotesListItemTouchHelper notesTouchHelper;
+    private TemporaryDataHolder temporaryData;
 
     private int selectedNoteColor;
     private int COLOR_HIGHLIGHTED_FRAME;
@@ -88,12 +93,13 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d(getClassName(), "onCreate()");
         super.onCreate(savedInstanceState);
-        initializeColors(getResources());
         setHasOptionsMenu(true);
-        state = new State();
+        onCreateInitialization(savedInstanceState);
+    }
 
+    private void onCreateInitialization(Bundle savedState) {
+        initializeColors(getResources());
         notesCoordinator = notesListAdapter.getNotesCoordinator();
         notesListAdapter.setListener(this);
         colorListAdapter.setListener(this);
@@ -102,6 +108,8 @@ public class NotesListFragment extends BaseFragment implements
         colorListAdapter.setHighlightColor(Color.BLACK);
         notesManager.registerListener(this);
         noteDetailAnimations = getAnimationsForNoteDetailFragment();
+        state = savedState == null ? new State() : savedState.getParcelable(ARG_STATE);
+        temporaryData = new TemporaryDataHolder();
     }
 
     @Override
@@ -129,39 +137,66 @@ public class NotesListFragment extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        setupColorPicker(inflater);
-        setupViewMvc(inflater, container);
+        setupColorPicker(inflater, savedInstanceState);
+        setupViewMvc(inflater, container, savedInstanceState);
         setupNotesListItemTouchHelper();
         return notesListViewMvc.getRootView();
     }
 
-    private void setupViewMvc(LayoutInflater inflater, @Nullable ViewGroup container) {
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            final int[] ids = savedInstanceState.getIntArray(ARG_IDS_HIGHLIGHTED);
+            temporaryData.putData(ARG_IDS_HIGHLIGHTED, ids);
+        }
+    }
+
+    private void setupViewMvc(LayoutInflater inflater, @Nullable ViewGroup container,
+                              Bundle savedState) {
         notesListViewMvc = new NotesListViewMvcImpl(inflater, container, notesListAdapter,
                 new LinearLayoutManager(inflater.getContext()));
         notesListViewMvc.registerListener(this);
         notesListViewMvc.addNoteItemDecoration(new NotesListItemDecorationImpl(
                 Units.dp2px(3, getResources().getDisplayMetrics())));
         notesListViewMvc.addViewToRightSideContainer(colorPickerViewMvc.getRootView());
+        notesListViewMvc.initFromSavedState(savedState);
     }
 
-    private void setupColorPicker(LayoutInflater inflater) {
+    private void setupColorPicker(LayoutInflater inflater, Bundle savedState) {
         colorPickerViewMvc = new ColorPickerViewMvcImpl(inflater, null);
         colorPickerViewMvc.setLayoutManager(new LinearLayoutManager(getContext()));
         colorPickerViewMvc.setAdapter(colorListAdapter);
         colorPickerViewMvc.addColorItemsDecoration(new ColorPickerItemDecoration(
                 Units.dp2px(10, getResources().getDisplayMetrics())));
+        colorPickerViewMvc.initFromSavedState(savedState);
     }
 
     private void setupNotesListItemTouchHelper() {
         notesTouchHelper = new NotesListItemTouchHelper(
                 new NotesListItemTouchCallback(notesListAdapter), null);
         notesTouchHelper.attachToRecyclerView(notesListViewMvc.getRecyclerView());
-        notesTouchHelper.listen(false);
+        notesTouchHelper.listen(state.isInReorderState());
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        state.setWasRestored(true);
+        notesListViewMvc.getState(outState);
+        colorPickerViewMvc.getState(outState);
+        outState.putInt(ARG_SELECTED_NOTE_COLOR, selectedNoteColor);
+        outState.putParcelable(ARG_STATE, state);
+        final int [] ids = ListUtils.extractNoteIdsIntoArray(
+                notesCoordinator.getListOfHighlightedNotes());
+        outState.putIntArray(ARG_IDS_HIGHLIGHTED, ids);
+        temporaryData.putData(ARG_IDS_HIGHLIGHTED, ids); // sometimes the fragment does not get destroyed and its attributes stay alive
     }
 
     public void onStart() {
         super.onStart();
-        notesManager.fetchNotes();
+        if (state == null || state.isInStartState() || state.wasRestored())
+            notesManager.fetchNotes();
     }
 
     @Override
@@ -222,8 +257,6 @@ public class NotesListFragment extends BaseFragment implements
         clearNoteHighlighting();
         if (notesListViewMvc.isRightSideContainerVisible())
             notesListViewMvc.hideRightSideContainer();
-
-
         state.setState(State.DEFAULT);
     }
 
@@ -399,12 +432,26 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onNotesFetched(@NonNull List<Note> notes) {
-        if (state.isInStartState()) {
-            Log.d(getClassName(), "onNotesFetched() : was in default state");
-            notesCoordinator.setNewNotesList(notes);
-            notesListAdapter.updateDataSet();
-            state.setState(State.DEFAULT);
+        notesCoordinator.setNewNotesList(notes);
+        if (state.wasRestored()) {
+            restoreNoteHighlighting();
+            state.setWasRestored(false);
         }
+        notesListAdapter.updateDataSet();
+        state.setState(State.DEFAULT);
+    }
+
+    private void restoreNoteHighlighting() {
+        final int[] savedIds = temporaryData.getAndRemoveData(ARG_IDS_HIGHLIGHTED);
+        if (savedIds != null) {
+            //noinspection ForLoopReplaceableByForEach
+            for (int i = 0; i < savedIds.length; ++i) {
+                Note note = notesCoordinator.getNoteWithIdOrDefault(savedIds[i], null);
+                if (note != null)
+                    notesCoordinator.addNoteToHighlighted(note);
+            }
+        } else;
+//            throw new NullPointerException("retrieved ids are null!");
     }
 
     @Override public void onNewNoteAdded(@NonNull Note note) {
