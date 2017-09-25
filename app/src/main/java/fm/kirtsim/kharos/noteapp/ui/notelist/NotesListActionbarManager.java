@@ -1,5 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 
@@ -11,13 +12,7 @@ import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ActionbarVisual;
 
 public class NotesListActionbarManager {
 
-    public static final int STATE_HOME = 0;
-    public static final int STATE_COLOR_NON_SELECTION = 1;
-    public static final int STATE_COLOR_SELECTION = 2;
-    public static final int STATE_REORDER = 3;
-
     private final NotesListActionBarViewMvc actionBarViewMvc;
-    private int actionbarVisualState;
 
     public NotesListActionbarManager(NotesListActionBarViewMvc actionBarViewMvc) {
         this.actionBarViewMvc = actionBarViewMvc;
@@ -38,5 +33,13 @@ public class NotesListActionbarManager {
 
     public void setTitle(String title) {
         actionBarViewMvc.setTitle(title);
+    }
+
+    public Bundle getActionBarState() {
+        return actionBarViewMvc.getState();
+    }
+
+    public void initializeActionBarFromSavedState(Bundle savedState) {
+        actionBarViewMvc.initializeFromSavedState(savedState);
     }
 }

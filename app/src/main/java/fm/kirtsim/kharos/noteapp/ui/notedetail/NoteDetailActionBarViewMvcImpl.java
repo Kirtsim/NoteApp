@@ -1,5 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.notedetail;
 
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +15,11 @@ import fm.kirtsim.kharos.noteapp.ui.base.BaseActionBarViewMvc;
 
 public class NoteDetailActionBarViewMvcImpl extends BaseActionBarViewMvc implements
         NoteDetailActionBarViewMvc {
+
+    private static final String ARG_DELETE_MI_VISIBLE = "noteDetail.DELETE_MI_VISIBLE";
+    private static final String ARG_SAVE_MI_VISIBLE = "noteDetail.SAVE_MI_VISIBLE";
+    private static final String ARG_BACK_BUTTON_VISIBLE = "noteDetail.BACK_BTN_VISIBLE";
+    private static final String ARG_TITLE = "noteDetail.TITLE";
 
     private MenuItem saveMenuItem;
     private MenuItem deleteMenuItem;
@@ -33,5 +39,23 @@ public class NoteDetailActionBarViewMvcImpl extends BaseActionBarViewMvc impleme
     public void hideAllIcons() {
         saveMenuItem.setVisible(false);
         deleteMenuItem.setVisible(false);
+    }
+
+    @Override
+    public void getState(Bundle bundle) {
+        bundle.putString(ARG_TITLE, getTitle());
+        bundle.putBoolean(ARG_DELETE_MI_VISIBLE, deleteMenuItem.isVisible());
+        bundle.putBoolean(ARG_SAVE_MI_VISIBLE, saveMenuItem.isVisible());
+        bundle.putBoolean(ARG_BACK_BUTTON_VISIBLE, isBackButtonVisible());
+    }
+
+    @Override
+    public void initializeFromSavedState(Bundle savedState) {
+        if (savedState != null) {
+            setTitle(savedState.getString(ARG_TITLE, ""));
+            setHomeButtonVisible(savedState.getBoolean(ARG_BACK_BUTTON_VISIBLE));
+            saveMenuItem.setVisible(savedState.getBoolean(ARG_SAVE_MI_VISIBLE));
+            deleteMenuItem.setVisible(savedState.getBoolean(ARG_DELETE_MI_VISIBLE));
+        }
     }
 }

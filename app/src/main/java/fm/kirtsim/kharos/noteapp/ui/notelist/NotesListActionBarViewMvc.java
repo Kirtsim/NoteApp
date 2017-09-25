@@ -1,5 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
+import android.os.Bundle;
+
 import fm.kirtsim.kharos.noteapp.ui.main.ActionBarViewMvc;
 
 /**

@@ -16,6 +16,7 @@ import javax.inject.Inject;
 
 import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
+import fm.kirtsim.kharos.noteapp.dataholder.TemporaryDataHolder;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerComponent;
 import fm.kirtsim.kharos.noteapp.manager.NotesManager;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
@@ -41,7 +42,7 @@ public class NoteDetailFragment extends BaseFragment implements
 
     private static final String ARG_DEFAULT_TITLE = "DETAIL_NOTE_DEF_TITLE";
     private static final String ARG_DEFAULT_TEXT = "DETAIL_NOTE_DEF_TEXT";
-    private static final String ARG_VIEW_STATE = "DETAIL_NOTE_VIEW_STATE";
+    private static final String ARG_ACTIONBAR_STATE = "DETAIL_NOTE_ACTIONBAR_STATE";
 
     @Inject NotesManager notesManager;
     @Inject NoteDetailActionBarViewMvc actionBarView;
@@ -52,6 +53,8 @@ public class NoteDetailFragment extends BaseFragment implements
     private int color = Color.WHITE;
     private boolean pinned = false;
     private long timestamp = -1;
+
+    private TemporaryDataHolder tempData;
 
     private boolean isTitleDefault = true;
     private boolean isTextDefault = true;
@@ -64,6 +67,7 @@ public class NoteDetailFragment extends BaseFragment implements
         setHasOptionsMenu(true);
         initializeTextColorAttributes();
         Bundle noteDetails = savedInstanceState == null ? getArguments() : savedInstanceState;
+        tempData = new TemporaryDataHolder();
         initFromBundle(noteDetails);
     }
 
@@ -108,7 +112,7 @@ public class NoteDetailFragment extends BaseFragment implements
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
-            viewMvc.initFromSavedState(savedInstanceState.getBundle(ARG_VIEW_STATE));
+            viewMvc.initFromSavedState(savedInstanceState);
         } else if (noteId != -1) {
             displayNoteDetailsFromBundle(getArguments());
         } else
@@ -125,13 +129,15 @@ public class NoteDetailFragment extends BaseFragment implements
         outState.putBoolean(ARG_NOTE_PINNED, pinned);
         outState.putBoolean(ARG_DEFAULT_TITLE, isTitleDefault);
         outState.putBoolean(ARG_DEFAULT_TEXT, isTextDefault);
-        outState.putBundle(ARG_VIEW_STATE, viewMvc.getState());
+        outState.putBundle(ARG_ACTIONBAR_STATE, actionBarView.getState());
+        viewMvc.getState(outState);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         actionBarView.setMenu(menu, inflater);
+        actionBarView.initializeFromSavedState(tempData.getData(ARG_ACTIONBAR_STATE));
     }
 
     @Override

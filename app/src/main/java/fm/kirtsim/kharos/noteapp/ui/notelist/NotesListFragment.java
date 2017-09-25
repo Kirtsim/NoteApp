@@ -64,6 +64,7 @@ public class NotesListFragment extends BaseFragment implements
     private static final String ARG_IDS_HIGHLIGHTED = "NOTES_LIST_IDS_HIGHLIGHTED";
     private static final String ARG_STATE = "NOTES_LIST_STATE";
     private static final String ARG_SELECTED_NOTE_COLOR = "NOTES_LIST_SELECTED_COLOR";
+    private static final String ARG_ACTIONBAR_STATE = "NOTES_LIST_ACTIONBAR_STATE";
 
     @Inject NotesListAdapter notesListAdapter;
     @Inject ColorPickerAdapter colorListAdapter;
@@ -149,6 +150,10 @@ public class NotesListFragment extends BaseFragment implements
         if (savedInstanceState != null) {
             final int[] ids = savedInstanceState.getIntArray(ARG_IDS_HIGHLIGHTED);
             temporaryData.putData(ARG_IDS_HIGHLIGHTED, ids);
+            temporaryData.putData(ARG_ACTIONBAR_STATE, savedInstanceState
+                    .getBundle(ARG_ACTIONBAR_STATE));
+            colorPickerViewMvc.initFromSavedState(savedInstanceState);
+            notesListViewMvc.initFromSavedState(savedInstanceState);
         }
     }
 
@@ -191,6 +196,9 @@ public class NotesListFragment extends BaseFragment implements
                 notesCoordinator.getListOfHighlightedNotes());
         outState.putIntArray(ARG_IDS_HIGHLIGHTED, ids);
         temporaryData.putData(ARG_IDS_HIGHLIGHTED, ids); // sometimes the fragment does not get destroyed and its attributes stay alive
+        final Bundle actionBarState = actionbarManager.getActionBarState();
+        outState.putBundle(ARG_ACTIONBAR_STATE, actionBarState);
+        temporaryData.putData(ARG_ACTIONBAR_STATE, actionBarState);
     }
 
     public void onStart() {
@@ -217,7 +225,12 @@ public class NotesListFragment extends BaseFragment implements
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         actionbarManager.inflateWithMenu(menu, inflater);
-        actionbarManager.applyVisual(new HomeActionbarVisual(), getString(R.string.your_notes_title));
+        Bundle savedState = temporaryData.getData(ARG_ACTIONBAR_STATE);
+        if (savedState != null)
+            actionbarManager.initializeActionBarFromSavedState(savedState);
+        else
+            actionbarManager.applyVisual(new HomeActionbarVisual(),
+                    getString(R.string.your_notes_title));
     }
 
     @Override
@@ -438,7 +451,8 @@ public class NotesListFragment extends BaseFragment implements
             state.setWasRestored(false);
         }
         notesListAdapter.updateDataSet();
-        state.setState(State.DEFAULT);
+        if (state.isInStartState())
+            state.setState(State.DEFAULT);
     }
 
     private void restoreNoteHighlighting() {
@@ -450,8 +464,7 @@ public class NotesListFragment extends BaseFragment implements
                 if (note != null)
                     notesCoordinator.addNoteToHighlighted(note);
             }
-        } else;
-//            throw new NullPointerException("retrieved ids are null!");
+        }
     }
 
     @Override public void onNewNoteAdded(@NonNull Note note) {

@@ -1,5 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,6 +14,14 @@ import fm.kirtsim.kharos.noteapp.ui.base.BaseActionBarViewMvc;
  */
 
 public class NotesListActionBarViewMvcImpl extends BaseActionBarViewMvc implements NotesListActionBarViewMvc {
+
+    private static final String ARG_DELETE_MI_VISIBLE = "notesList.DELETE_MI_VISIBLE";
+    private static final String ARG_SELECT_ALL_MI_VISIBLE = "notesList.SELECT_ALL_MI_VISIBLE";
+    private static final String ARG_COLOR_PALETTE_MI_VISIBLE = "notesList.COLOR_PALETTE_MI_VISIBLE";
+    private static final String ARG_REORDER_MI_VISIBLE = "notesList.REORDER_MI_VISIBLE";
+    private static final String ARG_TITLE = "notesList.ACTIONBAR_TITLE";
+    private static final String ARG_BACK_BUTTON_VISIBLE = "notesList.BACK_BUTTON_VISIBLE";
+
 
     private MenuItem deleteMI;
     private MenuItem selectAllMI;
@@ -45,6 +54,29 @@ public class NotesListActionBarViewMvcImpl extends BaseActionBarViewMvc implemen
     @Override
     public void setReorderItemVisible(boolean visible) {
         reorderMI.setVisible(visible);
+    }
+
+    @Override
+    public void getState(Bundle bundle) {
+        String title = getTitle();
+        bundle.putString(ARG_TITLE, title);
+        bundle.putBoolean(ARG_BACK_BUTTON_VISIBLE, isBackButtonVisible());
+        bundle.putBoolean(ARG_COLOR_PALETTE_MI_VISIBLE, colorPaletteMI.isVisible());
+        bundle.putBoolean(ARG_DELETE_MI_VISIBLE, deleteMI.isVisible());
+        bundle.putBoolean(ARG_REORDER_MI_VISIBLE, reorderMI.isVisible());
+        bundle.putBoolean(ARG_SELECT_ALL_MI_VISIBLE, selectAllMI.isVisible());
+    }
+
+    @Override
+    public void initializeFromSavedState(Bundle savedState) {
+        if (savedState != null) {
+            deleteMI.setVisible(savedState.getBoolean(ARG_DELETE_MI_VISIBLE));
+            selectAllMI.setVisible(savedState.getBoolean(ARG_SELECT_ALL_MI_VISIBLE));
+            colorPaletteMI.setVisible(savedState.getBoolean(ARG_COLOR_PALETTE_MI_VISIBLE));
+            reorderMI.setVisible(savedState.getBoolean(ARG_REORDER_MI_VISIBLE));
+            setHomeButtonVisible(savedState.getBoolean(ARG_BACK_BUTTON_VISIBLE));
+            setTitle(savedState.getString(ARG_TITLE, ""));
+        }
     }
 
     /* **********************************************************

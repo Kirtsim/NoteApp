@@ -1,5 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.main;
 
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 
@@ -20,4 +21,10 @@ public interface ActionBarViewMvc {
     Menu getMenu();
 
     void hideAllIcons();
+
+    void getState(Bundle bundle);
+
+    Bundle getState();
+
+    void initializeFromSavedState(Bundle savedState);
 }
