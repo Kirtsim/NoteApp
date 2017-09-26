@@ -90,10 +90,10 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
     public void initFromSavedState(@Nullable Bundle savedState) {
         super.initFromSavedState(savedState);
         if (savedState != null) {
-            if (!savedState.getBoolean(ARG_RIGHT_SIDE_CONTAINER_VISIBLE))
-                rightSideContainer.setTranslationX(RIGHT_SIDE_CONTAINER_MAX_TRANSLATION_X);
-            if (!savedState.getBoolean(ARG_ADD_BUTTON_VISIBLE))
-                addNoteButton.setTranslationY(FAB_MAX_TRANSLATION_Y);
+            if (savedState.getBoolean(ARG_RIGHT_SIDE_CONTAINER_VISIBLE))
+                rightSideContainer.setTranslationX(0);
+            if (savedState.getBoolean(ARG_ADD_BUTTON_VISIBLE))
+                addNoteButton.setTranslationY(0);
         }
     }
 
