@@ -2,7 +2,7 @@ package fm.kirtsim.kharos.noteapp.ui.colorPicker;
 
 import android.support.annotation.ColorInt;
 
-import fm.kirtsim.kharos.noteapp.ui.main.ViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.main.viewmvc.ViewMvc;
 
 /**
  * Created by kharos on 23/08/2017

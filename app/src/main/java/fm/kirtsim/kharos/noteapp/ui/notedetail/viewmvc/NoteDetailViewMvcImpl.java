@@ -1,4 +1,4 @@
-package fm.kirtsim.kharos.noteapp.ui.notedetail;
+package fm.kirtsim.kharos.noteapp.ui.notedetail.viewmvc;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,7 +15,7 @@ import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
  * Created by kharos on 31/07/2017
  */
 
-class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDetailViewMvcListener>
+public class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDetailViewMvcListener>
         implements NoteDetailViewMvc {
 
     private static final String ARG_NOTE_TITLE = "NOTE_TITLE";
@@ -30,7 +30,7 @@ class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDetailView
     @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private FrameLayout delimiterFL;
 
-    NoteDetailViewMvcImpl(LayoutInflater inflater, ViewGroup container) {
+    public NoteDetailViewMvcImpl(LayoutInflater inflater, ViewGroup container) {
         setRootView(inflater.inflate(R.layout.layout_note_detail, container, false));
         initializeViews();
         titleET.setOnFocusChangeListener((v, focus) -> listeners.

@@ -1,8 +1,8 @@
-package fm.kirtsim.kharos.noteapp.ui.notelist;
+package fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc;
 
 import android.support.annotation.ColorInt;
 
-import fm.kirtsim.kharos.noteapp.ui.main.ViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.main.viewmvc.ViewMvc;
 
 /**
  * Created by kharos on 30/07/2017

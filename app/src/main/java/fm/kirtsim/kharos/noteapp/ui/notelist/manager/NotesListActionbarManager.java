@@ -1,10 +1,11 @@
-package fm.kirtsim.kharos.noteapp.ui.notelist;
+package fm.kirtsim.kharos.noteapp.ui.notelist.manager;
 
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ActionbarVisual;
+import fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc.NotesListActionBarViewMvc;
 
 /**
  * Created by kharos on 08/09/2017

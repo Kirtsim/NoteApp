@@ -1,4 +1,4 @@
-package fm.kirtsim.kharos.noteapp.ui.notelist;
+package fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc;
 
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
@@ -21,7 +21,7 @@ import fm.kirtsim.kharos.noteapp.ui.recyclerview.NotesRecyclerView;
  * Created by kharos on 29/07/2017
  */
 
-class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvcListener>
+public class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvcListener>
         implements NotesListViewMvc {
 
     private static final String ARG_RIGHT_SIDE_CONTAINER_VISIBLE = "notesList.CONTAINER_VISIBLE";
@@ -38,7 +38,7 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
     private FrameLayout rightSideContainer;
 
 
-    NotesListViewMvcImpl(LayoutInflater inflater, ViewGroup container, ListAdapter adapter,
+    public NotesListViewMvcImpl(LayoutInflater inflater, ViewGroup container, ListAdapter adapter,
                          RecyclerView.LayoutManager layoutManager) {
         setRootView(inflater.inflate(R.layout.layout_notes_list, container, false));
         initializeViews();

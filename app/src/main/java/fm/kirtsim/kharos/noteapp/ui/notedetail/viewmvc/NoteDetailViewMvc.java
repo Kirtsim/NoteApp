@@ -1,4 +1,4 @@
-package fm.kirtsim.kharos.noteapp.ui.notedetail;
+package fm.kirtsim.kharos.noteapp.ui.notedetail.viewmvc;
 
 import android.support.annotation.ColorInt;
 
@@ -8,7 +8,7 @@ import fm.kirtsim.kharos.noteapp.ui.base.ObservableViewMvc;
  * Created by kharos on 31/07/2017
  */
 
-interface NoteDetailViewMvc extends
+public interface NoteDetailViewMvc extends
         ObservableViewMvc<NoteDetailViewMvc.NoteDetailViewMvcListener> {
     interface NoteDetailViewMvcListener {
         void onNoteTitleFocusChanged(boolean hasFocus);

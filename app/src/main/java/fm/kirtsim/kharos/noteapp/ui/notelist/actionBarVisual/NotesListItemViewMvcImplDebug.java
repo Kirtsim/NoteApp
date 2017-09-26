@@ -5,7 +5,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import fm.kirtsim.kharos.noteapp.R;
-import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListItemViewMvcImpl;
+import fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc.NotesListItemViewMvcImpl;
 
 /**
  * Created by kharos on 12/09/2017

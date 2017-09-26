@@ -1,4 +1,4 @@
-package fm.kirtsim.kharos.noteapp.ui.notelist;
+package fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc;
 
 import android.support.annotation.MainThread;
 import android.support.v7.widget.RecyclerView;
@@ -12,7 +12,7 @@ import fm.kirtsim.kharos.noteapp.ui.recyclerview.NotesRecyclerView;
  * Created by kharos on 29/07/2017
  */
 
-interface NotesListViewMvc extends
+public interface NotesListViewMvc extends
         ObservableViewMvc<NotesListViewMvc.NotesListViewMvcListener>
 {
     interface NotesListViewMvcListener {

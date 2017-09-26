@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView;
 
 import fm.kirtsim.kharos.noteapp.ui.adapter.ListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.BaseListItemDecoration;
-import fm.kirtsim.kharos.noteapp.ui.main.ViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.main.viewmvc.ViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.recyclerview.NotesRecyclerView;
 
 /**

@@ -5,9 +5,8 @@ import android.view.ViewGroup;
 
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.ui.adapterItemCoordinator.AdapterNotesListCoordinator;
-import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListItemViewMvc;
-import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListItemViewMvcImpl;
-import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.NotesListItemViewMvcImplDebug;
+import fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc.NotesListItemViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc.NotesListItemViewMvcImpl;
 import fm.kirtsim.kharos.noteapp.ui.viewHolder.NotesListViewHolder;
 
 /**
@@ -28,7 +27,7 @@ public class NotesListAdapterImpl extends NotesListAdapter {
      * ****************************************************/
     @Override
     public NotesListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        NotesListItemViewMvc mvcView = new NotesListItemViewMvcImplDebug(layoutInflater, parent);
+        NotesListItemViewMvc mvcView = new NotesListItemViewMvcImpl(layoutInflater, parent);
         NotesListViewHolder viewHolder = new NotesListViewHolder(mvcView);
         addViewHolder(viewHolder);
         return viewHolder;

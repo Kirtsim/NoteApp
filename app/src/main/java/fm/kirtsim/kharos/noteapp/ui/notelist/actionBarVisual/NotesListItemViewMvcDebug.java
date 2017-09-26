@@ -1,6 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual;
 
-import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListItemViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc.NotesListItemViewMvc;
 
 /**
  * Created by kharos on 12/09/2017

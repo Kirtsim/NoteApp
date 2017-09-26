@@ -8,25 +8,25 @@ import android.os.Parcelable;
  */
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-class State implements Parcelable{
+public class State implements Parcelable {
 
-    static final int START = 0;
-    static final int DEFAULT = 1;
-    static final int SELECTION = 2;
-    static final int SELECTION_COLOR = 3;
-    static final int COLOR = 4;
-    static final int REORDER = 5;
-    static final int NEW_NOTE = 6;
+    public static final int START = 0;
+    public static final int DEFAULT = 1;
+    public static final int SELECTION = 2;
+    public static final int SELECTION_COLOR = 3;
+    public static final int COLOR = 4;
+    public static final int REORDER = 5;
+    public static final int NEW_NOTE = 6;
     private static final int STATE_COUNT = 7;
 
     private int state;
     private boolean wasRestored;
 
-    State() {
+    public State() {
         this(START);
     }
 
-    State(int initialState) {
+    public State(int initialState) {
         setState(initialState);
         setWasRestored(false);
     }
@@ -48,47 +48,47 @@ class State implements Parcelable{
         }
     };
 
-    int getState() {
+    public int getState() {
         return state;
     }
 
-    boolean wasRestored() {
+    public boolean wasRestored() {
         return wasRestored;
     }
 
-    void setState(int newState) {
+    public void setState(int newState) {
         if (STATE_COUNT < newState || newState < 0)
             throw new IllegalArgumentException("the set state is undefined");
         state = newState;
     }
 
-    void setWasRestored(boolean restored) {
+    public void setWasRestored(boolean restored) {
         wasRestored = restored;
     }
 
-    boolean isInStartState() { return state == START; }
+    public boolean isInStartState() { return state == START; }
 
-    boolean isInDefaultState() {
+    public boolean isInDefaultState() {
         return state == DEFAULT;
     }
 
-    boolean isInSelectionState() {
+    public boolean isInSelectionState() {
         return state == SELECTION;
     }
 
-    boolean isInSelectionColoringState() {
+    public boolean isInSelectionColoringState() {
         return state == SELECTION_COLOR;
     }
 
-    boolean isInReorderState() {
+    public boolean isInReorderState() {
         return state == REORDER;
     }
 
-    boolean isInColoringState() {
+    public boolean isInColoringState() {
         return state == COLOR;
     }
 
-    boolean isInNewNoteState() { return state == NEW_NOTE; }
+    public boolean isInNewNoteState() { return state == NEW_NOTE; }
 
     @Override
     public int describeContents() {

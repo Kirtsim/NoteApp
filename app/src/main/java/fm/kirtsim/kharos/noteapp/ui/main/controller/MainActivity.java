@@ -1,11 +1,13 @@
-package fm.kirtsim.kharos.noteapp.ui.main;
+package fm.kirtsim.kharos.noteapp.ui.main.controller;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import fm.kirtsim.kharos.noteapp.ui.Animations;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseActivity;
-import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListFragment;
+import fm.kirtsim.kharos.noteapp.ui.main.viewmvc.MainViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.main.viewmvc.MainViewMvcImpl;
+import fm.kirtsim.kharos.noteapp.ui.notelist.controller.NotesListFragment;
 
 /**
  * Created by kharos on 27/07/2017

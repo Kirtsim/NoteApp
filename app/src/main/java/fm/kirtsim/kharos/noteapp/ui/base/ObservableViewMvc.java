@@ -1,6 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.base;
 
-import fm.kirtsim.kharos.noteapp.ui.main.ViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.main.viewmvc.ViewMvc;
 
 /**
  * Created by kharos on 02/08/2017

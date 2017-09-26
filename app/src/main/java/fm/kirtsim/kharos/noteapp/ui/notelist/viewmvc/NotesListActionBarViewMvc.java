@@ -1,8 +1,6 @@
-package fm.kirtsim.kharos.noteapp.ui.notelist;
+package fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc;
 
-import android.os.Bundle;
-
-import fm.kirtsim.kharos.noteapp.ui.main.ActionBarViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.main.viewmvc.ActionBarViewMvc;
 
 /**
  * Created by kharos on 04/08/2017

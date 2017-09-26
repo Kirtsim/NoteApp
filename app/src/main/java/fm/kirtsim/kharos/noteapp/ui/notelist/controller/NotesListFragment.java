@@ -1,4 +1,4 @@
-package fm.kirtsim.kharos.noteapp.ui.notelist;
+package fm.kirtsim.kharos.noteapp.ui.notelist.controller;
 
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -41,13 +41,18 @@ import fm.kirtsim.kharos.noteapp.ui.colorPicker.ColorPickerViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.colorPicker.ColorPickerViewMvcImpl;
 import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.ColorPickerItemDecoration;
 import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.NotesListItemDecorationImpl;
-import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailFragment;
+import fm.kirtsim.kharos.noteapp.ui.notedetail.controller.NoteDetailFragment;
+import fm.kirtsim.kharos.noteapp.ui.notelist.manager.NotesListActionbarManager;
+import fm.kirtsim.kharos.noteapp.ui.notelist.NotesReorderer;
+import fm.kirtsim.kharos.noteapp.ui.notelist.State;
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ColorPaletteNonSelectionActionbarVisual;
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ColorPaletteSelectionActionbarVisual;
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.HomeActionbarVisual;
-import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.NotesListItemViewMvcDebug;
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.ReorderActionbarVisual;
 import fm.kirtsim.kharos.noteapp.ui.notelist.actionBarVisual.SelectionActionbarVisual;
+import fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc.NotesListItemViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc.NotesListViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc.NotesListViewMvcImpl;
 import fm.kirtsim.kharos.noteapp.utils.ListUtils;
 import fm.kirtsim.kharos.noteapp.utils.Units;
 
@@ -71,7 +76,8 @@ public class NotesListFragment extends BaseFragment implements
     @Inject NotesListAdapter notesListAdapter;
     @Inject ColorPickerAdapter colorListAdapter;
     @Inject NotesManager notesManager;
-    @Inject NotesListActionbarManager actionbarManager;
+    @Inject
+    NotesListActionbarManager actionbarManager;
     @Inject MainThreadPoster mainThreadPoster;
     @Inject BackgroundThreadPoster backgroundPoster;
 
@@ -425,9 +431,6 @@ public class NotesListFragment extends BaseFragment implements
 
     @Override
     public void onNoteItemVisible(Note note, NotesListItemViewMvc noteItemView) {
-        NotesListItemViewMvcDebug viewMvc = (NotesListItemViewMvcDebug) noteItemView;
-        viewMvc.setId(note.getId());
-        viewMvc.setOrderNo(note.getOrderNo());
         noteItemView.setText(note.getText());
         noteItemView.setTitle(note.getTitle());
         setNoteItemBackground(note, noteItemView);

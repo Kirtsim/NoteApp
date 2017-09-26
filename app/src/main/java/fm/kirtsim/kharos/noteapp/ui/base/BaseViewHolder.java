@@ -7,7 +7,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-import fm.kirtsim.kharos.noteapp.ui.main.ViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.main.viewmvc.ViewMvc;
 
 /**
  * Created by kharos on 29/07/2017

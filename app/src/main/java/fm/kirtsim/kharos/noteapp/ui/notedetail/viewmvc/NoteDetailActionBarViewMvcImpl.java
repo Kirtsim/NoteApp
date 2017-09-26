@@ -1,4 +1,4 @@
-package fm.kirtsim.kharos.noteapp.ui.notedetail;
+package fm.kirtsim.kharos.noteapp.ui.notedetail.viewmvc;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;

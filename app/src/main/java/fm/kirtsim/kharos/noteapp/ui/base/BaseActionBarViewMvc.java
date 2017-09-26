@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 
-import fm.kirtsim.kharos.noteapp.ui.main.ActionBarViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.main.viewmvc.ActionBarViewMvc;
 
 /**
  * Created by kharos on 04/08/2017

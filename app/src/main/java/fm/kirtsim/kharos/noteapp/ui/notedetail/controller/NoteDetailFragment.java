@@ -1,4 +1,4 @@
-package fm.kirtsim.kharos.noteapp.ui.notedetail;
+package fm.kirtsim.kharos.noteapp.ui.notedetail.controller;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -20,6 +20,10 @@ import fm.kirtsim.kharos.noteapp.dataholder.TemporaryDataHolder;
 import fm.kirtsim.kharos.noteapp.dependencyinjection.controller.ControllerComponent;
 import fm.kirtsim.kharos.noteapp.manager.NotesManager;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseFragment;
+import fm.kirtsim.kharos.noteapp.ui.notedetail.viewmvc.NoteDetailActionBarViewMvc;
+
+import fm.kirtsim.kharos.noteapp.ui.notedetail.viewmvc.NoteDetailViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.notedetail.viewmvc.NoteDetailViewMvcImpl;
 import fm.kirtsim.kharos.noteapp.utils.DateUtils;
 import fm.kirtsim.kharos.noteapp.utils.StringUtils;
 
@@ -45,7 +49,8 @@ public class NoteDetailFragment extends BaseFragment implements
     private static final String ARG_ACTIONBAR_STATE = "DETAIL_NOTE_ACTIONBAR_STATE";
 
     @Inject NotesManager notesManager;
-    @Inject NoteDetailActionBarViewMvc actionBarView;
+    @Inject
+    NoteDetailActionBarViewMvc actionBarView;
     private NoteDetailViewMvc viewMvc;
 
     private int noteId = -1;

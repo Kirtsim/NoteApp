@@ -1,4 +1,4 @@
-package fm.kirtsim.kharos.noteapp.ui.main;
+package fm.kirtsim.kharos.noteapp.ui.main.viewmvc;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

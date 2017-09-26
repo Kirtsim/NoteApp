@@ -8,15 +8,13 @@ import fm.kirtsim.kharos.noteapp.ui.adapter.ColorPickerAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.ColorPickerAdapterImpl;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.adapter.NotesListAdapterImpl;
-import fm.kirtsim.kharos.noteapp.ui.adapter.itemTouchHelper.NotesListItemTouchHelper;
-import fm.kirtsim.kharos.noteapp.ui.adapter.touchCallback.NotesListItemTouchCallback;
 import fm.kirtsim.kharos.noteapp.ui.adapterItemCoordinator.AdapterNotesListCoordinatorImpl;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseActivity;
-import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailActionBarViewMvc;
-import fm.kirtsim.kharos.noteapp.ui.notedetail.NoteDetailActionBarViewMvcImpl;
-import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListActionBarViewMvc;
-import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListActionBarViewMvcImpl;
-import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListActionbarManager;
+import fm.kirtsim.kharos.noteapp.ui.notedetail.viewmvc.NoteDetailActionBarViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.notedetail.viewmvc.NoteDetailActionBarViewMvcImpl;
+import fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc.NotesListActionBarViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc.NotesListActionBarViewMvcImpl;
+import fm.kirtsim.kharos.noteapp.ui.notelist.manager.NotesListActionbarManager;
 
 /**
  * Created by kharos on 27/07/2017

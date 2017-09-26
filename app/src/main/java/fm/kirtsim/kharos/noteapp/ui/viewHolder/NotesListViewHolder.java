@@ -3,7 +3,7 @@ package fm.kirtsim.kharos.noteapp.ui.viewHolder;
 import android.view.MotionEvent;
 
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewHolder;
-import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListItemViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc.NotesListItemViewMvc;
 
 /**
  * Created by kharos on 29/07/2017

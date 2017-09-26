@@ -4,7 +4,7 @@ import android.view.LayoutInflater;
 
 import fm.kirtsim.kharos.noteapp.dataholder.Note;
 import fm.kirtsim.kharos.noteapp.ui.adapterItemCoordinator.AdapterNotesListCoordinator;
-import fm.kirtsim.kharos.noteapp.ui.notelist.NotesListItemViewMvc;
+import fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc.NotesListItemViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.viewHolder.NotesListViewHolder;
 
 /**
