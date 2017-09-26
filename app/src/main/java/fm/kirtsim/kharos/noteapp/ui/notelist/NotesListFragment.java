@@ -65,6 +65,8 @@ public class NotesListFragment extends BaseFragment implements
     private static final String ARG_STATE = "NOTES_LIST_STATE";
     private static final String ARG_SELECTED_NOTE_COLOR = "NOTES_LIST_SELECTED_COLOR";
     private static final String ARG_ACTIONBAR_STATE = "NOTES_LIST_ACTIONBAR_STATE";
+    private static final String ARG_NOTES_LIST_SCROLL = "NOTES_LIST_SCROLL";
+    private static final String ARG_SELECTED_COLOR_POSITION = "NOTES_LIST_COLOR_POSITION";
 
     @Inject NotesListAdapter notesListAdapter;
     @Inject ColorPickerAdapter colorListAdapter;
@@ -145,15 +147,18 @@ public class NotesListFragment extends BaseFragment implements
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            final int[] ids = savedInstanceState.getIntArray(ARG_IDS_HIGHLIGHTED);
+    public void onActivityCreated(@Nullable Bundle savedState) {
+        super.onActivityCreated(savedState);
+        if (savedState != null) {
+            final int[] ids = savedState.getIntArray(ARG_IDS_HIGHLIGHTED);
+            temporaryData.putData(ARG_NOTES_LIST_SCROLL, savedState.getInt(ARG_NOTES_LIST_SCROLL));
+            temporaryData.putData(ARG_ACTIONBAR_STATE, savedState.getBundle(ARG_ACTIONBAR_STATE));
             temporaryData.putData(ARG_IDS_HIGHLIGHTED, ids);
-            temporaryData.putData(ARG_ACTIONBAR_STATE, savedInstanceState
-                    .getBundle(ARG_ACTIONBAR_STATE));
-            colorPickerViewMvc.initFromSavedState(savedInstanceState);
-            notesListViewMvc.initFromSavedState(savedInstanceState);
+            colorPickerViewMvc.initFromSavedState(savedState);
+            colorListAdapter.setHighlightedColorPosition(
+                    savedState.getInt(ARG_SELECTED_COLOR_POSITION));
+
+            notesListViewMvc.initFromSavedState(savedState);
         }
     }
 
@@ -199,6 +204,9 @@ public class NotesListFragment extends BaseFragment implements
         final Bundle actionBarState = actionbarManager.getActionBarState();
         outState.putBundle(ARG_ACTIONBAR_STATE, actionBarState);
         temporaryData.putData(ARG_ACTIONBAR_STATE, actionBarState);
+
+        outState.putInt(ARG_SELECTED_COLOR_POSITION, colorListAdapter.getHighlightedColorPosition());
+        outState.putInt(ARG_NOTES_LIST_SCROLL, notesListViewMvc.getRecyclerView().getScrollPosition());
     }
 
     public void onStart() {
@@ -261,16 +269,14 @@ public class NotesListFragment extends BaseFragment implements
 
     private void onReorderIconClicked() {
         state.setState(State.REORDER);
-        actionbarManager.applyVisual(new ReorderActionbarVisual());
+        actionbarManager.applyVisual(new ReorderActionbarVisual(),
+                getString(R.string.notes_reorder_title));
         notesListViewMvc.hideAddButton();
         notesTouchHelper.listen(true);
     }
 
     private void onHomeBackButtonClicked() {
-        clearNoteHighlighting();
-        if (notesListViewMvc.isRightSideContainerVisible())
-            notesListViewMvc.hideRightSideContainer();
-        state.setState(State.DEFAULT);
+        onBackPressed();
     }
 
     private void deleteHighlightedNotes() {
@@ -309,22 +315,25 @@ public class NotesListFragment extends BaseFragment implements
             onBackPressedInSelectionState();
         } else if (state.isInReorderState())
             notesListViewMvc.showAddButton();
-        setStateAfterBackPress();
+        setStateAfterBackPressAndApplyVisual();
         return true;
     }
 
     private void onBackPressedInSelectionState() {
-        actionbarManager.applyVisual(new HomeActionbarVisual(), getString(R.string.your_notes_title));
         notesTouchHelper.listen(false);
         clearNoteHighlighting();
-        state.setState(State.DEFAULT);
     }
 
-    private void setStateAfterBackPress() {
-        if (state.isInSelectionColoringState())
+    private void setStateAfterBackPressAndApplyVisual() {
+        if (state.isInSelectionColoringState()) {
             state.setState(State.SELECTION);
-        else
+            actionbarManager.applyVisual(new SelectionActionbarVisual(),
+                    String.valueOf(notesCoordinator.getHighlightedCount()));
+        } else {
             state.setState(State.DEFAULT);
+            actionbarManager.applyVisual(new HomeActionbarVisual(),
+                    getString(R.string.your_notes_title));
+        }
     }
 
     // ###################### BaseFragment ########################
@@ -394,10 +403,12 @@ public class NotesListFragment extends BaseFragment implements
 
     private void onNoteRemovedFromHighlighted() {
         if (!notesCoordinator.containsHighlightedNotes()) {
-            actionbarManager.applyVisual(new HomeActionbarVisual());
-            actionbarManager.setTitle(getString(R.string.your_notes_title));
+            if (!state.isInDefaultState()) {
+                state.setState(State.DEFAULT);
+                actionbarManager.applyVisual(new HomeActionbarVisual());
+                actionbarManager.setTitle(getString(R.string.your_notes_title));
+            }
             notesListViewMvc.showAddButton();
-            state.setState(State.DEFAULT);
         } else {
             actionbarManager.setTitle(String.valueOf(notesCoordinator.getHighlightedCount()));
         }
@@ -448,6 +459,7 @@ public class NotesListFragment extends BaseFragment implements
         notesCoordinator.setNewNotesList(notes);
         if (state.wasRestored()) {
             restoreNoteHighlighting();
+            scrollNotesListToSavedPosition();
             state.setWasRestored(false);
         }
         notesListAdapter.updateDataSet();
@@ -464,6 +476,13 @@ public class NotesListFragment extends BaseFragment implements
                 if (note != null)
                     notesCoordinator.addNoteToHighlighted(note);
             }
+        }
+    }
+
+    private void scrollNotesListToSavedPosition() {
+        final Integer position = temporaryData.getAndRemoveData(ARG_NOTES_LIST_SCROLL);
+        if (position != null && position != -1) {
+            notesListViewMvc.getRecyclerView().scrollToPosition(position);
         }
     }
 

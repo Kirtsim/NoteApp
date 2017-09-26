@@ -13,6 +13,10 @@ public interface ColorPickerAdapter extends
         void onColorClicked(@ColorInt int color);
     }
 
+    int getHighlightedColorPosition();
+
+    void setHighlightedColorPosition(int position);
+
     void setColors(int[] colors);
 
     void setHighlightColor(@ColorInt int color);

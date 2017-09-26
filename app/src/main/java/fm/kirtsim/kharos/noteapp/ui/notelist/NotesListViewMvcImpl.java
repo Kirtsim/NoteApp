@@ -3,6 +3,7 @@ package fm.kirtsim.kharos.noteapp.ui.notelist;
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import fm.kirtsim.kharos.noteapp.R;
 import fm.kirtsim.kharos.noteapp.ui.adapter.ListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseViewMvc;
 import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.BaseListItemDecoration;
+import fm.kirtsim.kharos.noteapp.ui.recyclerview.NotesRecyclerView;
 
 /**
  * Created by kharos on 29/07/2017
@@ -22,12 +24,15 @@ import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.BaseListItemDecoration;
 class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvcListener>
         implements NotesListViewMvc {
 
+    private static final String ARG_RIGHT_SIDE_CONTAINER_VISIBLE = "notesList.CONTAINER_VISIBLE";
+    private static final String ARG_ADD_BUTTON_VISIBLE = "notesList.ADD_BUTTON_VISIBLE";
+
     private float FAB_MAX_TRANSLATION_Y;
     private float RIGHT_SIDE_CONTAINER_MAX_TRANSLATION_X;
 
     private ObjectAnimator fabAnimator;
     private ObjectAnimator rightSideContainerAnimator;
-    private RecyclerView notesList;
+    private NotesRecyclerView notesList;
     private FloatingActionButton addNoteButton;
 
     private FrameLayout rightSideContainer;
@@ -45,7 +50,7 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
     }
 
     private void initializeViews() {
-        notesList = (RecyclerView) rootView.findViewById(R.id.notes_recycler_view);
+        notesList = (NotesRecyclerView) rootView.findViewById(R.id.notes_recycler_view);
         addNoteButton = (FloatingActionButton) rootView.findViewById(R.id.new_note_fab);
         rightSideContainer = (FrameLayout) rootView.findViewById(R.id.color_picker_container);
     }
@@ -76,7 +81,21 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
 
     @MainThread
     @Override
-    public void getState(Bundle bundle) {}
+    public void getState(Bundle bundle) {
+        bundle.putBoolean(ARG_RIGHT_SIDE_CONTAINER_VISIBLE, isRightSideContainerVisible());
+        bundle.putBoolean(ARG_ADD_BUTTON_VISIBLE, isAddButtonVisible());
+    }
+
+    @Override
+    public void initFromSavedState(@Nullable Bundle savedState) {
+        super.initFromSavedState(savedState);
+        if (savedState != null) {
+            if (!savedState.getBoolean(ARG_RIGHT_SIDE_CONTAINER_VISIBLE))
+                rightSideContainer.setTranslationX(RIGHT_SIDE_CONTAINER_MAX_TRANSLATION_X);
+            if (!savedState.getBoolean(ARG_ADD_BUTTON_VISIBLE))
+                addNoteButton.setTranslationY(FAB_MAX_TRANSLATION_Y);
+        }
+    }
 
     @MainThread
     @Override
@@ -121,6 +140,11 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
     }
 
     @Override
+    public boolean isAddButtonVisible() {
+        return addNoteButton.getTranslationY() == 0;
+    }
+
+    @Override
     public RecyclerView.Adapter<?> getRecyclerViewAdapter() {
         return notesList.getAdapter();
     }
@@ -133,7 +157,7 @@ class NotesListViewMvcImpl extends BaseViewMvc<NotesListViewMvc.NotesListViewMvc
     }
 
     @Override
-    public RecyclerView getRecyclerView() {
+    public NotesRecyclerView getRecyclerView() {
         return notesList;
     }
 }

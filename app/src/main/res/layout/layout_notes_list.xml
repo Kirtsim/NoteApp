@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/layout_top_bottom_padding"
     android:paddingBottom="@dimen/layout_top_bottom_padding">
 
-    <android.support.v7.widget.RecyclerView
+    <fm.kirtsim.kharos.noteapp.ui.recyclerview.NotesRecyclerView
         android:id="@+id/notes_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

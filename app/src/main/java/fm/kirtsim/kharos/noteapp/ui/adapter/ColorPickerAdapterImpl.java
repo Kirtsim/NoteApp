@@ -75,6 +75,16 @@ public class ColorPickerAdapterImpl extends
     }
 
     @Override
+    public int getHighlightedColorPosition() {
+        return highlightedAt;
+    }
+
+    @Override
+    public void setHighlightedColorPosition(int position) {
+        highlightedAt = position;
+    }
+
+    @Override
     public void setColors(int[] colors) {
         colorsList.clear();
         for (int color : colors) colorsList.add(color);
