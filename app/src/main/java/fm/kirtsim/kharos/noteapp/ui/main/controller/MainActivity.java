@@ -1,7 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.main.controller;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import fm.kirtsim.kharos.noteapp.ui.Animations;
 import fm.kirtsim.kharos.noteapp.ui.base.BaseActivity;

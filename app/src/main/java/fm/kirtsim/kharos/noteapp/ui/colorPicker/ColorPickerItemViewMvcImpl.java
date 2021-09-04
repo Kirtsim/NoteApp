@@ -2,7 +2,7 @@ package fm.kirtsim.kharos.noteapp.ui.colorPicker;
 
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
+import androidx.annotation.ColorInt;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;

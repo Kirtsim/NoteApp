@@ -2,9 +2,9 @@ package fm.kirtsim.kharos.noteapp.ui.notedetail.controller;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.annotation.Nullable;
-import android.support.v4.content.res.ResourcesCompat;
+import androidx.annotation.ColorInt;
+import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;

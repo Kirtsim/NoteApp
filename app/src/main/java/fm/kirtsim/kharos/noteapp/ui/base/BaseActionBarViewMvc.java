@@ -1,7 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.base;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+import androidx.appcompat.app.ActionBar;
 import android.view.Menu;
 
 import fm.kirtsim.kharos.noteapp.ui.main.viewmvc.ActionBarViewMvc;

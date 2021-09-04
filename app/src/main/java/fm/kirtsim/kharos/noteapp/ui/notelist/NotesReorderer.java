@@ -1,6 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.common.collect.Lists;
 

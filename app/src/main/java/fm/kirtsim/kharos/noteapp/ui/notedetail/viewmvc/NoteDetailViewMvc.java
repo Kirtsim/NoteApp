@@ -1,6 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.notedetail.viewmvc;
 
-import android.support.annotation.ColorInt;
+import androidx.annotation.ColorInt;
 
 import fm.kirtsim.kharos.noteapp.ui.base.ObservableViewMvc;
 

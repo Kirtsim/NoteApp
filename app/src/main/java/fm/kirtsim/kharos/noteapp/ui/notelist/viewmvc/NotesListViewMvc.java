@@ -1,7 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.notelist.viewmvc;
 
-import android.support.annotation.MainThread;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.MainThread;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import fm.kirtsim.kharos.noteapp.ui.base.ObservableViewMvc;

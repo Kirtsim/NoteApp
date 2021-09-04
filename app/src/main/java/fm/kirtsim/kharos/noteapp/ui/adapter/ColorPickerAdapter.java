@@ -1,6 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.adapter;
 
-import android.support.annotation.ColorInt;
+import androidx.annotation.ColorInt;
 
 /**
  * Created by kharos on 23/08/2017

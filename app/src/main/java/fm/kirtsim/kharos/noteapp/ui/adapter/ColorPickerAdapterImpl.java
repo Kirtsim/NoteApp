@@ -1,7 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.adapter;
 
-import android.graphics.Color;
-import android.support.annotation.ColorInt;
+import androidx.annotation.ColorInt;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
