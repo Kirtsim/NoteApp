@@ -92,25 +92,26 @@ public class AdapterNotesListCoordinatorImpl implements AdapterNotesListCoordina
 
     @Override
     public boolean addNote(Note note) {
-        if (note != null) {
-            if (isNoteIdTaken(note.getId()))
-                throw new IllegalArgumentException("note with id "+ note.getId() + " already exists");
-            noteIdsMappingToIndexes.put(note.getId(), notes.size());
-            return notes.add(note);
-        }
-        return false;
+        return addNote(note, notes.size());
     }
 
     @Override
     public boolean addNote(Note note, int index) {
-        if (index < 0 || index >= notes.size())
-            throw new IndexOutOfBoundsException("index: " + index + "  size: " + notes.size());
-        boolean success = addNote(note);
-        if (success) {
-            for (int i = notes.size() -1; i > index; --i)
-                swapNotesAt(i-1, i);
+        index = Math.max(index, 0);
+        index = Math.min(index, notes.size());
+        if (note != null) {
+            if (isNoteIdTaken(note.getId()))
+                throw new IllegalArgumentException("note with id " + note.getId()
+                        + " already exists");
+            int oldNotesCount = notes.size();
+            if (notes.add(note)) {
+                noteIdsMappingToIndexes.put(note.getId(), oldNotesCount);
+                for (int i = notes.size() -1; i > index; --i)
+                    swapNotesAt(i-1, i);
+                return true;
+            }
         }
-        return success;
+        return false;
     }
 
     @Override
