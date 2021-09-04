@@ -2,9 +2,9 @@ package fm.kirtsim.kharos.noteapp.ui.base;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v4.app.Fragment;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.Fragment;
 import android.widget.Toast;
 
 import javax.inject.Inject;

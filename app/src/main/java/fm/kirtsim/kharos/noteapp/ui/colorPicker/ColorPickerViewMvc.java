@@ -1,6 +1,6 @@
 package fm.kirtsim.kharos.noteapp.ui.colorPicker;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import fm.kirtsim.kharos.noteapp.ui.adapter.ListAdapter;
 import fm.kirtsim.kharos.noteapp.ui.listItemDecorator.BaseListItemDecoration;

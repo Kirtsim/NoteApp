@@ -1,8 +1,8 @@
 package fm.kirtsim.kharos.noteapp.ui;
 
-import android.support.annotation.AnimRes;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentTransaction;
+import androidx.annotation.AnimRes;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentTransaction;
 
 import fm.kirtsim.kharos.noteapp.R;
 

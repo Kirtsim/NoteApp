@@ -1,8 +1,8 @@
 package fm.kirtsim.kharos.noteapp.ui.adapter.itemTouchHelper;
 
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 
 /**
  * Created by kharos on 29/08/2017

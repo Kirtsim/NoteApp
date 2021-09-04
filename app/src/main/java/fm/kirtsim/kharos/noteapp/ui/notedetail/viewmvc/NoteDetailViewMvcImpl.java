@@ -1,7 +1,7 @@
 package fm.kirtsim.kharos.noteapp.ui.notedetail.viewmvc;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.EditText;
