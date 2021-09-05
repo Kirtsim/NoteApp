@@ -121,4 +121,10 @@ public class NoteDetailViewMvcImpl extends BaseViewMvc<NoteDetailViewMvc.NoteDet
     public int getTextColor() {
         return textET.getCurrentTextColor();
     }
+
+    @Override
+    public void clearAllFocus() {
+        titleET.clearFocus();
+        textET.clearFocus();
+    }
 }

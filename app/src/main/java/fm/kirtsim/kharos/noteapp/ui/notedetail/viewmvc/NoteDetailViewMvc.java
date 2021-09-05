@@ -25,4 +25,6 @@ public interface NoteDetailViewMvc extends
     String getText();
     @ColorInt int getTitleColor();
     @ColorInt int getTextColor();
+
+    void clearAllFocus();
 }

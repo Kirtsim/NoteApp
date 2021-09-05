@@ -152,11 +152,11 @@ public class NoteDetailFragment extends BaseFragment implements
                 Note note = createNoteFromDetails();
                 if (!saveNote(note))
                     deleteNote(note);
-                popFromBackStack();
+                closeKeyboardAndPop();
                 break;
             case R.id.mi_delete:
                 deleteNote(createNoteFromDetails());
-                popFromBackStack();
+                closeKeyboardAndPop();
                 break;
             default: return super.onOptionsItemSelected(item);
         }
@@ -305,7 +305,12 @@ public class NoteDetailFragment extends BaseFragment implements
         Note note = createNoteFromDetails();
         if (!saveNote(note))
             deleteNote(note);
-        popFromBackStack();
+        closeKeyboardAndPop();
         return true;
+    }
+
+    private void closeKeyboardAndPop() {
+        viewMvc.clearAllFocus();
+        popFromBackStack();
     }
 }
